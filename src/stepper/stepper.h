@@ -1,15 +1,19 @@
 /*
   Drive stepper motor:
   - bipolar (two coils)
-  - using 4 wires
+  - using 4 GPIO for control, plus one for power on
   - IN/IN protocol to a driver IC
-  - always two coils energized (among other techniques)
   
   Simple API:
   - single steps, forward or back.
+  - forward or backward at a speed TODO
   - turnOffCoils: set driver inputs low so driver outputs float: H-bridge, two mosfets off)
   - turn driver power off and on (for low power)
   
+  Design features:
+  - clarity instead of performance
+  - depends on platform independent layer (DriverLib) TODO
+
   TODO
   half stepping (one coil energized sometimes)
   save current step to flash in case mcu gets unpowered
@@ -18,13 +22,20 @@
   
   Compatible with TI DRV8835 part.
   
-  Stateless except for current step.  
-  Does not know speed or which direction it was moving.
+  State
+  - current step.
+  - modes
+  State is persistent for FR chips in MSP430 family
+
+  Modes
+  - coasting or  braking
+  - one coil or two coil driving
+  Direction moving is not state.
 
   Std sequence of control signals, see below.
  
-  Low memory usage:  inlined methods and class methods.
   All data and methods belong to class:  No instance!  Do not use 'this'!
+
   Invoke as Stepper::stepForward()
 
   Typical call sequences:
@@ -37,8 +48,9 @@
        reset(), turnDriverOn(), manyStepForward(steps, speed), ...
     
     
-  All port positions (bits of a port) are compile time defined as macros.
-  Needs 5 port bits
+  All port positions (bits of a port) are compile time defined by macros.
+  Needs 5 port bits.
+  Hardcoded to PORT1
   
   On DRV8835 driver, pin 11 mode is grounded low: IN/IN protocol
   On Polulu breakout board, J1 pin 7 is mode.
@@ -51,16 +63,7 @@
 
 #include <msp430.h>
 
-// Compile time definition of mcu pins connected to driver IN pins
-// For example, to pins 3,4,5,6 of MSP430F2012 connected to pins AIN1, AIN2, BIN1, BIN2 of DRV8835
-// BIT0 is usually an LED on a launchpad target board
-#define MotorA1 BIT1    // Coil A
-#define MotorA2 BIT2
-#define MotorB1 BIT3    // Coil B
-#define MotorB2 BIT4
 
-// to gate of mosfet power switch that switches Vcc to driver
-#define DrivePowerSwitch BIT5
 
 /*
  Compile time define order of switching bits of IN/IN
@@ -82,12 +85,18 @@ class Stepper {
 private:
     // class data
 
-    // Declaration only.  See near end of file where one instance defined.
+    // Declaration only.
     static int currentStep;// ISO forbids initialization
-
+    static bool isCoastingMode;
+    static bool isHighTorqueMode;
 
 public:
 
+    /*
+     * Modes
+     */
+    static void setCoastingMode(bool);
+    static void setHighTorqueMode(bool);
     
     /*
     When turned on, the coils are not energized.
@@ -98,15 +107,12 @@ public:
     It is also possible that in this case, one stepping action would not step the motor.
     But a sequence of stepping actions should eventually step the motor.
     */
-    
-
-
     static void reset();
     
     static void configureIOPortForMotorControl();
     
     
-    // TODO evacuate use of the port
+    // TODO release use of GPIO
     // For now, if there is any other use of the pins, it may interfere with IO port settings
     
     
@@ -116,7 +122,7 @@ public:
     */
 
     /*
-     *  Hides full (two coils) or half (one coil) power.
+     *  Hides high torque, full (two coils) or half (one coil) power.
      */
     static void stepToStep(int nextStep);
 
@@ -144,8 +150,8 @@ public:
     
     /*
     After a step, you may turnOffCoils.
-    turnOffCoils leaves the motor outputs floating (coasting), and motor may overshoot?
-    Braking not implemented (both controls high, both outputs shunted to ground.
+    turnOffCoils leaves the motor outputs floating (braking),
+    or grounded (coasting) according to coasting mode.
     Neither coasting nor braking uses current at the motor?
     */
     static void turnOffCoils();
@@ -172,26 +178,24 @@ public:
     C modulo is really remainder and can return a negative number!
     Return positive number as defined by math modulo operator.
     */
-    static int positiveModulo(int a, int modulus) {
-        // Require modulus positive, not require a positive
-        // if(modulusb < 0) //you can check for modulus == 0 separately and do what you want
-        // return mod(-a, -b);   
-        int result = a % modulus;
-        if(result < 0) result += modulus;
-        return result;
-    }
+    static int positiveModulo(int a, int modulus);
     
     
     /*
      * Get step in direction from current step.
      *
-     * If the motor is not actually at current step,
-     * results are undefined.
+     * If the motor is not physically at current step,
+     * movement of motor when driven is unpredictable.
      */
     static int getStepNext(int direction);
 
 
-    
+    /*
+     * Energize coil defined by bits.
+     * end1Bit low, end2Bit high
+     */
+    static void energizeCoil(unsigned int end1Bit, unsigned int end2Bit);
+    static void deenergizeCoil(unsigned int end1Bit, unsigned int end2Bit);
     /*
     Forward and reverse current direction on coils A and B
     
@@ -207,15 +211,18 @@ public:
     static void setBBackward();
     
     
-    #ifdef CoastBetweenSteps
-    // Both IN/IN low is coasting
+   /*
+    * Denergize coil.
+    *
+    * Exist two alternatives:
+    * - Both IN/IN low is coasting ( magnetic field collapses quickly, dumped to ground)
+    * - Both IN/IN high is braking ( field collapse slowly, dumped to Vcc)
+    * ??? Or are the FET float?
+    */
     static void setAOff();
     static void setBOff();
-    #else
-    // Both IN/IN high is braking
-    static void setAOff();
-    static void setBOff();
-    #endif
+
+
     
 
 /*
