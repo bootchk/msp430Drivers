@@ -39,7 +39,7 @@ int Stepper::getStepNext(int direction)
 void Stepper::reset()
 {
     // state comprises all GPIO pin states, and class data
-    turnOffDriver();
+    turnPowerOff();
     turnOffCoils();
 
     currentStep = 0;// This may not match the physical position of rotor!
@@ -115,10 +115,10 @@ void Stepper::turnOffCoils()
     P1OUT &= ~( MotorA1 | MotorA2 | MotorB1 | MotorB2); // bit clear
 }
 
-void Stepper::turnOnDriver()
+void Stepper::turnPowerOn()
 {   P1OUT |= DrivePowerSwitch;}
 
-void Stepper::turnOffDriver()
+void Stepper::turnPowerOff()
 {   P1OUT &= ~DrivePowerSwitch;}
 
 

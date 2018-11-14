@@ -107,6 +107,10 @@ public:
     It is also possible that in this case, one stepping action would not step the motor.
     But a sequence of stepping actions should eventually step the motor.
     */
+
+    /*
+     * Reset driver software, GPIO interface, and turn off driver chip.
+     */
     static void reset();
     
     static void configureIOPortForMotorControl();
@@ -158,16 +162,16 @@ public:
     
     
     /*
-    Unpower driver to save energy.
-    Switch Vcc to motor driver.
+    Unpower, to save energy.
+    Switch Vcc to motor driver chip.
     Typically high-side switch (better than low-side switch i.e. switched ground.)
 
     Requires switch enabled high (typically a load switch, a PMOS with inverting control mosfet.)
     Caller must wait appropriate time defined by driver chip datasheet
     for time from powerup to ready to step.
     */
-    static void turnOnDriver();
-    static void turnOffDriver();
+    static void turnPowerOn();
+    static void turnPowerOff();
     
     
   private:
