@@ -2,20 +2,14 @@
 #include <msp430.h>
 #include <cassert>
 
+//#include "../gpio/gpio.h"
+
 #include "config.h"
 
-/*
- Compile time define order of switching bits of IN/IN
- If this is not defined, then we brake between steps: both bits high briefly
- It doesn't matter for single stepping, but for manyStep, coasting may save energy?
- */
-#define CoastBetweenSteps
+#include "makeBreak.h"
 
-/*
- Compile time definition of whether whole stepping is full or half power.
- Half stepping is a mix of full and half power.
- */
-#define FullPower
+
+
 
 
 // Define class data
@@ -23,14 +17,33 @@ int Stepper::currentStep = 0;
 bool Stepper::isCoastingMode = false;
 bool Stepper::isHighTorqueMode = false;
 
+#ifdef FUTURE
+// Define GPIO port and pins of control signals
+Gpio MotorA1(1, 0);
+Gpio MotorA2(1, 0);
+Gpio MotorB1(1, 0);
+Gpio MotorB2(1, 0);
+#endif
+
+
+// Setters
+void Stepper::setCoastingMode(bool value) { isCoastingMode = value; }
+void Stepper::setHighTorqueMode(bool value) { isCoastingMode = value; }
 
 
 
+/*
+ * Side effect, increment currentStep
+ */
 int Stepper::getStepNext(int direction)
 {
     // require direction is +1 or -1
-    return positiveModulo((currentStep + direction), 4);
-    // ensure result is positive, is modulo 4, and one different from INcurrentStep
+    int result;
+
+    result = positiveModulo((currentStep + direction), 4);
+    currentStep = result;
+    return result;
+    // ensure result is positive, is modulo 4, and one different from previous currentStep
     // !!! currentStep need not be actual motor position.
 }
 
@@ -52,6 +65,8 @@ void Stepper::reset()
 void Stepper::configureIOPortForMotorControl()
 {
     // Set direction of all port pins to output
+    //MotorA1.configAsOutput();
+    //MotorA1.configAsOutput();
     P1DIR |= MotorA1 | MotorA2 | MotorB1 | MotorB2 | DrivePowerSwitch;
 
     // Select function: all pins as digital IO
@@ -62,8 +77,6 @@ void Stepper::configureIOPortForMotorControl()
     // P1OUT is not set by this method
 }
 
-// TODO evacuate use of the port
-// For now, if there is any other use of the pins, it may interfere with IO port settings
 
 /*
  Caller must hold step an appropriate time for the desired speed.
@@ -84,14 +97,24 @@ void Stepper::stepForward()
 void Stepper::stepBackward()
 {   stepToStep(getStepNext(-1));}
 
+
+// Delay, enough to overcome inductance.
+void delayForSingleStep() {
+    __delay_cycles(SingleStepDelay);
+}
+
+
 void Stepper::singleStepForward()
 {
     stepForward();
     // coils are energized
-    //TODO delay, enough to overcome inductance ??
+
+    delayForSingleStep();
+
     turnOffCoils();
-    // coils are denergized
+    // coils are not energized
 }
+
 
 void Stepper::stepManyForward(int count, int speed)
 {
@@ -109,11 +132,20 @@ void Stepper::stepManyForward(int count, int speed)
 /*
  * Implementation depends on driver chip?
  * All driver IN's low, which yields all driver OUT's floating (high impedance)
+ *
+ * varies with coastingMode
  */
 void Stepper::turnOffCoils()
 {
-    P1OUT &= ~( MotorA1 | MotorA2 | MotorB1 | MotorB2); // bit clear
+    deenergizeCoil(MotorA2, MotorA1);
+    deenergizeCoil(MotorB2, MotorB1);
 }
+
+
+
+
+
+
 
 void Stepper::turnPowerOn()
 {   P1OUT |= DrivePowerSwitch;}
@@ -141,44 +173,9 @@ int Stepper::positiveModulo(int a, int modulus)
     return result;
 }
 
-void breakOpen(unsigned int breakBit)
-{
-    // bit clear
-    P1OUT &= ~breakBit;
-}
 
-void makeClosed(unsigned int makeBit)
-{
-    // bit set
-    P1OUT |= makeBit;
-}
 
-void breakThenMake(unsigned int makeBit, unsigned int breakBit)
-{
-    breakOpen(breakBit);
-    /*
-     * Assert both ends of coil shorted to ground, field dumps: coasting
-     */
-    makeClosed(makeBit);
-}
 
-void makeThenBreak(unsigned int makeBit, unsigned int breakBit)
-{
-// TODO
-}
-
-/*
- * bits off in any order
- */
-void breakBits(unsigned int bit1, unsigned int bit2) {
-    // bit clear
-    P1OUT &= ~(bit1 & bit2);
-}
-
-void makeBits(unsigned int bit1, unsigned int bit2) {
-    // bit set
-    P1OUT |=  (bit1 & bit2);
-}
 
 /*
  * Clear breakBit and set makeBit.
@@ -267,8 +264,6 @@ void Stepper::advanceStepFullPower(int nextStep)
         default:
         assert(false);
     }
-    currentStep = nextStep;
-    // ensure currentStep is INcurrentStep + 1
     // ensure both coils are driven in some direction
 }
 
@@ -289,8 +284,6 @@ void Stepper::advanceStepWave(int nextStep)
         default:
         assert(false);
     }
-    currentStep = nextStep;
-    // ensure currentStep is INcurrentStep + 1
     // ensure both coils are driven in some direction
 }
 
@@ -305,14 +298,12 @@ void Stepper::advanceStepHalfPower(int nextStep)
     switch (nextStep)
     {
         case 0: setAForward(); setBOff(); break;   // 1000
-        case 1: setAOff(); setBForward(); break;// 0010
-        case 2: setABackward(); setBOff(); break;// 0100
-        case 3: setAOff(); setBBackward(); break;// 0001
+        case 1: setAOff(); setBForward(); break;   // 0010
+        case 2: setABackward(); setBOff(); break;  // 0100
+        case 3: setAOff(); setBBackward(); break;  // 0001
         default:
         assert(false);
     }
-    currentStep = nextStep;
-    // ensure currentStep is INcurrentStep + 1
     // ensure at most one coil driven in some direction
 }
 

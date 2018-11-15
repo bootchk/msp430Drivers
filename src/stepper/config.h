@@ -8,10 +8,16 @@
  * BIT0 is usually an LED on a launchpad target board
  */
 
-#define MotorA1 BIT1    // Coil A
-#define MotorA2 BIT2
-#define MotorB1 BIT3    // Coil B
-#define MotorB2 BIT4
+#define MSPEXP4233  // my breadboard, 4 consecutive pins of Launchpad
+#ifdef MSPEXP4233
+#define MotorA1 BIT0    // Coil A
+#define MotorA2 BIT5
+#define MotorB1 BIT4    // Coil B
+#define MotorB2 BIT6
 
 // to gate of mosfet power switch that switches Vcc to driver
-#define DrivePowerSwitch BIT5
+#define DrivePowerSwitch BIT7
+#endif
+
+
+#define SingleStepDelay 500 //10000

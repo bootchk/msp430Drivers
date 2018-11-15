@@ -65,18 +65,7 @@
 
 
 
-/*
- Compile time define order of switching bits of IN/IN
- If this is not defined, then we brake between steps: both bits high briefly
- It doesn't matter for single stepping, but for manyStep, coasting may save energy?
-*/
-#define CoastBetweenSteps
 
-/*
-Compile time definition of whether whole stepping is full or half power.
-Half stepping is a mix of full and half power.
-*/
-#define FullPower
 
 
 
@@ -87,7 +76,20 @@ private:
 
     // Declaration only.
     static int currentStep;// ISO forbids initialization
+
+    /*
+     Order of switching bits of IN/IN.
+     Coasting: both bits low, shorted to ground and mag field collapses.
+     Not coasting is braking: both bits high, ends of coil high impedance and mag field persists.
+
+     ??? It doesn't matter for single stepping, but for manyStep, coasting may save energy?
+     */
     static bool isCoastingMode;
+
+    /*
+     Whether whole stepping is full (two coils) or half (one coil) power.
+     Half stepping is a mix of full and half power.
+     */
     static bool isHighTorqueMode;
 
 public:

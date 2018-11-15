@@ -3,7 +3,7 @@
 #include "stepper/stepper.h"
 
 
-void testStepperForward();
+void testStepper();
 void testCompass();
 
 
@@ -11,6 +11,6 @@ int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
-	testStepperForward();
-	testCompass();
+	testStepper();
+	//testCompass();
 }

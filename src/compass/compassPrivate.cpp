@@ -50,6 +50,7 @@ Direction (y<0) = 270 - [arcTAN(x/y)]*180/1
 Direction (y=0, x<0) = 180.0
 Direction (y=0, x>0) = 0.0
 */
+#ifdef WIP
 unsigned int Compass::convertThreeAxisIntMagneticDataToCompassHeading() {
     unsigned int result;
 
@@ -65,3 +66,4 @@ unsigned int Compass::convertThreeAxisIntMagneticDataToCompassHeading() {
     return result;
     // assert result in range [0, 360] i.e. a compass heading
 }
+#endif
