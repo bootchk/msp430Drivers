@@ -1,4 +1,8 @@
 
+// The constant a LIS3MDL chip returns as identifier from register that holds ID
+const unsigned int LIS3MDLIdentifier = 0x3D;
+
+
 
 enum class CompassAddress : unsigned char {
 

@@ -18,17 +18,17 @@ void CompassInterface::readRawBytesOfMagneticData(unsigned char * destination) {
     Bridge::readBuffer(static_cast<BridgedAddress> (CompassAddress::MagXYZBytes),
                        6,
                        destination);
-
 }
+
 
 bool CompassInterface::isReadable() {
     /*
-     * Sane if upper byte of part ID reads as 08, from 08xx part family.
-     * Read will return 0 if SPI or RTC not working.
-     * The RTC does not need to be configured first.
+     * Sane if part ID register reads correctly.
+     * Read will return 0 if SPI or chip not working.
+     * The chip does not need to be configured first.
      */
     unsigned char ID;
 
     ID = Bridge::read(static_cast<BridgedAddress> (CompassAddress::Identifier));
-    return (ID == 0x08);
+    return (ID == LIS3MDLIdentifier);
 }
