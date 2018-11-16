@@ -1,5 +1,6 @@
 
 #include "compass.h"
+#include "mangler.h"
 
 void Compass::turnPowerOn() { }
 
@@ -7,10 +8,7 @@ void Compass::turnPowerOff() { }
 
 void Compass::reset() { }
 
-int Compass::readCompassHeading() {
-
-    readRawBytesOfMagneticData();
-    // if failed
-    convertRawBytesToIntMagneticData();
-    convertThreeAxisIntMagneticDataToCompassHeading();
+unsigned int Compass::readCompassHeading() {
+    // delegate
+    return Mangler::readCompassHeading();
 }

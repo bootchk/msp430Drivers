@@ -6,13 +6,13 @@
 
 void testCompass()
 {
-    Compass
-    ::reset();
-    // assert GPIO configured
-
+    // todo spi ready
     // TODO unlock lpm5
 
     Compass::turnPowerOn();
+
+    Compass
+    ::reset();
 
     // forever, single step forward
     while (true)

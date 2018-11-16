@@ -11,11 +11,7 @@ public:
     static void turnPowerOff();
 
     static void reset();
+    static bool isReadable();
 
-    static int readCompassHeading();
-
-private:
-    static void readRawBytesOfMagneticData();
-    static void convertRawBytesToIntMagneticData();
-    static unsigned int convertThreeAxisIntMagneticDataToCompassHeading();
+    static unsigned int readCompassHeading();
 };
