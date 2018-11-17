@@ -1,7 +1,7 @@
 
 #include "bridge.h"
 
-//#include "../../pinFunction/spiPins.h"
+// The serial bus that the bridge crosses
 #include "serialBus/serial.h"
 
 //#include "../../debug/myAssert.h"
@@ -37,7 +37,7 @@ unsigned char mangleWriteAddress(BridgedAddress address) {
  * The SPI.transfer is duplex or bidirectional: both read and write in the same transfer.
  * On write, we ignore what is read from slave.
  */
-void readBuffer( unsigned char * bufferPtr, unsigned int size) {
+void innerReadBuffer( unsigned char * bufferPtr, unsigned int size) {
 	// require slave already selected
 	for(unsigned int i = 0; i < size; i++) {
 	    /*
@@ -100,11 +100,11 @@ void Bridge::write(BridgedAddress address, unsigned char value) {
 	// require mcu Serial interface configured
 
     // discard values read during writes of address and value
-	SPIPins::selectSPISlave();
+	Serial::selectSlave();
 	(void) Serial::transfer(mangleWriteAddress(address));
 	(void) Serial::transfer( value);
 
-	SPIPins::deselectSPISlave();
+	Serial::deselectSlave();
 
 	unsigned char finalValue = Bridge::read(address);
 	//myAssert(finalValue == value);
@@ -141,9 +141,20 @@ unsigned char Bridge::read(BridgedAddress address) {
 
 	unsigned char result;
 
-	SPIPins::selectSPISlave();
+	Serial::selectSlave();
 	(void) Serial::transfer(mangleReadAddress(address));
 	result = Serial::transfer( 0 );
-	SPIPins::deselectSPISlave();
+	Serial::deselectSlave();
 	return result;
+}
+
+
+void Bridge::readBuffer(BridgedAddress address,
+                        unsigned int length,
+                        unsigned char * destination) {
+
+    Serial::selectSlave();
+    (void) Serial::transfer(mangleReadAddress(address));
+    innerReadBuffer(destination, length);
+    Serial::deselectSlave();
 }

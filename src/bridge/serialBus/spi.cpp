@@ -34,7 +34,7 @@
 #include "../../pinFunction/spiPins.h"
 #include "../../board.h"
 
-#include "../../debug/myAssert.h"
+//#include "../../debug/myAssert.h"
 
 
 
@@ -109,7 +109,7 @@ unsigned char SPI::transfer(unsigned char value) {
  * configure when disabled, in this order
  */
 void SPI::configureMaster() {
-    myAssert(not isEnabled());
+    // myAssert(not isEnabled());
 	configureMasterDevice();
 	SPIPins::configure();
 }

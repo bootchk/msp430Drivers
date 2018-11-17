@@ -3,6 +3,8 @@
 
 #include "spi.h"
 
+#include "../../pinFunction/spiPins.h"
+
 
 
 void Serial::begin() {
@@ -36,6 +38,11 @@ unsigned char Serial::transfer(unsigned char value) {
     // requires configured
 	return SPI::transfer(value);
 }
+
+// Delegate to SPIPins
+void Serial::selectSlave() { SPIPins::selectSlave(); }
+void Serial::deselectSlave() { SPIPins::deselectSlave(); }
+
 
 
 #ifdef NOT_USED

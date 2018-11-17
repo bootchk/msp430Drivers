@@ -1,13 +1,16 @@
 
 #include "../compass/compass.h"
+#include "../pinFunction/spiPins.h"
 
-
+// DriverLib
+#include <pmm.h>
 
 
 void testCompass()
 {
-    // todo spi ready
-    // TODO unlock lpm5
+    SPIPins::configure();
+
+    PMM_unlockLPM5();
 
     Compass::turnPowerOn();
 
@@ -18,7 +21,7 @@ void testCompass()
     while (true)
     {
         Compass
-        ::readCompassHeading();
+        ::readSingleCompassHeading();
 
         __delay_cycles(500000);
     }

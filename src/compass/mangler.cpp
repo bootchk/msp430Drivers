@@ -16,9 +16,12 @@ unsigned int Mangler::readCompassHeading(){
     CompassInterface::readRawBytesOfMagneticData(rawMag);
     // TODO if failed
     convertRawBytesToIntMagneticData();
-    convertThreeAxisIntMagneticDataToCompassHeading();
+    return convertThreeAxisIntMagneticDataToCompassHeading();
 }
 
+void Mangler::readAndDiscardToResetDataReady() {
+    CompassInterface::readRawBytesOfMagneticData(rawMag);
+}
 
 /*
  * Common endian-ness manipulation:

@@ -41,4 +41,11 @@ public:
 	 * So this might be unecessary.)
 	 */
 	static void end();
+
+	/*
+	 * Select slave on serial bus.
+	 * This directs a transfer to one of many slave devices on bus.
+	 */
+	static void selectSlave();
+	static void deselectSlave();
 };

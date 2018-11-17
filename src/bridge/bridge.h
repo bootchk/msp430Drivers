@@ -56,7 +56,7 @@ public:
 	/*
 	 * Read many consecutive bytes
 	 */
-	static unsigned char readBuffer(BridgedAddress,
+	static void readBuffer(BridgedAddress,
 	                                unsigned int length,
 	                                unsigned char * destination);
 

@@ -1,8 +1,6 @@
 eclipse.preferences.version=1
 encoding//Debug/MSP430FR2xx_4xx/subdir_rules.mk=UTF-8
 encoding//Debug/MSP430FR2xx_4xx/subdir_vars.mk=UTF-8
-encoding//Debug/driverlib/MSP430FR2xx_4xx/subdir_rules.mk=UTF-8
-encoding//Debug/driverlib/MSP430FR2xx_4xx/subdir_vars.mk=UTF-8
 encoding//Debug/driverlib/subdir_rules.mk=UTF-8
 encoding//Debug/driverlib/subdir_vars.mk=UTF-8
 encoding//Debug/makefile=UTF-8
@@ -14,6 +12,8 @@ encoding//Debug/src/bridge/subdir_rules.mk=UTF-8
 encoding//Debug/src/bridge/subdir_vars.mk=UTF-8
 encoding//Debug/src/compass/subdir_rules.mk=UTF-8
 encoding//Debug/src/compass/subdir_vars.mk=UTF-8
+encoding//Debug/src/pinFunction/subdir_rules.mk=UTF-8
+encoding//Debug/src/pinFunction/subdir_vars.mk=UTF-8
 encoding//Debug/src/stepper/subdir_rules.mk=UTF-8
 encoding//Debug/src/stepper/subdir_vars.mk=UTF-8
 encoding//Debug/src/subdir_rules.mk=UTF-8

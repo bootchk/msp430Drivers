@@ -7,6 +7,8 @@ const unsigned int LIS3MDLIdentifier = 0x3D;
 enum class CompassAddress : unsigned char {
 
     Identifier =         0x0F,
+    Control3 =           0x22,
+    Status =             0x27,
     MagXYZBytes =        0x28,
 };
 

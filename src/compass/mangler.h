@@ -6,6 +6,7 @@
 class Mangler {
 public:
     static unsigned int readCompassHeading();
+    static void readAndDiscardToResetDataReady();
 
 private:
     static void readRawBytesOfMagneticData();
