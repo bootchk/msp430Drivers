@@ -6,7 +6,7 @@
 
 
 /*
- * Depends on hardware design i.e. connections between pins of mcu and rtc chips
+ * Describes hardware design i.e. connections between pins of mcu and rtc chips
  *
  * Local alias to definitions specific to:
  * - choice of family member (here MSP430FR2433)
@@ -75,15 +75,16 @@
 
 #define SPIInstanceAddress      EUSCI_A1_BASE
 
-// msp430fr2433 specific, using instance UCA1: 2.6, 2.5, 2.4
-
-// P2.6
+// msp430fr2433 and Launchpad MSP-EXP430FR2433, using instance UCA1:
+// MOSI 2.6
+// MISO 2.5
+// CLK 2.4
 #define MOSI_PORT     GPIO_PORT_P2
 #define MOSI_PIN      GPIO_PIN6
-// P2.5
+
 #define MISO_PORT     GPIO_PORT_P2
 #define MISO_PIN      GPIO_PIN5
-// P2.4
+
 #define SPI_CLK_PORT  GPIO_PORT_P2
 #define SPI_CLK_PIN   GPIO_PIN4
 

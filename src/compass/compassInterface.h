@@ -3,7 +3,15 @@
  * Low level interface to compass chip.
  *
  * Here, only implement things I am interested in for low power, low performance.
- * At reset, most everything else defaults to a reasonable value.
+ * Except chip is disabled for reading mag data (see set mode).
+ * All registers should be readable after reset, but mag values bogus until set mode.
+ *
+ * At reset, most register contents default to a reasonable value.
+ *
+ *
+ * Data ready bit and DRDY line.
+ * Reading mag data (a certain byte) clears bit and DRDY line goes low.
+ * Bit will be set and DRDY line goes high when the next data sample is ready.
  */
 
 class CompassInterface {
@@ -28,11 +36,18 @@ public:
     /*
      * Just a read.
      * Requires configured mode.
+     *
+     * If mode is singleConversion, a read returns chip to idle state.
      */
     static void readRawBytesOfMagneticData(unsigned char*);
 
 
+    /*
+     Is data ready bit in status register?
+     This does NOT access the DRDY signal line.
+     */
     static bool isDataReady();
+
 
     /*
      * Likely other methods:

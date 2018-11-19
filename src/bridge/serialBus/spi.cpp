@@ -156,11 +156,21 @@ void SPI::configureMasterDevice() {
 	// setBitOrder()
 	param.msbFirst = EUSCI_A_SPI_MSB_FIRST;
 
-    // SPI clock mode
-	// SPI_MODE == 0
+    /*
+     SPI mode
+
+     MODE == 0 => CPOL=0, CPHA=0
+     For AB08xx RTC
+
+     MODE == 3 => CPOL=1, CPHA=1
+     For AB08xx RTC
+     */
 	// setDataMode()
-	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
-	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
+	// TODO a parameter
+	//param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+	//param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
+	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
+	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
 
 	/*
 	 * TI's SPI mode

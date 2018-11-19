@@ -4,6 +4,8 @@
 // The serial bus that the bridge crosses
 #include "serialBus/serial.h"
 
+#include "addressMangler.h"
+
 //#include "../../debug/myAssert.h"
 
 /*
@@ -14,22 +16,6 @@
 
 
 namespace {
-
-/*
- * Routines for protocol of RTC chip
- * Quirk: ABx8xx devices require clear upper bit of address, on read
- */
-
-unsigned char mangleReadAddress(BridgedAddress address) {
-	return (127 & (unsigned char) address);
-}
-
-// ABx8xx devices require set upper bit of address, on write
-unsigned char mangleWriteAddress(BridgedAddress address) {
-	return (128 | (unsigned char) address);
-}
-
-
 
 /*
  * Transfer many bytes over SPI.
@@ -101,7 +87,7 @@ void Bridge::write(BridgedAddress address, unsigned char value) {
 
     // discard values read during writes of address and value
 	Serial::selectSlave();
-	(void) Serial::transfer(mangleWriteAddress(address));
+	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
 	(void) Serial::transfer( value);
 
 	Serial::deselectSlave();
@@ -142,7 +128,9 @@ unsigned char Bridge::read(BridgedAddress address) {
 	unsigned char result;
 
 	Serial::selectSlave();
-	(void) Serial::transfer(mangleReadAddress(address));
+	// transfer address
+	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+	// transfer single byte of data
 	result = Serial::transfer( 0 );
 	Serial::deselectSlave();
 	return result;
@@ -154,7 +142,9 @@ void Bridge::readBuffer(BridgedAddress address,
                         unsigned char * destination) {
 
     Serial::selectSlave();
-    (void) Serial::transfer(mangleReadAddress(address));
+    // transfer the address
+    (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+    // transfer the data bytes
     innerReadBuffer(destination, length);
     Serial::deselectSlave();
 }

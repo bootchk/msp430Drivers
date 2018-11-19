@@ -24,8 +24,10 @@ void CompassInterface::setSingleConversionMode() {
      */
     Bridge::clearBits(static_cast<BridgedAddress> (CompassAddress::Control3),
                     0b11);
+    // assert mode is continuous
     Bridge::setBits(static_cast<BridgedAddress> (CompassAddress::Control3),
                         0b1);
+    // assert mode is single
 }
 
 

@@ -13,6 +13,10 @@ void Compass::turnPowerOff() { }
 
 void Compass::reset() { }
 
+
+bool Compass::isSane() { return CompassInterface::isReadable(); }
+
+
 void Compass::configureForLowPowerSingleRead() {
     CompassInterface::setLowPowerMode();
     CompassInterface::setSingleConversionMode();
@@ -29,9 +33,11 @@ unsigned int Compass::readContinuousCompassHeading() {
  */
 unsigned int Compass::readSingleCompassHeading() {
 
-    configureForLowPowerSingleRead();
-
+    // A read clears the data ready bit
     Mangler::readAndDiscardToResetDataReady();
+
+    // Configuring wakes up the sensing mechanism and starts a computation
+    configureForLowPowerSingleRead();
 
     while (not CompassInterface::isDataReady() );
 

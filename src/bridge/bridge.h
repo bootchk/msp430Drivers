@@ -1,4 +1,6 @@
 
+#pragma once
+
 /*
  * Abstracts access across a bridge.
  * A bridge across a serial channel.

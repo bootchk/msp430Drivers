@@ -9,6 +9,8 @@ class Compass {
 public:
     /*
      * After power on, chip is in reset state.
+     * The chip is not immediately ready for SPI.
+     * DRDY line goes high when ready.
      */
     static void turnPowerOn();
     static void turnPowerOff();
@@ -20,7 +22,10 @@ public:
 
     static void configureForLowPowerSingleRead();
 
-    static bool isReadable();
+    /*
+     * SPI and chip seems to be functioning.
+     */
+    static bool isSane();
 
     /*
      * If on and configured for continuous reading, returns most recent reading.
@@ -28,6 +33,10 @@ public:
      */
     static unsigned int readContinuousCompassHeading();
 
+    /*
+     * Configure for a single read of mag data,
+     * then read, and convert to compass heading in degrees.
+     */
     static unsigned int readSingleCompassHeading();
 
 };

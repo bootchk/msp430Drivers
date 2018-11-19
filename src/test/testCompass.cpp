@@ -1,6 +1,8 @@
 
 #include "../compass/compass.h"
-#include "../pinFunction/spiPins.h"
+
+//#include "../pinFunction/spiPins.h"
+#include "../bridge/bridge.h"
 
 // DriverLib
 #include <pmm.h>
@@ -8,14 +10,19 @@
 
 void testCompass()
 {
-    SPIPins::configure();
-
     PMM_unlockLPM5();
 
-    Compass::turnPowerOn();
+    // TODO this should be power manager
+    // Compass::turnPowerOn();
+    // Compass is not ready until later, require a delay
 
-    Compass
-    ::reset();
+    Bridge::configureMcuSide();
+    // assert SPI bus ready
+
+    bool foo = Compass::isSane();
+
+    Compass::reset();
+
 
     // forever, single step forward
     while (true)
