@@ -1,10 +1,10 @@
 #include <msp430.h> 
 
-#include "stepper/stepper.h"
 
 
 void testStepper();
 void testCompass();
+void testRTC();
 
 
 int main(void)
@@ -12,5 +12,6 @@ int main(void)
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
 	//testStepper();
-	testCompass();
+	// testCompass();
+	testRTC();
 }

@@ -56,11 +56,14 @@ public:
 	static unsigned char read(BridgedAddress);
 
 	/*
-	 * Read many consecutive bytes
+	 * Read/write many consecutive bytes
 	 */
 	static void readBuffer(BridgedAddress,
 	                                unsigned int length,
 	                                unsigned char * destination);
+	static void writeBuffer(BridgedAddress,
+	                                    unsigned int length,
+	                                    unsigned char * source);
 
 	/*
 	 * Write one byte to remote register at BridgedAddress.
