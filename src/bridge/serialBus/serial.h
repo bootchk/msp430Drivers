@@ -20,7 +20,7 @@ public:
 	 * Enable device and configure data and clock pins for it.
 	 * Does not configure chip (slave) select pin.
 	 */
-	static void begin();
+	static void begin(bool isRWBitHighForRead);
 
 	/*
 	 * Writes AND reads at the same time.

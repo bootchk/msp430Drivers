@@ -16,7 +16,7 @@ void testRTC()
     // Compass::turnPowerOn();
     // Compass is not ready until later, require a delay
 
-    Bridge::configureMcuSide();
+    Bridge::configureMcuSide(false);
     // assert SPI bus ready
 
     bool foo = RTC::isReadable();

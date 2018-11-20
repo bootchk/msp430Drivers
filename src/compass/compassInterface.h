@@ -48,6 +48,7 @@ public:
      */
     static bool isDataReady();
 
+    static unsigned char readStatus();
 
     /*
      * Likely other methods:

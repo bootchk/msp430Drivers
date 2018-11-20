@@ -7,7 +7,7 @@
 
 
 
-void Serial::begin() {
+void Serial::begin(bool isRWBitHighForRead) {
 	/*
 	 * Only configures 3 of the 4 pins (not the Slave Select pin):
 	 * MOSI, MISO, SCLK
@@ -18,7 +18,7 @@ void Serial::begin() {
 	 * Configure the mcu SPI peripheral with parameters of rtc chip's SPI
 	 */
 	SPI::disable();	// Can only configure when disabled.
-	SPI::configureMaster();
+	SPI::configureMaster(isRWBitHighForRead);
 	SPI::enable();
 
 	// ensure ready for transfer()

@@ -16,10 +16,12 @@ void testCompass()
     // Compass::turnPowerOn();
     // Compass is not ready until later, require a delay
 
-    Bridge::configureMcuSide();
+    Bridge::configureMcuSide(true);
     // assert SPI bus ready
 
     bool foo = Compass::isSane();
+
+    unsigned char bar = Compass::readStatus();
 
     Compass::reset();
 

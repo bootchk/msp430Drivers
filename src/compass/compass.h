@@ -27,6 +27,8 @@ public:
      */
     static bool isSane();
 
+    static unsigned char readStatus();
+
     /*
      * If on and configured for continuous reading, returns most recent reading.
      * ??? are registers double buffered, or is this garbled?

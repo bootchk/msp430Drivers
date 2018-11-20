@@ -27,12 +27,18 @@
  */
 // TI DriverLib
 #include "eusci_a_spi.h"
-//#include "eusci_b_spi.h"
+// alternate device: #include "eusci_b_spi.h"
 
-#include "gpio.h"
-
-#include "../../pinFunction/spiPins.h"
+// Configuration: SPIInstanceAddress
 #include "../../board.h"
+
+
+// Configure pins used for SPI
+#include "../../pinFunction/spiPins.h"
+// Configure mangling of address byte
+#include "../addressMangler.h"
+
+
 
 //#include "../../debug/myAssert.h"
 
@@ -108,9 +114,10 @@ unsigned char SPI::transfer(unsigned char value) {
  * Per eUSCI chapter of user guide,
  * configure when disabled, in this order
  */
-void SPI::configureMaster() {
+void SPI::configureMaster(bool isRWBitHighForRead) {
     // myAssert(not isEnabled());
 	configureMasterDevice();
+	RegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
 	SPIPins::configure();
 }
 
@@ -129,7 +136,7 @@ void SPI::unconfigureMaster() {
 
 
 /*
- * Configure device.
+ * Configure device on mcu (the master.)
  *
  * SPI bus has many variations.
  * Remote device usually hardwires one variation.
@@ -150,8 +157,9 @@ void SPI::configureMasterDevice() {
 	 * I experienced failure in RTC comm, and tried to reduce bit rate.
 	 * I also shortened wires.  May be noise, or loose connection.
 	 */
-	param.desiredSpiClock = 1000000;
+	/// AB0815 param.desiredSpiClock = 1000000; // 1 Mhz
 	///param.desiredSpiClock = 500000;
+	param.desiredSpiClock = 100000;
 
 	// setBitOrder()
 	param.msbFirst = EUSCI_A_SPI_MSB_FIRST;
@@ -167,10 +175,16 @@ void SPI::configureMasterDevice() {
      */
 	// setDataMode()
 	// TODO a parameter
+
+	// AB08x5
 	//param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
 	//param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
-	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
+
+	// ?? Doesn't work LIS3MDL
 	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
+	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
+	//param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+
 
 	/*
 	 * TI's SPI mode

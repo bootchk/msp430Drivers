@@ -59,8 +59,11 @@ bool CompassInterface::isReadable() {
 }
 
 
+unsigned char CompassInterface::readStatus() {
+    return (Bridge::read(static_cast<BridgedAddress> (CompassAddress::Status) ));
+}
 
 bool CompassInterface::isDataReady() {
     // zyxda bit set
-    return (Bridge::read(static_cast<BridgedAddress> (CompassAddress::Status)) & 0b1000 );
+    return (readStatus() & 0b1000 );
 }

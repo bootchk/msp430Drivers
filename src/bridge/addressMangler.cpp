@@ -2,9 +2,15 @@
 #include "addressMangler.h"
 
 
-bool RegisterAddressMangler::isReadHigh = true;
+bool RegisterAddressMangler::isRWBitHighForRead = true;
 
-// TODO setter
+
+
+
+
+void RegisterAddressMangler::configureRWBitHighForRead(bool yesNo) {
+    RegisterAddressMangler::isRWBitHighForRead = yesNo;
+}
 
 
 
@@ -12,7 +18,7 @@ bool RegisterAddressMangler::isReadHigh = true;
 unsigned char RegisterAddressMangler::mangle(BridgedAddress address, ReadOrWrite direction) {
     unsigned char result;
 
-    if (isReadHigh and direction == ReadOrWrite::Read) {
+    if (isRWBitHighForRead and direction == ReadOrWrite::Read) {
         // bit set
         result = 128 | (unsigned char) address;
     }
@@ -21,3 +27,5 @@ unsigned char RegisterAddressMangler::mangle(BridgedAddress address, ReadOrWrite
     }
     return result;
 }
+
+

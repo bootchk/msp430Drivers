@@ -56,7 +56,7 @@ void writeBuffer( unsigned char * bufferPtr, unsigned int size) {
  *
  * See SPI::setModule() for choosing an alternate SPI peripheral.
  */
-void Bridge::configureMcuSide() {
+void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 	// not require isSPIReady() since configuration is on the mcu side
 
 	/*
@@ -70,7 +70,7 @@ void Bridge::configureMcuSide() {
 	 * But code seems to indicate it doesn't.
 	 * Although there exists an overloaded transfer(SSpin, value) method apparently not implemented on Energia.
 	 */
-	Serial::begin();
+	Serial::begin(isRWBitHighForRead);
 }
 
 

@@ -34,7 +34,7 @@ public:
 	/*
 	 * Configure mcu side of interface.
 	 */
-	static void configureMcuSide();
+	static void configureMcuSide(bool isRWBitHighForRead);
 
 	/*
 	 * Configure SPI pins to low power state.

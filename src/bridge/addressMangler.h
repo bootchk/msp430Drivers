@@ -1,16 +1,18 @@
 
 /*
- * Mangles address of register on chip to indicate a read or write operation,
+ * Mangles RWBit (BIT7) of address of register on chip to indicate a read or write operation,
  * and multiple byte transfers (on some chips.)
  *
- *
- * Modal.  Mode defaults.
+ * Modal with respect to RWBit.  Mode defaults to RWBit high for read.
  *
  * There is no formal SPI standard, the chips vary widely.
  * Different SPI chips use different schemes to indicate read/write.
  *
- * Some chips (LIS3MDL) use a 5-bit address and BIT6 means multiple byte.
+ * Some chips (LIS3MDL) use 5 bits of the byte for address.
+ * Some chips (AB08x5) use a 6 bits of the byte for address.
+ *
  * BIT7 means read or write.
+ * BIT6 means multiple byte transfer.
  */
 
 #include "bridge.h"  // BridgedAddress
@@ -23,8 +25,10 @@ enum class ReadOrWrite {
 
 class RegisterAddressMangler {
     // Whether the chip wants MSBit to be high on a read.
-    static bool isReadHigh;
+    static bool isRWBitHighForRead;
 
 public:
     static unsigned char mangle(BridgedAddress, ReadOrWrite);
+
+    static void configureRWBitHighForRead(bool);
 };
