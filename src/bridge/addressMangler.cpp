@@ -25,6 +25,10 @@ unsigned char RegisterAddressMangler::mangle(BridgedAddress address, ReadOrWrite
     else {
         result = 127 & (unsigned char) address;
     }
+
+    // Temp test: set the multiple read byte, BIT6
+    // result |= 64; // BIT6;
+
     return result;
 }
 

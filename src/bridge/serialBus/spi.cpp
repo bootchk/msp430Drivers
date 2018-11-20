@@ -159,7 +159,7 @@ void SPI::configureMasterDevice() {
 	 */
 	/// AB0815 param.desiredSpiClock = 1000000; // 1 Mhz
 	///param.desiredSpiClock = 500000;
-	param.desiredSpiClock = 100000;
+	param.desiredSpiClock = 10000;
 
 	// setBitOrder()
 	param.msbFirst = EUSCI_A_SPI_MSB_FIRST;
@@ -182,8 +182,8 @@ void SPI::configureMasterDevice() {
 
 	// ?? Doesn't work LIS3MDL
 	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
-	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
-	//param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+	// param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
+	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
 
 
 	/*
