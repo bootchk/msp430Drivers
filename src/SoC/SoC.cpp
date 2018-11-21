@@ -1,10 +1,12 @@
 
 #include <msp430.h>
 
-#include <driverlib.h>
-#include <src/SoC/SoC.h>
+// TI driverlib
+#include <sysctl.h>
+
+#include "../SoC/SoC.h"
 #include "../PMM/powerMgtModule.h"
-///#include "../resetReason.h"
+#include "../resetReason/resetReason.h"
 
 
 #ifdef DISABLE_BSL
@@ -85,4 +87,4 @@ void SoC::triggerSoftwareReset() { PMM::triggerSoftwareBORReset(); }
  * Delegate to ResetReason
  * (Another version delegates to PMM)
  */
-///bool SoC::isResetAWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }
+bool SoC::isResetAWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }

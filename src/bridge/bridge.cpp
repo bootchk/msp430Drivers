@@ -34,7 +34,7 @@ void innerReadBuffer( unsigned char * bufferPtr, unsigned int size) {
 	}
 }
 
-void writeBuffer( unsigned char * bufferPtr, unsigned int size) {
+void innerWriteBuffer( unsigned char * bufferPtr, unsigned int size) {
 	// require slave already selected
 	for(unsigned int i = 0; i < size; i++) {
 		// ignore returned read
@@ -146,5 +146,17 @@ void Bridge::readBuffer(BridgedAddress address,
     (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
     // transfer the data bytes
     innerReadBuffer(destination, length);
+    Serial::deselectSlave();
+}
+
+void Bridge::writeBuffer(BridgedAddress address,
+                        unsigned int length,
+                        unsigned char * source) {
+
+    Serial::selectSlave();
+    // transfer the address
+    (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
+    // transfer the data bytes
+    innerWriteBuffer(source, length);
     Serial::deselectSlave();
 }

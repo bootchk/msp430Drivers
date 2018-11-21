@@ -1,6 +1,19 @@
 Work in progress
 
-Requires TI MSPWare DriveLib
+High level drivers.
+Abstracts peripherals on TI MSP430.
+
+
+Pragmatics
+==========
+
+Currently not built as a linkable library.
+Copy src into a folder into your project.
+And add an include path to that folder.
+
+
+Requires TI MSPWare DriverLib
+============================
 
 You might be able to use TI Resource Explorer.
 On MacOS, download standalone MSPWare installer and install to /applications/ti.
