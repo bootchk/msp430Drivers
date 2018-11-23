@@ -178,10 +178,14 @@ void I2C::configureMasterDevice() {
  *
  */
 void I2C::selectSlave(unsigned int slave) {
-    //eI2C_setSlaveAddress
-    //eI2C_setMode
-} // TODO }
+    // TODO select from a table of addresses
+    // LIS3MDL address is 11100 if SDO pin is grounded, or 11110 if SDO pin is high
+    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, 0b1110);
+    //EUSCI_B_I2C_setMode();
+}
 
 
 
-void I2C::deselectSlave() { ; } // TODO }
+void I2C::deselectSlave() {
+    EUSCI_B_I2C_disable(I2CInstanceAddress);
+}

@@ -1,24 +1,35 @@
 
 /*
- * A serial interface using SPI
+ * A serial interface using SPI or I2C.
  *
  * Hides choice of serial kind of device
  * (both what kind of device it is, and what instance of the device.)
  *
- * Modeled after the Arduino/Energia SPI library,
+ * Modeled after the Arduino/Energia Wire library,
  * or the Linux SPI library
  * or the RTOS SPI library.
  *
  * See the provided implementation.
  * You can provide other implementations.
+ *
+ * Serial does not implement any multi-byte transfers.
+ * Such are implemented in the layer above (Bridge).
+ * (Even though some I2C libraries implement multi-byte transfers.
+ *
+ * Also, a session is designated read or write.
+ * (Even though SPI is full duplex and a session can read and write at the same time.)
  */
 
 
 class Serial {
 public:
 	/*
-	 * Enable device and configure data and clock pins for it.
-	 * Does not configure chip (slave) select pin.
+	 * Start a session.
+	 *
+	 * Configure and enable a serial device.
+	 * Configure GPIO pins for it.
+	 *
+	 * Does not configure chip (slave) select pin. ????
 	 */
 	static void begin(unsigned int slave, bool isRWBitHighForRead);
 
