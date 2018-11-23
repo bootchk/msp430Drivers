@@ -1,25 +1,26 @@
 
 #include "serial.h"
 
-#include "spi.h"
 
-#include "../../pinFunction/spiPins.h"
+//#define SERIAL_DEVICE_CLASS SPI
+#define SERIAL_DEVICE_CLASS I2C
+
+
+#include "spi/spi.h"
+#include "i2c/i2c.h"
 
 
 
-void Serial::begin(bool isRWBitHighForRead) {
+
+void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
+
 	/*
-	 * Only configures 3 of the 4 pins (not the Slave Select pin):
-	 * MOSI, MISO, SCLK
-	 *
-	 * TI Energia document doesn't say this configure MISO ???
+	 * Configure the mcu peripheral as master with parameters compatible with slave
 	 */
-	/*
-	 * Configure the mcu SPI peripheral with parameters of rtc chip's SPI
-	 */
-	SPI::disable();	// Can only configure when disabled.
-	SPI::configureMaster(isRWBitHighForRead);
-	SPI::enable();
+    SERIAL_DEVICE_CLASS::disable();	// Can only configure when disabled.
+	SERIAL_DEVICE_CLASS::configureMaster(isRWBitHighForRead);
+	SERIAL_DEVICE_CLASS::selectSlave(slave);
+	SERIAL_DEVICE_CLASS::enable();
 
 	// ensure ready for transfer()
 }
@@ -27,21 +28,21 @@ void Serial::begin(bool isRWBitHighForRead) {
 
 void Serial::end() {
 	// ??? disabling saves power
-	SPI::disable();
+	SERIAL_DEVICE_CLASS::disable();
 
-	SPI::unconfigureMaster();
+	SERIAL_DEVICE_CLASS::unconfigureMaster();
 }
 
 
 unsigned char Serial::transfer(unsigned char value) {
     // requires slave selected
     // requires configured
-	return SPI::transfer(value);
+	return SERIAL_DEVICE_CLASS::transfer(value);
 }
 
-// Delegate to SPIPins
-void Serial::selectSlave() { SPIPins::selectSlave(); }
-void Serial::deselectSlave() { SPIPins::deselectSlave(); }
+
+void Serial::selectSlave(unsigned int slave) { SERIAL_DEVICE_CLASS::selectSlave(slave); }
+void Serial::deselectSlave() { SERIAL_DEVICE_CLASS::deselectSlave(); }
 
 
 

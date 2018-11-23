@@ -76,7 +76,7 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 
 void Bridge::unconfigureMcuSide() {
 	Serial::end();
-	// assert selectSPIPin is low power output
+	// assert all serial pins low power
 }
 
 

@@ -20,7 +20,7 @@ public:
 	 * Enable device and configure data and clock pins for it.
 	 * Does not configure chip (slave) select pin.
 	 */
-	static void begin(bool isRWBitHighForRead);
+	static void begin(unsigned int slave, bool isRWBitHighForRead);
 
 	/*
 	 * Writes AND reads at the same time.
@@ -46,6 +46,6 @@ public:
 	 * Select slave on serial bus.
 	 * This directs a transfer to one of many slave devices on bus.
 	 */
-	static void selectSlave();
+	static void selectSlave(unsigned int slave);
 	static void deselectSlave();
 };

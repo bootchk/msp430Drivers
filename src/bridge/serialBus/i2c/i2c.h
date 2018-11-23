@@ -7,7 +7,7 @@
 /*
  * See specifications at Serial.
  */
-class SPI {
+class I2C {
 private:
 	static void configureMasterDevice();
 
@@ -18,7 +18,6 @@ public:
 	static void enable();
 	static void disable();
 	static bool isEnabled();
-
 
 	/*
 	 * Configure SPI.
@@ -33,10 +32,12 @@ public:
 	 */
 	static void unconfigureMaster();
 
-
 	static unsigned char transfer(unsigned char);
 
 	// Is RX or TX interrupt flag set?
 	static bool isInterrupt();
 	static void clearInterrupt();
+
+	static void selectSlave(unsigned int);
+	static void deselectSlave();
 };

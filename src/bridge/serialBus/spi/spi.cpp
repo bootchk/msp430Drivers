@@ -30,13 +30,13 @@
 // alternate device: #include "eusci_b_spi.h"
 
 // Configuration: SPIInstanceAddress
-#include "../../board.h"
+#include "../../../board.h"
 
 
 // Configure pins used for SPI
-#include "../../pinFunction/spiPins.h"
+#include "../../../pinFunction/spiPins.h"
 // Configure mangling of address byte
-#include "../addressMangler.h"
+#include "../../addressMangler.h"
 
 
 
@@ -109,6 +109,16 @@ unsigned char SPI::transfer(unsigned char value) {
 
 	return EUSCI_A_SPI_receiveData(SPIInstanceAddress);
 }
+
+
+
+
+/*
+ * Only configures 3 of the 4 pins (not the Slave Select pin):
+ * MOSI, MISO, SCLK
+ *
+ * TI Energia document doesn't say this configure MISO ???
+ */
 
 /*
  * Per eUSCI chapter of user guide,
@@ -194,3 +204,14 @@ void SPI::configureMasterDevice() {
 
 	EUSCI_A_SPI_initMaster(SPIInstanceAddress, &param);
 }
+
+
+/*
+ *
+ * In SPI, select slaves via dedicated pins.
+ *
+ * Delegate to SPIPins
+ *
+ */
+void SPI::selectSlave() { SPIPins::selectSlave(); }
+void SPI::deselectSlave() { SPIPins::deselectSlave(); }

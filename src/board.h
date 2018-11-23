@@ -74,6 +74,7 @@
 // And also configuration of one prototype on launchpad
 
 #define SPIInstanceAddress      EUSCI_A1_BASE
+#define I2CInstanceAddress      EUSCI_B0_BASE
 
 // msp430fr2433 and Launchpad MSP-EXP430FR2433, using instance UCA1:
 // MOSI 2.6

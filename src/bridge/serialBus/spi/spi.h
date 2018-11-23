@@ -1,0 +1,45 @@
+
+/*
+ * Implements a SPI device interface.
+ * Hides choice of SPI instance.
+ */
+
+/*
+ * See specifications at Serial.
+ */
+class SPI {
+private:
+	static void configureMasterDevice();
+
+	static void configureMasterPins();
+	static void unconfigureMasterPins();
+
+public:
+	static void enable();
+	static void disable();
+	static bool isEnabled();
+
+
+	/*
+	 * Configure SPI.
+	 * When there are multiple slaves, call this before switching to another slave.
+	 * When there is only one slave, can call this once during each booted session.
+	 */
+	static void configureMaster(bool isRWBitHighForRead);
+
+	/*
+	 * Leave device configured, but configure pins for low power.
+	 * After this, no SPI methods should be used until configured again.
+	 */
+	static void unconfigureMaster();
+
+
+	static unsigned char transfer(unsigned char);
+
+	// Is RX or TX interrupt flag set?
+	static bool isInterrupt();
+	static void clearInterrupt();
+
+	static void selectSlave();
+	static void deselectSlave();
+};
