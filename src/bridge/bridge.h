@@ -24,7 +24,10 @@
  * An address on remote device.
  * BridgedAddress is one byte transmitted across the bridge.
  */
-typedef unsigned char BridgedAddress ;
+typedef struct {
+    unsigned int device;
+    unsigned char subaddress;
+} BridgedAddress ;
 
 
 

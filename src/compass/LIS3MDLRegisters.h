@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Constants of the compass chip
  */

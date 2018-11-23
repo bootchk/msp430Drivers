@@ -70,7 +70,7 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 	 * But code seems to indicate it doesn't.
 	 * Although there exists an overloaded transfer(SSpin, value) method apparently not implemented on Energia.
 	 */
-	Serial::begin(isRWBitHighForRead);
+	Serial::begin(1,isRWBitHighForRead);
 }
 
 
@@ -86,7 +86,7 @@ void Bridge::write(BridgedAddress address, unsigned char value) {
 	// require mcu Serial interface configured
 
     // discard values read during writes of address and value
-	Serial::selectSlave();
+	Serial::selectSlave(address.device);
 	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
 	(void) Serial::transfer( value);
 
@@ -127,7 +127,7 @@ unsigned char Bridge::read(BridgedAddress address) {
 
 	unsigned char result;
 
-	Serial::selectSlave();
+	Serial::selectSlave(address.device);
 	// transfer address
 	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
 	// transfer single byte of data
@@ -141,7 +141,7 @@ void Bridge::readBuffer(BridgedAddress address,
                         unsigned int length,
                         unsigned char * destination) {
 
-    Serial::selectSlave();
+    Serial::selectSlave(address.device);
     // transfer the address
     (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
     // transfer the data bytes
@@ -153,7 +153,7 @@ void Bridge::writeBuffer(BridgedAddress address,
                         unsigned int length,
                         unsigned char * source) {
 
-    Serial::selectSlave();
+    Serial::selectSlave(address.device);
     // transfer the address
     (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
     // transfer the data bytes

@@ -14,7 +14,13 @@
  * Bit will be set and DRDY line goes high when the next data sample is ready.
  */
 
+#include "LIS3MDLRegisters.h"
+
+
+
 class CompassInterface {
+private:
+    static void setCompassAddress(CompassAddress subaddress);
 public:
     /*
      * Test sanity of SPI and compass chip by reading chip ID.

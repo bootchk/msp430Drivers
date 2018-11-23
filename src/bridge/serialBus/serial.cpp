@@ -6,7 +6,7 @@
 #define SERIAL_DEVICE_CLASS I2C
 
 
-#include "spi/spi.h"
+//#include "spi/spi.h"
 #include "i2c/i2c.h"
 
 
@@ -14,11 +14,11 @@
 
 void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 
-	/*
-	 * Configure the mcu peripheral as master with parameters compatible with slave
-	 */
-    SERIAL_DEVICE_CLASS::disable();	// Can only configure when disabled.
+    SERIAL_DEVICE_CLASS::disable(); // Can only configure when disabled.
+
+	//Configure the mcu peripheral as master with parameters compatible with slave
 	SERIAL_DEVICE_CLASS::configureMaster(isRWBitHighForRead);
+
 	SERIAL_DEVICE_CLASS::selectSlave(slave);
 	SERIAL_DEVICE_CLASS::enable();
 

@@ -20,10 +20,10 @@ unsigned char RegisterAddressMangler::mangle(BridgedAddress address, ReadOrWrite
 
     if (isRWBitHighForRead and direction == ReadOrWrite::Read) {
         // bit set
-        result = 128 | (unsigned char) address;
+        result = 128 | (unsigned char) address.subaddress;
     }
     else {
-        result = 127 & (unsigned char) address;
+        result = 127 & (unsigned char) address.subaddress;
     }
 
     // Temp test: set the multiple read byte, BIT6

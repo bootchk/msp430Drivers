@@ -177,6 +177,11 @@ void I2C::configureMasterDevice() {
  * In I2C, select slaves by transmit slave address over bus.
  *
  */
-void I2C::selectSlave(unsigned int slave) { ; } // TODO }
+void I2C::selectSlave(unsigned int slave) {
+    //eI2C_setSlaveAddress
+    //eI2C_setMode
+} // TODO }
+
+
 
 void I2C::deselectSlave() { ; } // TODO }

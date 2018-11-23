@@ -6,6 +6,7 @@
 #include "AB08xxRegisters.h"
 
 
+static BridgedAddress rtcAddress = {1,0};
 
 
 
@@ -28,7 +29,8 @@ void RTC::clearIRQInterrupt() {
 	 * ALM controls the AIRQ signal
 	 * AIRQ signal is configured to pin Fout/nIRQ.
 	 */
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::Status), 0);
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::Status);
+	Bridge::write(rtcAddress, 0);
 }
 
 
@@ -61,7 +63,9 @@ void RTC::configureAlarmInterruptToFoutnIRQPin() {
  * Must use writeBits: does not ensure that given mask is the final contents of register.
  */
 void RTC::configure24HourMode() {
-	Bridge::clearBits(static_cast<BridgedAddress>(RTCAddress::Control1), (unsigned char) 0b01000000 ); // BIT6
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::Control1);
+	Bridge::clearBits(rtcAddress,
+	                  (unsigned char) 0b01000000 ); // BIT6
 }
 
 
@@ -76,8 +80,8 @@ void RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod() {
 
 	// OSEL on => BIT7;
 	// ACAL == 10 (17 minute autocalibration period) => BIT6
-
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::OscillatorControl),
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::OscillatorControl);
+	Bridge::write(rtcAddress,
 	              (unsigned char) 0b11000000 ); // (BIT7 | BIT6) );
 }
 
@@ -86,7 +90,8 @@ void RTC::enableAutocalibrationFilter() {
 	unlockMiscRegisters();
 
 	// Enable filter
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::AutocalibrationFilter),
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::AutocalibrationFilter);
+	Bridge::write(rtcAddress,
 	              (unsigned char) Key::AutocalibrationFilterEnable );
 }
 
@@ -102,8 +107,8 @@ void RTC::enablePulseInterruptForAlarm() {
 	 * Bit 2:  AIE: enable alarm interrupt
 	 * Bit 5,6: IM: == 11 1/4 second pulse width, requires least power
 	 */
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::InterruptMask),
-	              0b01100100 );
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::InterruptMask);
+	Bridge::write(rtcAddress, 0b01100100 );
 
 	// Polarity of interrupt is not configurable, is high-to-low
 }
@@ -114,7 +119,8 @@ void RTC::connectFoutnIRQPinToAlarmSignal() {
 	 * Here, we connect only the rtc's internal nAIRQ signal (from alarm)
 	 * bits 0,1: OUT1S: == 11, pin is signal nAIRQ if AIE is set, else OUT
 	 */
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::Control2),
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::Control2);
+	Bridge::write(rtcAddress,
 	              0b11 );
 }
 
@@ -125,21 +131,22 @@ void RTC::enableAlarm() {
      * Bits [4:2]==1 => alarm once per year
      * Bits [4:2]==0 => alarm disabled
      */
-    Bridge::write(static_cast<BridgedAddress>(RTCAddress::TimerControl),
-                  0b100 );
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::TimerControl);
+    Bridge::write(rtcAddress, 0b100 );
 }
 
 
 
 
 void RTC::unlockMiscRegisters() {
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::ConfigurationKey),
-	              (unsigned char) Key::UnlockMiscRegisters );
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::ConfigurationKey);
+	Bridge::write(rtcAddress, (unsigned char) Key::UnlockMiscRegisters );
 }
 
+
 void RTC::unlockOscControlRegister() {
-	Bridge::write(static_cast<BridgedAddress>(RTCAddress::ConfigurationKey),
-	              (unsigned char) Key::UnlockOscillatorControl );
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::ConfigurationKey);
+	Bridge::write(rtcAddress, (unsigned char) Key::UnlockOscillatorControl );
 }
 
 bool RTC::isReadable() {
@@ -150,12 +157,14 @@ bool RTC::isReadable() {
      */
     unsigned char ID;
 
-    ID = Bridge::read(static_cast<BridgedAddress>(RTCAddress::Identifier));
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::Identifier);
+    ID = Bridge::read(rtcAddress);
     return (ID == 0x08);
 }
 
 
 bool RTC::readOUTBit() {
-    unsigned char control1 = Bridge::read(static_cast<BridgedAddress>(RTCAddress::Control1));
+    rtcAddress.subaddress = static_cast<unsigned char>(RTCAddress::Control1);
+    unsigned char control1 = Bridge::read(rtcAddress);
     return (control1 & 0b1000);
 }

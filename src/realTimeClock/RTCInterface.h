@@ -8,10 +8,14 @@
 
 // the time type the AB08xx implements
 #include "../time/rtcTime.h"
+#include "AB08xxRegisters.h"
 
 
 
 class RTCInterface {
+private:
+    static void setAddress(RTCAddress subaddress);
+
 public:
     static void readTime(RTCTime*);
     static void writeAlarm(const RTCTime*);

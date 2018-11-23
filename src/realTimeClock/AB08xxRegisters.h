@@ -1,4 +1,4 @@
-
+#pragma once
 
 /*
  * Partial enumeration of device's register addresses and other values.

@@ -6,11 +6,21 @@
 
 #include "../bridge/bridge.h"
 
-#include "LIS3MDLRegisters.h"
+
+
+static BridgedAddress compassAddress = {1,0};
+
+
+void CompassInterface::setCompassAddress(CompassAddress subaddress) {
+    compassAddress.subaddress = static_cast<unsigned char>(subaddress);
+}
+
+
 
 
 void CompassInterface::setLowPowerMode() {
-    Bridge::setBits(static_cast<BridgedAddress> (CompassAddress::Control3),
+    setCompassAddress(CompassAddress::Control3);
+    Bridge::setBits(compassAddress,
                             0b100000);
 }
 
@@ -22,11 +32,10 @@ void CompassInterface::setSingleConversionMode() {
      * value 0b01 is mode:singleConversion.
      * There is no Bridge method to set a value in bit fields, so implementation is clear both bits, then set one.
      */
-    Bridge::clearBits(static_cast<BridgedAddress> (CompassAddress::Control3),
-                    0b11);
+    setCompassAddress(CompassAddress::Control3);
+    Bridge::clearBits(compassAddress, 0b11);
     // assert mode is continuous
-    Bridge::setBits(static_cast<BridgedAddress> (CompassAddress::Control3),
-                        0b1);
+    Bridge::setBits(compassAddress, 0b1);
     // assert mode is single
 }
 
@@ -40,7 +49,8 @@ void CompassInterface::readRawBytesOfMagneticData(unsigned char * destination) {
      */
     // TODO data ready
     // single transfer mode
-    Bridge::readBuffer(static_cast<BridgedAddress> (CompassAddress::MagXYZBytes),
+    setCompassAddress(CompassAddress::MagXYZBytes);
+    Bridge::readBuffer(compassAddress,
                        6,
                        destination);
 }
@@ -54,13 +64,17 @@ bool CompassInterface::isReadable() {
      */
     unsigned char ID;
 
-    ID = Bridge::read(static_cast<BridgedAddress> (CompassAddress::Identifier));
+    setCompassAddress(CompassAddress::Identifier);
+
+    ID = Bridge::read(compassAddress);
     return (ID == LIS3MDLIdentifier);
 }
 
 
 unsigned char CompassInterface::readStatus() {
-    return (Bridge::read(static_cast<BridgedAddress> (CompassAddress::Status) ));
+    setCompassAddress(CompassAddress::Status);
+
+    return Bridge::read(compassAddress);
 }
 
 bool CompassInterface::isDataReady() {

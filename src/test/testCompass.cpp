@@ -17,7 +17,7 @@ void testCompass()
     // Compass is not ready until later, require a delay
 
     Bridge::configureMcuSide(true);
-    // assert SPI bus ready
+    // assert serial bus ready
 
     bool foo = Compass::isSane();
 
