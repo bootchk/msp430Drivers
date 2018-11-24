@@ -85,7 +85,8 @@ void SPI::clearInterrupt() {
  * and master put data on MOSI on each clock cycle.
  * I.E. duplex communication.
  */
-unsigned char SPI::transfer(unsigned char value) {
+unsigned char SPI::transfer(ReadOrWrite direction,  // not used for SPI
+                            unsigned char value) {
 
     /*
      * Requires any previous transfer complete.
@@ -213,5 +214,8 @@ void SPI::configureMasterDevice() {
  * Delegate to SPIPins
  *
  */
-void SPI::selectSlave() { SPIPins::selectSlave(); }
+void SPI::selectSlave(unsigned int slaveOrdinal) {
+    // TODO choose signal line to select given slave
+    SPIPins::selectSlave();
+}
 void SPI::deselectSlave() { SPIPins::deselectSlave(); }

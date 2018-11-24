@@ -7,6 +7,12 @@
 /*
  * See specifications at Serial.
  */
+
+#include "../serial.h"  // ReadOrWrite
+
+
+
+
 class SPI {
 private:
 	static void configureMasterDevice();
@@ -34,12 +40,12 @@ public:
 	static void unconfigureMaster();
 
 
-	static unsigned char transfer(unsigned char);
+	static unsigned char transfer(ReadOrWrite, unsigned char);
 
 	// Is RX or TX interrupt flag set?
 	static bool isInterrupt();
 	static void clearInterrupt();
 
-	static void selectSlave();
+	static void selectSlave(unsigned int);
 	static void deselectSlave();
 };

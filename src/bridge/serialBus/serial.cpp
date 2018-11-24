@@ -1,12 +1,10 @@
 
 #include "serial.h"
 
-
+// Change the implementation between two choices
 //#define SERIAL_DEVICE_CLASS SPI
-#define SERIAL_DEVICE_CLASS I2C
-
-
 //#include "spi/spi.h"
+#define SERIAL_DEVICE_CLASS I2C
 #include "i2c/i2c.h"
 
 
