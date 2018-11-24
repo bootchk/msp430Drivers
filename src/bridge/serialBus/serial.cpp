@@ -34,10 +34,14 @@ void Serial::end() {
 }
 
 
-unsigned char Serial::transfer(unsigned char value) {
+/*
+ * Some implementations (SPI) may ignore the direction
+ */
+unsigned char Serial::transfer(ReadOrWrite direction,
+                               unsigned char value) {
     // requires slave selected
     // requires configured
-	return SERIAL_DEVICE_CLASS::transfer(value);
+	return SERIAL_DEVICE_CLASS::transfer(direction, value);
 }
 
 

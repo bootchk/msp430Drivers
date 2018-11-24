@@ -1,4 +1,6 @@
 
+#pragma once
+
 /*
  * A serial interface using SPI or I2C.
  *
@@ -19,6 +21,12 @@
  * Also, a session is designated read or write.
  * (Even though SPI is full duplex and a session can read and write at the same time.)
  */
+
+
+enum class ReadOrWrite {
+    Read,
+    Write
+};
 
 
 class Serial {
@@ -42,7 +50,9 @@ public:
 	 *
 	 * Not asynch io; blocks.
 	 */
-	static unsigned char transfer(unsigned char);
+	static unsigned char transfer(
+	        ReadOrWrite,        // direction of transfer on bus
+	        unsigned char );    // value to transfer
 
 	/*
 	 * Disable device and configure pins for low power

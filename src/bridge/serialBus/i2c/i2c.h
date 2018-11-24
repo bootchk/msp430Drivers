@@ -7,6 +7,10 @@
 /*
  * See specifications at Serial.
  */
+#include "../serial.h"  // ReadOrWrite
+
+
+
 class I2C {
 private:
 	static void configureMasterDevice();
@@ -32,7 +36,7 @@ public:
 	 */
 	static void unconfigureMaster();
 
-	static unsigned char transfer(unsigned char);
+	static unsigned char transfer(ReadOrWrite,  unsigned char);
 
 	// Is RX or TX interrupt flag set?
 	static bool isInterrupt();

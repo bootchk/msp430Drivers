@@ -16,11 +16,7 @@
  */
 
 #include "bridge.h"  // BridgedAddress
-
-enum class ReadOrWrite {
-    Read,
-    Write
-};
+#include "serialBus/serial.h" // ReadOrWrite
 
 
 class RegisterAddressMangler {

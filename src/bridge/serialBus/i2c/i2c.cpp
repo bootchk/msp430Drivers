@@ -2,40 +2,34 @@
 #include "i2c.h"
 
 /*
- * Derived from
- * Maksim Gorev spi_driverlib.c http://www.breakmyboard.com/blog/ti-mcu-ti-driverlib-based-simple-spi-library/
- * https://github.com/machinaut/msp432-driverlib.git/spi.c
- * MSP430F5529_driverlib_examples/13A_USCI_B_I2C_MCP41010_digiPot
- * TI-RTOS for SimpleLink Wireless MCUs ... I2C.h
- *
- */
-/*
  * Much specialization here, see TI docs
  * Serial
  *    USCI	(older device)
  *    eUSCI (newer device)
- *       eUSCI_A variant support UART, iRDA, I2C  <====== this
+ *       eUSCI_A variant support UART, iRDA, SPI  <====== this
  *          one or more instances, e.g. A0 and A1
- *       eUSCI_B variant support I2C or I2C
+ *       eUSCI_B variant support SPI or I2C
  *          one or more instances per family member
  */
 
 
+// Work in progress.  Much cruft copied from SPI implementation
 
 /*
  * To change to another instance, edit board.h and include different driverlib
  */
 // TI DriverLib
-#include "eusci_a_spi.h"
-#include "eusci_b_i2c.h"
+//#include "eusci_a_spi.h"
 // alternate device: #include "eusci_b_spi.h"
+#include "eusci_b_i2c.h"
+
 
 // Configuration: I2CInstanceAddress
 #include "../../../board.h"
 
 
 // Configure pins used for I2C
-#include "../../../pinFunction/spiPins.h"
+#include "../../../pinFunction/i2cPins.h"
 
 // Configure mangling of address byte
 #include "../../addressMangler.h"
@@ -86,11 +80,11 @@ void I2C::clearInterrupt() {
 
 /*
  * A transfer is the master clocking the bus.
- * The slave may put data on MISO
- * and master put data on MOSI on each clock cycle.
- * I.E. duplex communication.
+ *
+ * I2C is half duplex: each transfer has a direction.
  */
-unsigned char I2C::transfer(unsigned char value) {
+unsigned char I2C::transfer(ReadOrWrite direction, unsigned char value) {
+    unsigned char result = 0;
 
     /*
      * Requires any previous transfer complete.
@@ -101,20 +95,29 @@ unsigned char I2C::transfer(unsigned char value) {
      */
     while(EUSCI_B_I2C_isBusBusy(I2CInstanceAddress)) ;
 
-	EUSCI_B_I2C_masterSendSingleByte(I2CInstanceAddress, value);
+    /*
+     * A transfer consists of half-duplex ops, in given direction
+     */
+	if (direction == ReadOrWrite::Write) {
+	    EUSCI_B_I2C_setMode(I2CInstanceAddress,
+	                        EUSCI_B_I2C_TRANSMIT_MODE);
+	    // TODO enable??
+	    EUSCI_B_I2C_masterSendSingleByte(I2CInstanceAddress, value);
+	}
+	else {
+	    EUSCI_B_I2C_setMode(I2CInstanceAddress,
+                            EUSCI_B_I2C_RECEIVE_MODE);
+	    result = EUSCI_B_I2C_masterReceiveSingleByte(I2CInstanceAddress);
+	}
 
 	/*
-	 * Spin until transfer is complete.
-	 * I2C bus is slower than CPU.
-	 * Wait until result (of duplex communication).
-	 *
-	 * Finite.  If infinite duration, hw has failed.
-	 *
-	 * Other implementations use an interrupt flag???
+	 * io is synchronous, will not return until complete.
+	 * No need for spinning.
 	 */
+	// TODO timeouts?
 	while(EUSCI_B_I2C_isBusBusy(I2CInstanceAddress)) ;
 
-	return EUSCI_B_I2C_masterReceiveSingleByte(I2CInstanceAddress);
+	return result;
 }
 
 
@@ -135,6 +138,7 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
     // myAssert(not isEnabled());
 	configureMasterDevice();
 	RegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
+	I2CPins::configure();
 
 	// i2c does not have dedicated pins for select slave
 }
@@ -151,9 +155,9 @@ void I2C::unconfigureMaster() {
 
 static EUSCI_B_I2C_initMasterParam param {
     EUSCI_B_I2C_CLOCKSOURCE_SMCLK,
-    8000000,
+    8000000,    // freq of clock
     EUSCI_B_I2C_SET_DATA_RATE_400KBPS,
-    16,
+    16, // threshold for auto stop
     EUSCI_B_I2C_NO_AUTO_STOP,
 };
 
@@ -181,7 +185,6 @@ void I2C::selectSlave(unsigned int slave) {
     // TODO select from a table of addresses
     // LIS3MDL address is 11100 if SDO pin is grounded, or 11110 if SDO pin is high
     EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, 0b1110);
-    //EUSCI_B_I2C_setMode();
 }
 
 

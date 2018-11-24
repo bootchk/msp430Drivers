@@ -89,6 +89,17 @@
 #define SPI_CLK_PORT  GPIO_PORT_P2
 #define SPI_CLK_PIN   GPIO_PIN4
 
+
+
+// msp430fr2433 and Launchpad MSP-EXP430FR2433, using instance UCB0:
+// data P1.2
+// clock P1.3
+#define I2C_SDA_PORT  GPIO_PORT_P1
+#define I2C_SDA_PIN   GPIO_PIN2
+
+#define I2C_SCL_PORT  GPIO_PORT_P1
+#define I2C_SCL_PIN   GPIO_PIN3
+
 #endif
 
 

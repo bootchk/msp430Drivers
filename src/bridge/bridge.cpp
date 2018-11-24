@@ -33,7 +33,8 @@ void innerReadBuffer( unsigned char * bufferPtr, unsigned int size) {
 	     * Transfer as a read requires dummy byte here a distinctive pattern.
 	     * Expect return value is from slave
 	     */
-		bufferPtr[i] = Serial::transfer(0b10101010);
+		bufferPtr[i] = Serial::transfer(ReadOrWrite::Read,
+		                                0b10101010);    // nonsense value
 	}
 }
 
@@ -41,7 +42,8 @@ void innerWriteBuffer( unsigned char * bufferPtr, unsigned int size) {
 	// require slave already selected
 	for(unsigned int i = 0; i < size; i++) {
 		// ignore returned read
-		(void) Serial::transfer(bufferPtr[i]);
+		(void) Serial::transfer(ReadOrWrite::Write,
+		                        bufferPtr[i]);
 	}
 }
 
@@ -88,13 +90,16 @@ void Bridge::unconfigureMcuSide() {
 void Bridge::write(BridgedAddress address, unsigned char value) {
 	// require mcu Serial interface configured
 
-    // discard values read during writes of address and value
+    // (void) means discard values read during writes of address and value
 	Serial::selectSlave(address.device);
-	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
-	(void) Serial::transfer( value);
+	(void) Serial::transfer(ReadOrWrite::Write,
+	                        RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
+	(void) Serial::transfer(ReadOrWrite::Write,
+	                        value);
 
 	Serial::deselectSlave();
 
+	// reread and return the value  that was written, so caller may ensure it was written correctly
 	unsigned char finalValue = Bridge::read(address);
 	//myAssert(finalValue == value);
 }
@@ -131,10 +136,11 @@ unsigned char Bridge::read(BridgedAddress address) {
 	unsigned char result;
 
 	Serial::selectSlave(address.device);
-	// transfer address
-	(void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
-	// transfer single byte of data
-	result = Serial::transfer( 0 );
+	// write register address to bus, where address designates read the register
+	(void) Serial::transfer(ReadOrWrite::Write,
+	                        RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+	// read single byte of data
+	result = Serial::transfer( ReadOrWrite::Read, 0 );
 	Serial::deselectSlave();
 	return result;
 }
@@ -145,8 +151,9 @@ void Bridge::readBuffer(BridgedAddress address,
                         unsigned char * destination) {
 
     Serial::selectSlave(address.device);
-    // transfer the address
-    (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+    // write register address
+    (void) Serial::transfer(ReadOrWrite::Write,
+                            RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
     // transfer the data bytes
     innerReadBuffer(destination, length);
     Serial::deselectSlave();
@@ -157,8 +164,9 @@ void Bridge::writeBuffer(BridgedAddress address,
                         unsigned char * source) {
 
     Serial::selectSlave(address.device);
-    // transfer the address
-    (void) Serial::transfer(RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
+    // write register address
+    (void) Serial::transfer(ReadOrWrite::Write,
+                            RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
     // transfer the data bytes
     innerWriteBuffer(source, length);
     Serial::deselectSlave();
