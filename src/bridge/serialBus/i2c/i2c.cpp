@@ -102,6 +102,7 @@ unsigned char I2C::transfer(ReadOrWrite direction, unsigned char value) {
 	    EUSCI_B_I2C_setMode(I2CInstanceAddress,
 	                        EUSCI_B_I2C_TRANSMIT_MODE);
 	    // TODO enable??
+	    enable();
 	    EUSCI_B_I2C_masterSendSingleByte(I2CInstanceAddress, value);
 	}
 	else {
@@ -183,8 +184,8 @@ void I2C::configureMasterDevice() {
  */
 void I2C::selectSlave(unsigned int slave) {
     // TODO select from a table of addresses
-    // LIS3MDL address is 11100 if SDO pin is grounded, or 11110 if SDO pin is high
-    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, 0b1110);
+    //  is
+    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, LIS3MDLAddress);
 }
 
 

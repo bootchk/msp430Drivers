@@ -4,6 +4,10 @@
  */
 
 
+/*
+ * Wiring:
+ * Using i2c, CS pin should be tied high.  Also, SDO pin should be tied low or high to choose the i2c address the compass responds to.
+ */
 
 // The constant a LIS3MDL chip returns as identifier from register that holds ID
 const unsigned int LIS3MDLIdentifier = 0x3D;

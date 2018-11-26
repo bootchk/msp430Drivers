@@ -20,6 +20,7 @@
  *
  * Also, a session is designated read or write.
  * (Even though SPI is full duplex and a session can read and write at the same time.)
+ * Also, even though a session is "read from slave", it requires reads and writes over the bus.
  */
 
 

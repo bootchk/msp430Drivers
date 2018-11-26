@@ -18,7 +18,9 @@ void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 	SERIAL_DEVICE_CLASS::configureMaster(isRWBitHighForRead);
 
 	SERIAL_DEVICE_CLASS::selectSlave(slave);
-	SERIAL_DEVICE_CLASS::enable();
+
+	// TODO TEMP for i2c, don't enable until after set mode
+	// SERIAL_DEVICE_CLASS::enable();
 
 	// ensure ready for transfer()
 }

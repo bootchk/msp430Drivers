@@ -197,3 +197,9 @@
 #define PSideLEDPort GPIO_PORT_P1
 #define PSideLEDPin  GPIO_PIN1
 
+
+/*
+ * 11100 if SDO pin is grounded
+ * 11110 if SDO pin is high
+ */
+#define LIS3MDLAddress 0b11100
