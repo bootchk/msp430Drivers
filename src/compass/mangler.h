@@ -8,8 +8,7 @@ public:
     static unsigned int readCompassHeading();
     static void readAndDiscardToResetDataReady();
 
-private:
-    static void readRawBytesOfMagneticData();
-    static void convertRawBytesToIntMagneticData();
-    static unsigned int convertThreeAxisIntMagneticDataToCompassHeading();
+    //static void readRawBytesOfMagneticData();
+    static void convertRawBytesToIntMagneticData(unsigned char rawMag[6], int mag[3]);
+    static unsigned int convertThreeAxisIntMagneticDataToCompassHeading(int mag[3]);
 };

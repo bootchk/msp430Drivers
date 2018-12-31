@@ -1,21 +1,23 @@
 
 #include "bridge.h"
 
-// The serial bus that the bridge crosses
+/*
+ * Crosses a Serial channel, typically  SPI or I2C
+ */
 #include "serialBus/serial.h"
 
 #include "addressMangler.h"
 
-//#include "../../debug/myAssert.h"
+#include "../assert/myAssert.h"
 
-/*
- * Uses a Serial channel, typically  SPI or I2C
- */
+
 
 
 
 
 namespace {
+
+unsigned int chosenDevice;
 
 /*
  * Transfer many bytes over the bus.
@@ -64,18 +66,18 @@ void innerWriteBuffer( unsigned char * bufferPtr, unsigned int size) {
 void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 	// not require isSPIReady() since configuration is on the mcu side
 
+    /*
+     * Modal choice of device
+     */
+    // TODO not implemented in lower layers to choose corresponding select line
+    chosenDevice = 1;
+
 	/*
 	 * Enable serial device
 	 * Configure a set of the mcu's GPIO pins for the serial peripheral/module
 	 * e.g. a SPI module
 	 */
-	/*
-	 * we don't need to specify SS pin on Energia?
-	 * Docs for begin() says is configures default SS pin in the SPI library.
-	 * But code seems to indicate it doesn't.
-	 * Although there exists an overloaded transfer(SSpin, value) method apparently not implemented on Energia.
-	 */
-	Serial::begin(1,isRWBitHighForRead);
+	Serial::begin(chosenDevice, isRWBitHighForRead);
 }
 
 
@@ -87,35 +89,37 @@ void Bridge::unconfigureMcuSide() {
 
 
 
-void Bridge::write(BridgedAddress address, unsigned char value) {
+void Bridge::write(RegisterAddress registerAddress, unsigned char value) {
 	// require mcu Serial interface configured
 
     // (void) means discard values read during writes of address and value
-	Serial::selectSlave(address.device);
+	Serial::selectSlave(chosenDevice);
 	(void) Serial::transfer(ReadOrWrite::Write,
-	                        RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
+	                        SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Write));
 	(void) Serial::transfer(ReadOrWrite::Write,
 	                        value);
 
 	Serial::deselectSlave();
 
 	// reread and return the value  that was written, so caller may ensure it was written correctly
-	unsigned char finalValue = Bridge::read(address);
-	//myAssert(finalValue == value);
+	unsigned char finalValue = Bridge::read(registerAddress);
+//#ifdef VERIFY_BRIDGE_WRITES
+	myAssert(finalValue == value);
+//#endif
 }
 
 
 /*
  * See I2C Device library, Github for comparable code.
  */
-void Bridge::setBits(BridgedAddress address, unsigned char mask) {
+void Bridge::setBits(RegisterAddress registerAddress, unsigned char mask) {
 
-    unsigned char initialValue = Bridge::read(address);
+    unsigned char initialValue = Bridge::read(registerAddress);
 
-    Bridge::write(address, mask | initialValue );
+    Bridge::write(registerAddress, mask | initialValue );
 }
 
-void Bridge::clearBits(BridgedAddress address, unsigned char mask) {
+void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
 
     /*
      * initial value          11
@@ -123,22 +127,22 @@ void Bridge::clearBits(BridgedAddress address, unsigned char mask) {
      * ~mask                  10
      * initial value & ~mask  10
      */
-    unsigned char initialValue = Bridge::read(address);
+    unsigned char initialValue = Bridge::read(registerAddress);
 
-    Bridge::write(address, initialValue & ~mask );
+    Bridge::write(registerAddress, initialValue & ~mask );
 }
 
 
 
-unsigned char Bridge::read(BridgedAddress address) {
+unsigned char Bridge::read(RegisterAddress registerAddress) {
 	// require mcu Serial interface configured
 
 	unsigned char result;
 
-	Serial::selectSlave(address.device);
-	// write register address to bus, where address designates read the register
+	Serial::selectSlave(chosenDevice);
+	// write registerAddress to bus, where address designates read the register
 	(void) Serial::transfer(ReadOrWrite::Write,
-	                        RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+	                        SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Read));
 	// read single byte of data
 	result = Serial::transfer( ReadOrWrite::Read, 0 );
 	Serial::deselectSlave();
@@ -146,27 +150,27 @@ unsigned char Bridge::read(BridgedAddress address) {
 }
 
 
-void Bridge::readBuffer(BridgedAddress address,
+void Bridge::readBuffer(RegisterAddress registerAddress,
                         unsigned int length,
                         unsigned char * destination) {
 
-    Serial::selectSlave(address.device);
-    // write register address
+    Serial::selectSlave(chosenDevice);
+    // write registerAddress
     (void) Serial::transfer(ReadOrWrite::Write,
-                            RegisterAddressMangler::mangle(address, ReadOrWrite::Read));
+                            SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Read));
     // transfer the data bytes
     innerReadBuffer(destination, length);
     Serial::deselectSlave();
 }
 
-void Bridge::writeBuffer(BridgedAddress address,
+void Bridge::writeBuffer(RegisterAddress registerAddress,
                         unsigned int length,
                         unsigned char * source) {
 
-    Serial::selectSlave(address.device);
-    // write register address
+    Serial::selectSlave(chosenDevice);
+    // write registerAddress
     (void) Serial::transfer(ReadOrWrite::Write,
-                            RegisterAddressMangler::mangle(address, ReadOrWrite::Write));
+                            SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Write));
     // transfer the data bytes
     innerWriteBuffer(source, length);
     Serial::deselectSlave();

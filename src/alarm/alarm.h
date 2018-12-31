@@ -152,6 +152,18 @@ class Alarm {
 	 */
 	static bool clearAlarmOnRTC();
 
+
+
+
+	/*
+	 * Clear alarm on RTC side of interface.
+	 * Might reset instead of returning.
+	 * RTC is remote device that may fail.
+	 */
+	static void clearAlarmOnRTCOrReset();
+
+
+public:
     /*
      * Is logical state of signal high?
      * Does not mean the mcu interrupt flag is not set.
@@ -161,24 +173,27 @@ class Alarm {
      * The signal is on a net of two pins:
      *  - RTC Fout/nIRQ pin
      *  - some GPIO pin of the mcu
+     *
+     * Mainly public for testing.
      */
     static bool isAlarmInterruptSignalHigh();
 
 
 
-
-public:
-	/*
-	 * Might reset instead of returning.
-	 * RTC is remote device that may fail.
-	 */
-	static void clearAlarmOnRTCOrReset();
-
-
 	/*
 	 * Clear alarm interrupt flag on MCU side of signal.
+	 *
+	 * clearAlarm() is more general,
+	 * but the ISR for alarm can call this to clear part of the alarm state.
 	 */
 	static void clearAlarmOnMCU();
+
+    /*
+     * Clear alarm on both sides of interface.
+     */
+    static void clearAlarm();
+
+
 
 	/*
 	 * Set alarm to go off duration from now.
@@ -190,20 +205,23 @@ public:
 	static bool setAlarmDurationSecondsFromNow(Duration);
 
 	/*
-	 *
+	 * Set alarm to given time in future.
+	 * !!! It must be in future, else alarm will not go off.
 	 */
 	static bool setAlarmToTime(EpochTime);
 
-	/*
-	 * Clear alarm on both sides of interface.
-	 */
-	static void clearAlarm();
+
+
+
+
 
     /*
      * Prepare for setAlarm()
      * May reset on failure.
      *
      * May lose time on RTC.
+     *
+     * Configures bus pins, and alarm pin
      */
     static void configureForAlarming();
 

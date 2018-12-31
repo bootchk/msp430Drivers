@@ -8,12 +8,12 @@ Pragmatics
 ==========
 
 Currently not built as a linkable library.
-Copy src into a folder into your project.
+Copy src into a folder into your project (or link a folder in your project to msp430Drivers/src.)
 And add an include path to that folder.
 
 
 Requires TI MSPWare DriverLib
-============================
+=============================
 
 You might be able to use TI Resource Explorer.
 On MacOS, download standalone MSPWare installer and install to /applications/ti.
@@ -26,3 +26,22 @@ specifically the version for your processor family e.g. MSP430FR2xx4xx
 
 The above fails?  So just copy the driverlib directory into the project
 and add an include path to the project properties.
+
+
+Configuration
+=============
+
+board.h defines the configuration of your PCB (the functions of GPIO pins of the mcu.)
+
+config.h defines other configuration of the library (for testing versus production.)
+
+driverParameters defines constants for certain drivers
+
+
+Layers
+======
+
+Loosely speaking, there are high level drivers and low-level drivers.
+The high-level drivers should be platform independent.
+The low-level drivers target a specific platform family.
+But a platform specific library of lower-level drivers (e.g. DriverLib for the MSP430) are independent of specific family member.

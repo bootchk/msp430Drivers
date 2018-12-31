@@ -1,14 +1,14 @@
 
-#include "../realTimeClock/realTimeClock.h"
+#include "../src/compass/compass.h"
 
 //#include "../pinFunction/spiPins.h"
-#include "../bridge/bridge.h"
+#include "../src/bridge/bridge.h"
 
 // DriverLib
 #include <pmm.h>
 
 
-void testRTC()
+void testCompass()
 {
     PMM_unlockLPM5();
 
@@ -16,15 +16,21 @@ void testRTC()
     // Compass::turnPowerOn();
     // Compass is not ready until later, require a delay
 
-    Bridge::configureMcuSide(false);
-    // assert SPI bus ready
+    Bridge::configureMcuSide(true);
+    // assert serial bus ready
 
-    bool foo = RTC::isReadable();
+    bool foo = Compass::isSane();
+
+    unsigned char bar = Compass::readStatus();
+
+    Compass::reset();
+
 
     // forever, single step forward
     while (true)
     {
-        // RTC::foo();
+        Compass
+        ::readSingleCompassHeading();
 
         __delay_cycles(500000);
     }

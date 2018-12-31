@@ -13,18 +13,21 @@
  *
  * BIT7 means read or write.
  * BIT6 means multiple byte transfer.
+ *
+ * This is only for SPI.  I2C uses a RW bit outside the register address.
+ * ??? I2C uses different bit mangling of register address to indicate multiple byte reads?
  */
 
-#include "bridge.h"  // BridgedAddress
 #include "serialBus/serial.h" // ReadOrWrite
+#include "bridge.h"  // RegisterAddress
 
 
-class RegisterAddressMangler {
+class SPIRegisterAddressMangler {
     // Whether the chip wants MSBit to be high on a read.
     static bool isRWBitHighForRead;
 
 public:
-    static unsigned char mangle(BridgedAddress, ReadOrWrite);
+    static unsigned char mangle(RegisterAddress registerAddress, ReadOrWrite);
 
     static void configureRWBitHighForRead(bool);
 };

@@ -2,6 +2,13 @@
 
 #include "../SoC/SoC.h"
 
+#include "../config.h"
+
+#include <cassert>
+
+
+
+
 #ifdef OLD
 #include <msp430.h>
 
@@ -14,8 +21,9 @@
 
 #endif
 
-// On production PCB
-#define FATAL_PRODUCTION 1
+
+
+
 
 
 void Fatal::reboot() {
@@ -33,22 +41,27 @@ void Fatal::reboot() {
 }
 
 
-
-void Fatal::fatalReset() {
 #ifdef FATAL_TESTING
-    Fatal::warbleGreenLEDForever();
+
+void Fatal::fatalReset()                   { Fatal::warbleGreenLEDForever(); }
+void Fatal::fatalAssert(unsigned int line) { Fatal::warbleRedLEDForever(); }
+
+
 #elif defined(FATAL_PRODUCTION)
-    reboot();
+
+void Fatal::fatalReset()                   { reboot(); }
+void Fatal::fatalAssert(unsigned int line) { reboot(); }
+
+#elif defined(FATAL_DEBUGGING)
+
+// Delegate to C assert
+void Fatal::fatalReset()                   { assert(false); }
+void Fatal::fatalAssert(unsigned int line) { assert(false); }
+
 #endif
-}
 
-void Fatal::fatalAssert(unsigned int line) {
-    // TODO Debug::persistLineNumber(line);
 
-#ifdef FATAL_TESTING
-    Fatal::warbleRedLEDForever();
-#elif defined(FATAL_PRODUCTION)
-    reboot();
-#endif
+// TODO Debug::persistLineNumber(line);
 
-}
+
+

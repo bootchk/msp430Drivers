@@ -67,6 +67,9 @@ public:
 	/*
 	 * Select slave on serial bus.
 	 * This directs a transfer to one of many slave devices on bus.
+	 *
+	 * SPI: drive dedicated signal high
+	 * I2C: set slave address to be sent over bus
 	 */
 	static void selectSlave(unsigned int slave);
 	static void deselectSlave();

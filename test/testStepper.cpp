@@ -1,5 +1,5 @@
 
-#include "../stepper/stepper.h"
+#include "../src/stepper/stepper.h"
 
 // DriverLib
 #include <pmm.h>

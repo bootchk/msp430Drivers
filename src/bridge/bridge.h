@@ -1,6 +1,7 @@
 
 #pragma once
 
+
 /*
  * Abstracts access across a bridge.
  * A bridge across a serial channel.
@@ -10,7 +11,7 @@
  *
  * Hides any quirks of the remote device protocol:
  * - the upper bit(s) of register address have special meaning.
- * - send BridgedAddress, then values
+ * - send registerAddress, then values
  *
  * Hides handshaking: which is not necessary when slave is always ready for serial communication.
  * More handshaking is necessary when there are many masters.
@@ -25,24 +26,20 @@
  * However, they can be used consecutively.
  *
  * A bridge is a bus having possibly many slaves.
- * TODO can two slaves be used in same session?
- * What is a session?
+ * A bridge is modal on the selected slave.
+ * Slave is selected when Bridge is configured.
+ * Different slaves can only use the Bridge sequentially, not concurrently.
+ *
+ * The Bridge class is a singleton.
+ *
+ * A registerAddress on remote device is an unsigned byte.
+ * First you configure Bridge for a device (which on some busses has a slaveAddress.
+ * Then you address a registerAddress (a subaddress?) on the device.
+ *
  */
 
 
-
-
-
-/*
- * An address on remote device.
- * BridgedAddress is one byte transmitted across the bridge.
- */
-typedef struct {
-    unsigned int device;       // which slave chip instance
-    unsigned char subaddress;  // which slave register addressed
-} BridgedAddress ;
-
-
+typedef unsigned char RegisterAddress;
 
 
 class Bridge {
@@ -74,27 +71,27 @@ public:
 	/*
 	 * Read single byte
 	 */
-	static unsigned char read(BridgedAddress);
+	static unsigned char read(RegisterAddress registerAddress);
 
 	/*
 	 * Read/write many consecutive bytes
 	 */
-	static void readBuffer(BridgedAddress,
+	static void readBuffer(RegisterAddress registerAddress,
 	                                unsigned int length,
 	                                unsigned char * destination);
-	static void writeBuffer(BridgedAddress,
+	static void writeBuffer(RegisterAddress registerAddress,
 	                                    unsigned int length,
 	                                    unsigned char * source);
 
 	/*
-	 * Write one byte to remote register at BridgedAddress.
+	 * Write one byte to remote register at RegisterAddress registerAddress.
 	 *
 	 * Assertions ensure register contains value.
 	 * Said assertions read back the register.
 	 * This is not appropriate when a read will clear a register
 	 * (But there are no such registers on this RTC chip.)
 	 */
-	static void write(BridgedAddress, unsigned char value);
+	static void write(RegisterAddress registerAddress, unsigned char value);
 
 	/*
 	 * Convenience functions.
@@ -102,14 +99,14 @@ public:
 	 * then write (with the new value)
 	 */
 	/*
-	 * Sets bits given by mask to remote register at BridgedAddress.
+	 * Sets bits given by mask to remote register at registerAddress.
 	 * Ensures that masked bits of register are set.
 	 * Ensures all other bits (not masked) retain their values.
 	 *
 	 * Not general purpose: more generally, you would pass a mask and a value for the masked bits.
 	 */
-	static void setBits(BridgedAddress, unsigned char mask);
+	static void setBits(RegisterAddress registerAddress, unsigned char mask);
 
-	static void clearBits(BridgedAddress, unsigned char mask);
+	static void clearBits(RegisterAddress registerAddress, unsigned char mask);
 
 };

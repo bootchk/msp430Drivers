@@ -40,6 +40,16 @@
 
 
 
+static EUSCI_B_I2C_initMasterParam param {
+    EUSCI_B_I2C_CLOCKSOURCE_SMCLK,
+    8000000,    // freq of clock
+    EUSCI_B_I2C_SET_DATA_RATE_400KBPS,
+    16, // threshold for auto stop
+    EUSCI_B_I2C_NO_AUTO_STOP,
+};
+
+
+
 void I2C::enable() {
 	EUSCI_B_I2C_enable(I2CInstanceAddress);
 }
@@ -58,6 +68,7 @@ bool I2C::isEnabled() {
     return ((UCA1CTLW0 & BIT0) == 0) ;
 #endif
 }
+
 
 
 /*
@@ -138,7 +149,8 @@ unsigned char I2C::transfer(ReadOrWrite direction, unsigned char value) {
 void I2C::configureMaster(bool isRWBitHighForRead) {
     // myAssert(not isEnabled());
 	configureMasterDevice();
-	RegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
+	// TODO this is wrong, i2c mangles for multiple reads
+	SPIRegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
 	I2CPins::configure();
 
 	// i2c does not have dedicated pins for select slave
@@ -154,13 +166,7 @@ void I2C::unconfigureMaster() {
 
 
 
-static EUSCI_B_I2C_initMasterParam param {
-    EUSCI_B_I2C_CLOCKSOURCE_SMCLK,
-    8000000,    // freq of clock
-    EUSCI_B_I2C_SET_DATA_RATE_400KBPS,
-    16, // threshold for auto stop
-    EUSCI_B_I2C_NO_AUTO_STOP,
-};
+
 
 
 /*

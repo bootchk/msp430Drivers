@@ -87,7 +87,12 @@ void Alarm::configureMcuSide() {
 }
 
 // TODO this should be done somewhere else when there are two slaves
-void Alarm::configureMcuSPIInterface(){ Bridge::configureMcuSide(false); }
+void Alarm::configureMcuSPIInterface(){
+    // TODO hardcoded for AB0815, false means RW bit is not high (is low) for a read
+    Bridge::configureMcuSide(false);
+}
+
+
 
 void Alarm::unconfigureMcuSPIInterface() {
     Bridge::unconfigureMcuSide();

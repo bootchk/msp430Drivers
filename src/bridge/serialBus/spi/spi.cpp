@@ -128,7 +128,7 @@ unsigned char SPI::transfer(ReadOrWrite direction,  // not used for SPI
 void SPI::configureMaster(bool isRWBitHighForRead) {
     // myAssert(not isEnabled());
 	configureMasterDevice();
-	RegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
+	SPIRegisterAddressMangler::configureRWBitHighForRead(isRWBitHighForRead);
 	SPIPins::configure();
 }
 
@@ -182,19 +182,22 @@ void SPI::configureMasterDevice() {
      For AB08xx RTC
 
      MODE == 3 => CPOL=1, CPHA=1
-     For AB08xx RTC
+     For AB0815 RTC
      */
-	// setDataMode()
-	// TODO a parameter
 
-	// AB08x5
-	//param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
-	//param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
+	// AB0815 specific
+	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_LOW;
+
+#ifdef CRUFT
+	A hack trying to use LIS3MDL
+	Should be a parameter, setDataMode()
 
 	// ?? Doesn't work LIS3MDL
 	param.clockPolarity = EUSCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH;
 	// param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT;
 	param.clockPhase = EUSCI_A_SPI_PHASE_DATA_CAPTURED_ONFIRST_CHANGED_ON_NEXT;
+#endif
 
 
 	/*

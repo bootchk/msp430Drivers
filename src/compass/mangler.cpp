@@ -6,7 +6,7 @@
 #include <math.h>
 
 
-
+// mag data is signed
 int16_t mag[3];
 
 uint8_t rawMag[6];
@@ -15,8 +15,8 @@ uint8_t rawMag[6];
 unsigned int Mangler::readCompassHeading(){
     CompassInterface::readRawBytesOfMagneticData(rawMag);
     // TODO if failed
-    convertRawBytesToIntMagneticData();
-    return convertThreeAxisIntMagneticDataToCompassHeading();
+    convertRawBytesToIntMagneticData(rawMag, mag);
+    return convertThreeAxisIntMagneticDataToCompassHeading(mag);
 }
 
 void Mangler::readAndDiscardToResetDataReady() {
@@ -33,7 +33,7 @@ void Mangler::readAndDiscardToResetDataReady() {
  * low, high
  * I.E. consecutive register bytes are xlow, xhigh, ylow, ...
  */
-void Mangler::convertRawBytesToIntMagneticData() {
+void Mangler::convertRawBytesToIntMagneticData(unsigned char rawMag[6], int mag[3] ) {
     // combine high and low bytes into signed 16-bit int
      mag[0] = (int16_t)(rawMag[1] << 8 | rawMag[0]);
      mag[1] = (int16_t)(rawMag[3] << 8 | rawMag[2]);
@@ -61,7 +61,7 @@ Direction (y=0, x<0) = 180.0
 Direction (y=0, x>0) = 0.0
 */
 
-unsigned int Mangler::convertThreeAxisIntMagneticDataToCompassHeading() {
+unsigned int Mangler::convertThreeAxisIntMagneticDataToCompassHeading(int mag[3]) {
     unsigned int result;
 
     if (mag[1] == 0) {

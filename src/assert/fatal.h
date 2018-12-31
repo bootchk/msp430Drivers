@@ -30,10 +30,10 @@ public:
      */
     static void abortGreenLED();
 
-    /*
-     *
-     */
+    // Software reset
     static void reboot();
+    // Fatal condition discovered in ordinary code
     static void fatalReset();
+    // Fatal condition discovered by myAssert()
     static void fatalAssert(unsigned int);
 };

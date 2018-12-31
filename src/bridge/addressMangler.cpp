@@ -2,28 +2,45 @@
 #include "addressMangler.h"
 
 
-bool RegisterAddressMangler::isRWBitHighForRead = true;
+bool SPIRegisterAddressMangler::isRWBitHighForRead = true;
 
 
 
 
 
-void RegisterAddressMangler::configureRWBitHighForRead(bool yesNo) {
-    RegisterAddressMangler::isRWBitHighForRead = yesNo;
+void SPIRegisterAddressMangler::configureRWBitHighForRead(bool yesNo) {
+    SPIRegisterAddressMangler::isRWBitHighForRead = yesNo;
 }
 
 
 
 
-unsigned char RegisterAddressMangler::mangle(BridgedAddress address, ReadOrWrite direction) {
+unsigned char SPIRegisterAddressMangler::mangle(RegisterAddress address, ReadOrWrite direction)
+{
     unsigned char result;
 
-    if (isRWBitHighForRead and direction == ReadOrWrite::Read) {
-        // bit set
-        result = 128 | (unsigned char) address.subaddress;
-    }
-    else {
-        result = 127 & (unsigned char) address.subaddress;
+    result = address;
+
+    switch (direction) {
+    case ReadOrWrite::Read :
+        if (isRWBitHighForRead)
+        {
+            result = 128 | result; // bit set
+        }
+        else
+        {
+            result = 127 & result;
+        }
+        break;
+    case ReadOrWrite::Write:
+        if (isRWBitHighForRead)
+        {
+            result = 127 & result;
+        }
+        else
+        {
+            result = 128 | result;  // bit set
+        }
     }
 
     // Temp test: set the multiple read byte, BIT6

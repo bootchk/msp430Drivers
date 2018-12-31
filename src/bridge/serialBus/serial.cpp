@@ -1,11 +1,15 @@
 
 #include "serial.h"
 
-// Change the implementation between two choices
-//#define SERIAL_DEVICE_CLASS SPI
-//#include "spi/spi.h"
+// Implementation is either I2C or SPI
+#ifdef SERIAL_IS_I2C
 #define SERIAL_DEVICE_CLASS I2C
 #include "i2c/i2c.h"
+#else
+#define SERIAL_DEVICE_CLASS SPI
+#include "spi/spi.h"
+#endif
+
 
 
 
@@ -19,8 +23,8 @@ void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 
 	SERIAL_DEVICE_CLASS::selectSlave(slave);
 
-	// TODO TEMP for i2c, don't enable until after set mode
-	// SERIAL_DEVICE_CLASS::enable();
+	// TODO for i2c, don't enable until after set mode
+	SERIAL_DEVICE_CLASS::enable();
 
 	// ensure ready for transfer()
 }

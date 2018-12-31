@@ -199,7 +199,9 @@
 
 
 /*
- * 11100 if SDO pin is grounded
- * 11110 if SDO pin is high
+ * 7-bit address
+ * 0011100 if SDO pin is grounded
+ * 0x1e  0b0011110 if SDO pin is high
+ * Pololu breakout board pullups SDO pin high by default.
  */
-#define LIS3MDLAddress 0b11100
+#define LIS3MDLAddress 0x1e
