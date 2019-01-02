@@ -4,7 +4,7 @@
 // mcu hal layer e.g. MSPWare DriverLib
 #include <gpio.h>   // depends on msp430.h
 
-#include "../board.h"
+#include <board.h>
 
 
 

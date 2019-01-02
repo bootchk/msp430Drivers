@@ -1,11 +1,11 @@
 
 #include "led.h"
 
-
 // DriverLib
 #include <gpio.h>
 
-#include "../board.h"
+// App
+#include <board.h>
 
 
 

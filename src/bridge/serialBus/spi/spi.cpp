@@ -1,6 +1,9 @@
 
 #include "spi.h"
 
+// App
+#include <board.h>
+
 /*
  * Derived from
  * Maksim Gorev spi_driverlib.c http://www.breakmyboard.com/blog/ti-mcu-ti-driverlib-based-simple-spi-library/
@@ -30,10 +33,6 @@
 // alternate device: #include "eusci_b_spi.h"
 
 // Configuration: SPIInstanceAddress
-#include "../../../board.h"
-
-
-// Configure pins used for SPI
 #include "../../../pinFunction/spiPins.h"
 // Configure mangling of address byte
 #include "../../addressMangler.h"

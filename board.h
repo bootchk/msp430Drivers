@@ -1,8 +1,19 @@
 
 #pragma once
 
+
+/*
+ * TODO Currently a mess.
+ * Should be reduced to a template.
+ *
+ * This board.h is only for the test harness of msp430Drivers.
+ * This is NOT in /src and hence not part of the library.
+ * A real app would define board.h higher in the dependency tree.
+ */
+
 // Some right hand sides from gpio.h in DriverLib
 #include <gpio.h>
+
 
 
 /*
@@ -198,6 +209,24 @@
 #define PSideLEDPin  GPIO_PIN1
 
 
+
+/*
+ * A voltage which ensures a slow-rising power supply (solar)
+ * has enough reserve to continue the boot code.
+ * Used at coldstart time, to sleep until Vcc reaches this level.
+ *
+ * This depends on the board: the trigger voltage of the voltage monitor
+ * and the size of the power supply storage.
+ *
+ * Units centivolts
+ */
+#define MinVccForStarting 190
+
+
+
+
+
+
 /*
  * 7-bit address
  * 0011100 if SDO pin is grounded
@@ -205,3 +234,5 @@
  * Pololu breakout board pullups SDO pin high by default.
  */
 #define LIS3MDLAddress 0x1e
+
+

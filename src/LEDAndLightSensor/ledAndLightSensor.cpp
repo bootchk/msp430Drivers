@@ -1,11 +1,13 @@
 
 #include "ledAndLightSensor.h"
+#include "../driverParameters.h"
 
 // DriverLib
 #include <gpio.h>
 
-#include "../board.h"
-#include "../driverParameters.h"
+// App
+#include <board.h>
+
 
 
 /*

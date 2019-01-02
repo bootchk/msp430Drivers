@@ -1,6 +1,10 @@
 
 #include "i2c.h"
 
+// App
+#include <board.h>
+
+
 /*
  * Much specialization here, see TI docs
  * Serial
@@ -25,10 +29,6 @@
 
 
 // Configuration: I2CInstanceAddress
-#include "../../../board.h"
-
-
-// Configure pins used for I2C
 #include "../../../pinFunction/i2cPins.h"
 
 // Configure mangling of address byte

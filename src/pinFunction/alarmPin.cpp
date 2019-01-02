@@ -1,9 +1,11 @@
 
+
 #include "alarmPin.h"
 
-#include "../board.h"
-
 #include "../assert/myAssert.h"
+
+// App
+#include <board.h>
 
 /*
  * Alarm pin

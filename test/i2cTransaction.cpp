@@ -25,7 +25,7 @@
 #include <eusci_b_i2c.h>
 #include <cs.h> // determine clock freq
 
-#include "../src/board.h"   // Module and GPIO defs
+#include <board.h>   // Module and GPIO defs
 
 
 

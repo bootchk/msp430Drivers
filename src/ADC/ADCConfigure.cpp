@@ -1,12 +1,13 @@
 
 #include "ADCConfigure.h"
 
-#include "../board.h"
-
 // DriverLib
 #include <gpio.h>
 #include <adc.h>
 #include <pmm.h>
+
+// App
+#include <board.h>
 
 
 /*

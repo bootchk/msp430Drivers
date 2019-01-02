@@ -1,14 +1,14 @@
 
 #include "ledPins.h"
 
-#include "../board.h"
-
+#include <board.h>
 
 
 
 void LEDPins::configure() {
     // set value before configuring
 
+    // TODO ifdef is cruft
 #ifdef LAUNCHPAD_BOARD
     // Launch pad LED pins 1.0 and 1.1 (out)
 
@@ -22,6 +22,8 @@ void LEDPins::configure() {
 
 #else
     // TODO depend on LEDAndLightSensor method??
+    // IE this assumes driving both sides of LED
+
     // both LED pins low
     GPIO_setOutputLowOnPin(NSideLEDPort, NSideLEDPin);
     GPIO_setOutputLowOnPin(PSideLEDPort, PSideLEDPin);
