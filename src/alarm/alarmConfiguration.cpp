@@ -65,7 +65,12 @@ void Alarm::configureAfterWake() {
 
     Alarm::configureMcuSPIInterface();
 
-    // TODO this should be a reset
+    /*
+     * When RTC is not readable, fatal.
+     * myAssert() will reset the mcu.
+     * Although that probably will not alleviate the fatal condition,
+     * since it doesn't reset the RTC.
+     */
     myAssert(RTC::isReadable());
     // An older design checks the FOUT/nIRQ pin to test readiness of RTC
     // OLD Alarm::resetIfSPINotReady();

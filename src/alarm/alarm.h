@@ -90,8 +90,7 @@ class Alarm {
 	/*
 	 * Configure a set of mcu's GPIO pins for the mcu's SPI peripheral/module,
 	 * and configure the mcu's SPI peripheral with parameters matching the rtc's SPI.
-	 *
-	 * No error return.
+	 * Does NOT configure the alarm pin.
 	 *
 	 * The library does not support use of said GPIO pins for other purposes while the library is in use.
 	 */

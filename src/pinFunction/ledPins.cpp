@@ -1,6 +1,7 @@
 
 #include "ledPins.h"
 
+// board.h comes from App or from test harness directory
 #include <board.h>
 
 
