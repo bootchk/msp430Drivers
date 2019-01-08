@@ -27,11 +27,20 @@ void LEDAndLightSensor::toMeasuringFromReversed() {
 }
 
 
+
+/*
+ * Low power considerations:
+ * the loop body takes tens of instructions.
+ * The CPU is active during the loop.
+ * We want to minimize the max loop iterations to minimize power consumed.
+ *
+ */
 unsigned int LEDAndLightSensor::measureByBleeding() {
     unsigned int result;
     unsigned char value;
 
-    for ( result = 0; result < 30000; result++) {
+    // 30000 is a wildly safe value to use
+    for ( result = 0; result < DriverConstant::MaxCyclesInDarkToDischargeLEDCapacitance; result++) {
         value = GPIO_getInputPinValue(NSideLEDPort, NSideLEDPin);
         // assert value is 0 or 1
         if (  value == GPIO_INPUT_PIN_LOW )
