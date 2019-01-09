@@ -66,4 +66,10 @@ public:
      * lkk Not sure this is necessary.  Added this function so I could test whether it affected LPM4.5.
      */
     static void disableXT1();
+
+    /*
+     * Are all GPIO pins configured for their general purpose IO function (not a module.)
+     * For assertions.
+     */
+    static bool areGPIOGeneralPurpose();
 };
