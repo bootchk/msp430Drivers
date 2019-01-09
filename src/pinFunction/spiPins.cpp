@@ -31,8 +31,12 @@ void SPIPins::unconfigure() {
     GPIO_setAsOutputPin(MOSI_PORT,    MOSI_PIN);
     GPIO_setAsOutputPin(SPI_CLK_PORT, SPI_CLK_PIN);
 
-    // OLD GPIO_setAsOutputPin(MISO_PORT,    MISO_PIN);
-    GPIO_setAsInputPinWithPullDownResistor(MISO_PORT,    MISO_PIN);
+    /*
+     * Not clear whether to leave this configured as input or output.
+     * It is an input but the signal source (the slave) is not driving it (high impedance?)
+     */
+    GPIO_setAsOutputPin(MISO_PORT,    MISO_PIN);
+    //GPIO_setAsInputPinWithPullDownResistor(MISO_PORT,    MISO_PIN);
 }
 
 

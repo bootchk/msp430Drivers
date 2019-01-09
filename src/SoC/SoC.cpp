@@ -3,6 +3,7 @@
 
 // TI driverlib
 #include <sysctl.h>
+#include <cs.h>
 
 #include "../SoC/SoC.h"
 #include "../PMM/powerMgtModule.h"
@@ -88,3 +89,8 @@ void SoC::triggerSoftwareReset() { PMM::triggerSoftwareBORReset(); }
  * (Another version delegates to PMM)
  */
 bool SoC::isResetAWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }
+
+
+void SoC::disableXT1() {
+    CS_turnOffXT1();
+}

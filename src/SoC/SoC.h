@@ -58,4 +58,12 @@ public:
 
 
     static void triggerSoftwareReset();
+
+    /*
+     * Disable XT1AutoOff.
+     * XT1AutoOff defaults to enabled.
+     * This function is stronger: ensures that XT1 is off unless it is selected in Port function.
+     * lkk Not sure this is necessary.  Added this function so I could test whether it affected LPM4.5.
+     */
+    static void disableXT1();
 };
