@@ -1,6 +1,10 @@
 
 #pragma once
 
+#include "../bridge.h"   // RegisterAddress
+
+
+
 /*
  * A serial interface using SPI or I2C.
  *
@@ -73,4 +77,7 @@ public:
 	 */
 	static void selectSlave(unsigned int slave);
 	static void deselectSlave();
+
+
+	static RegisterAddress mangleRegisterAddress(ReadOrWrite, RegisterAddress address );
 };

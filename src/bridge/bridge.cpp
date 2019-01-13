@@ -1,4 +1,5 @@
 
+
 #include "bridge.h"
 
 /*
@@ -6,11 +7,11 @@
  */
 #include "serialBus/serial.h"
 
-#include "addressMangler.h"
-
 #include "../assert/myAssert.h"
 
+#include "../driverConfig.h"
 
+//#include <src/bridge/SPIAddressMangler.h>
 
 
 
@@ -92,6 +93,7 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 
 void Bridge::unconfigureMcuSide() {
 	Serial::end();
+	_isConfigured = false;
 	// assert all serial pins low power
 }
 
@@ -99,14 +101,15 @@ void Bridge::unconfigureMcuSide() {
 
 
 void Bridge::write(RegisterAddress registerAddress, unsigned char value) {
-	// require mcu Serial interface configured
+    myRequire(isConfigured());
 
     // (void) means discard values read during writes of address and value
 	Serial::selectSlave(chosenDevice);
-	(void) Serial::transfer(ReadOrWrite::Write,
-	                        SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Write));
-	(void) Serial::transfer(ReadOrWrite::Write,
-	                        value);
+
+	RegisterAddress mangled;
+	mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
+	(void) Serial::transfer(ReadOrWrite::Write, mangled);
+	(void) Serial::transfer(ReadOrWrite::Write, value);
 
 	Serial::deselectSlave();
 
@@ -150,8 +153,9 @@ unsigned char Bridge::readByte(RegisterAddress registerAddress) {
 
 	Serial::selectSlave(chosenDevice);
 	// write registerAddress to bus, where address designates read the register
-	(void) Serial::transfer(ReadOrWrite::Write,
-	                        SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Read));
+    RegisterAddress mangled;
+    mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
+	(void) Serial::transfer(ReadOrWrite::Write, mangled);
 	// read single byte of data
 	result = Serial::transfer( ReadOrWrite::Read, 0 );
 	Serial::deselectSlave();
@@ -168,9 +172,10 @@ void Bridge::readBuffer(RegisterAddress registerAddress,
     myRequire(isConfigured());
 
     Serial::selectSlave(chosenDevice);
+    RegisterAddress mangled;
+    mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
     // write registerAddress
-    (void) Serial::transfer(ReadOrWrite::Write,
-                            SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Read));
+    (void) Serial::transfer(ReadOrWrite::Write, mangled);
     // transfer the data bytes
     innerReadBuffer(destination, length);
     Serial::deselectSlave();
@@ -183,9 +188,10 @@ void Bridge::writeBuffer(RegisterAddress registerAddress,
     myRequire(isConfigured());
 
     Serial::selectSlave(chosenDevice);
+    RegisterAddress mangled;
+    mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
     // write registerAddress
-    (void) Serial::transfer(ReadOrWrite::Write,
-                            SPIRegisterAddressMangler::mangle(registerAddress, ReadOrWrite::Write));
+    (void) Serial::transfer(ReadOrWrite::Write, mangled);
     // transfer the data bytes
     innerWriteBuffer(source, length);
     Serial::deselectSlave();

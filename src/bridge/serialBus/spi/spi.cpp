@@ -1,8 +1,10 @@
 
 #include "spi.h"
+#include "SPIAddressMangler.h"
 
 // App
 #include <board.h>
+
 
 /*
  * Derived from
@@ -35,7 +37,6 @@
 // Configuration: SPIInstanceAddress
 #include "../../../pinFunction/spiPins.h"
 // Configure mangling of address byte
-#include "../../addressMangler.h"
 
 
 
@@ -221,3 +222,14 @@ void SPI::selectSlave(unsigned int slaveOrdinal) {
     SPIPins::selectSlave();
 }
 void SPI::deselectSlave() { SPIPins::deselectSlave(); }
+
+
+
+
+RegisterAddress SPI::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) {
+    // delegate to separate class which is configured early with the kind of mangling specific to the chip
+    // !!! flipped parameters
+    return SPIRegisterAddressMangler::mangle(address, readOrWrite);
+}
+
+

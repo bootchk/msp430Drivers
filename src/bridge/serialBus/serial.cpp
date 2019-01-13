@@ -58,3 +58,6 @@ unsigned char Serial::transfer(ReadOrWrite direction,
 void Serial::selectSlave(unsigned int slave) { SERIAL_DEVICE_CLASS::selectSlave(slave); }
 void Serial::deselectSlave() { SERIAL_DEVICE_CLASS::deselectSlave(); }
 
+RegisterAddress Serial::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) { SERIAL_DEVICE_CLASS::mangleRegisterAddress(readOrWrite, address); }
+
+

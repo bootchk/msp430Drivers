@@ -1,5 +1,5 @@
 
-#include "addressMangler.h"
+#include "SPIAddressMangler.h"
 
 
 bool SPIRegisterAddressMangler::isRWBitHighForRead = true;

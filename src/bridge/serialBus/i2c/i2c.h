@@ -27,6 +27,8 @@ public:
 	 * Configure SPI.
 	 * When there are multiple slaves, call this before switching to another slave.
 	 * When there is only one slave, can call this once during each booted session.
+	 *
+	 * TODO I2C comments
 	 */
 	static void configureMaster(bool isRWBitHighForRead);
 
@@ -44,4 +46,6 @@ public:
 
 	static void selectSlave(unsigned int);
 	static void deselectSlave();
+
+	static RegisterAddress mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address );
 };

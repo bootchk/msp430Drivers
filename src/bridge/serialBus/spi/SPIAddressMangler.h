@@ -18,8 +18,8 @@
  * ??? I2C uses different bit mangling of register address to indicate multiple byte reads?
  */
 
-#include "serialBus/serial.h" // ReadOrWrite
-#include "bridge.h"  // RegisterAddress
+#include "../serial.h" // ReadOrWrite
+#include "../../bridge.h"  // RegisterAddress
 
 
 class SPIRegisterAddressMangler {

@@ -48,4 +48,6 @@ public:
 
 	static void selectSlave(unsigned int);
 	static void deselectSlave();
+
+	static RegisterAddress mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address );
 };
