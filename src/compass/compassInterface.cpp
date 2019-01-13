@@ -56,13 +56,13 @@ bool CompassInterface::isReadable() {
      */
     unsigned char ID;
 
-    ID = Bridge::read(static_cast<unsigned char>(CompassAddress::Identifier));
+    ID = Bridge::readByte(static_cast<unsigned char>(CompassAddress::Identifier));
     return (ID == LIS3MDLIdentifier);
 }
 
 
 unsigned char CompassInterface::readStatus() {
-    return Bridge::read(static_cast<unsigned char>(CompassAddress::Status));
+    return Bridge::readByte(static_cast<unsigned char>(CompassAddress::Status));
 }
 
 bool CompassInterface::isDataReady() {

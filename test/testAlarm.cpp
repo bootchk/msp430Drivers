@@ -19,14 +19,24 @@ void testAlarm()
 
     assert (not Alarm::isAlarmInterruptSignalHigh() );
 
-    Alarm::setAlarmDurationSecondsFromNow(10);
+    while (true)
+    {
+        Alarm
+        ::setAlarmDurationSecondsFromNow(10);
 
-    /*
-     * To test that the alarm causes an interrupt, sleep.
-     * You cannot poll the alarm, because the ISR clears the interrupt.
-     * In normal use, the interrupt wakes from sleep.
-     */
+        /*
+         * To test that the alarm causes an interrupt, sleep.
+         * You cannot poll the alarm, because the ISR clears the interrupt.
+         * In normal use, the interrupt wakes from sleep.
+         */
 
-    _low_power_mode_3();
-    __no_operation();
+        _low_power_mode_3();
+        __no_operation();
+
+        /*
+         * ISR already cleared alarm interrupt on mcu.
+         * Clear it on RTC.
+         */
+        Alarm::clearAlarm();
+    }
 }

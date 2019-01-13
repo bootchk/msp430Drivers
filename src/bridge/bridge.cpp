@@ -19,6 +19,10 @@ namespace {
 
 unsigned int chosenDevice;
 
+// state, for assertions that catch API errors
+bool _isConfigured = false;
+
+
 /*
  * Transfer many bytes over the bus.
  *
@@ -54,6 +58,9 @@ void innerWriteBuffer( unsigned char * bufferPtr, unsigned int size) {
 
 
 
+bool Bridge::isConfigured() { return _isConfigured; }
+
+
 
 /*
  * Three SPI pins are chosen by SPI library.
@@ -78,6 +85,8 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 	 * e.g. a SPI module
 	 */
 	Serial::begin(chosenDevice, isRWBitHighForRead);
+
+	_isConfigured = true;
 }
 
 
@@ -102,10 +111,10 @@ void Bridge::write(RegisterAddress registerAddress, unsigned char value) {
 	Serial::deselectSlave();
 
 	// reread and return the value  that was written, so caller may ensure it was written correctly
-	unsigned char finalValue = Bridge::read(registerAddress);
-//#ifdef VERIFY_BRIDGE_WRITES
+	unsigned char finalValue = Bridge::readByte(registerAddress);
+#ifdef VERIFY_BRIDGE_WRITES
 	myAssert(finalValue == value);
-//#endif
+#endif
 }
 
 
@@ -114,7 +123,7 @@ void Bridge::write(RegisterAddress registerAddress, unsigned char value) {
  */
 void Bridge::setBits(RegisterAddress registerAddress, unsigned char mask) {
 
-    unsigned char initialValue = Bridge::read(registerAddress);
+    unsigned char initialValue = Bridge::readByte(registerAddress);
 
     Bridge::write(registerAddress, mask | initialValue );
 }
@@ -127,17 +136,17 @@ void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
      * ~mask                  10
      * initial value & ~mask  10
      */
-    unsigned char initialValue = Bridge::read(registerAddress);
+    unsigned char initialValue = Bridge::readByte(registerAddress);
 
     Bridge::write(registerAddress, initialValue & ~mask );
 }
 
 
 
-unsigned char Bridge::read(RegisterAddress registerAddress) {
-	// require mcu Serial interface configured
-
+unsigned char Bridge::readByte(RegisterAddress registerAddress) {
 	unsigned char result;
+
+	myRequire(isConfigured());
 
 	Serial::selectSlave(chosenDevice);
 	// write registerAddress to bus, where address designates read the register
@@ -150,9 +159,13 @@ unsigned char Bridge::read(RegisterAddress registerAddress) {
 }
 
 
+
+
 void Bridge::readBuffer(RegisterAddress registerAddress,
                         unsigned int length,
                         unsigned char * destination) {
+
+    myRequire(isConfigured());
 
     Serial::selectSlave(chosenDevice);
     // write registerAddress
@@ -166,6 +179,8 @@ void Bridge::readBuffer(RegisterAddress registerAddress,
 void Bridge::writeBuffer(RegisterAddress registerAddress,
                         unsigned int length,
                         unsigned char * source) {
+
+    myRequire(isConfigured());
 
     Serial::selectSlave(chosenDevice);
     // write registerAddress

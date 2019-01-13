@@ -16,7 +16,7 @@
 
 #ifdef OBSOLETE
 // didn't work, reverse powered mcu through analog pin
-// TODO hack, not tied to board.h
+// TODO, not tied to board.h
 void ADCConfigure::releaseExternalPin() {
     // bit clear A0
     SYSCFG2 &= ~BIT0;

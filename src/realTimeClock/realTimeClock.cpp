@@ -151,12 +151,12 @@ bool RTC::isReadable() {
      */
     unsigned char ID;
 
-    ID = Bridge::read(static_cast<unsigned char>(RTCAddress::Identifier));
+    ID = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Identifier));
     return (ID == 0x08);
 }
 
 
 bool RTC::readOUTBit() {
-    unsigned char control1 = Bridge::read(static_cast<unsigned char>(RTCAddress::Control1));
+    unsigned char control1 = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control1));
     return (control1 & 0b1000);
 }

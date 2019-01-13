@@ -1,11 +1,11 @@
 
 /*
- * Implements a SPI device interface.
- * Hides choice of SPI instance.
- */
-
-/*
- * See specifications at Serial.
+ * Implements API Serial for SPI bus.
+ *
+ * Hides choice of SPI master peripheral instance, and other implementation design choices.
+ * (E.G. eUSCI_A versus eUSCI_B using DriverLib)
+ *
+ * API documented at Serial.h.
  */
 
 #include "../serial.h"  // ReadOrWrite

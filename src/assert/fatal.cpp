@@ -1,11 +1,11 @@
+
 #include "fatal.h"
 
 #include "../SoC/SoC.h"
 
-#include "../config.h"
-
 #include <cassert>
 
+#include "../driverConfig.h"
 
 
 

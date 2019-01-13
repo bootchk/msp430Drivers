@@ -44,6 +44,8 @@ typedef unsigned char RegisterAddress;
 
 class Bridge {
 public:
+    static bool isConfigured();
+
 	/*
 	 * Configure mcu side of interface.
 	 * Interface comprises:
@@ -68,10 +70,7 @@ public:
 	 */
 	static void unconfigureMcuSide();
 
-	/*
-	 * Read single byte
-	 */
-	static unsigned char read(RegisterAddress registerAddress);
+	static unsigned char readByte(RegisterAddress registerAddress);
 
 	/*
 	 * Read/write many consecutive bytes

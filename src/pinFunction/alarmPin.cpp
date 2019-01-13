@@ -34,8 +34,14 @@ bool AlarmPin::isConfigured() {
 }
 
 bool AlarmPin::isInterruptClear() {
-    // hack not independent of port, fixed to port 1
-    return not (P1IFG & AlarmSignalPin);
+    /*
+     * Implementation is independent of choice of alarm port.
+     * But certain ports on certain family members (P3 on MSP430FR2433) do not generated interrupts!!!!
+     */
+    uint16_t interruptBits;
+    interruptBits = GPIO_getInterruptStatus(AlarmSignalPort, AlarmSignalPin);
+    return interruptBits == 0;
+
 }
 
 void AlarmPin::clearInterrupt() {

@@ -1,11 +1,17 @@
 
 #include "serial.h"
 
-// Implementation is either I2C or SPI
+#include "../../driverConfig.h"
+
+
+
+
 #ifdef SERIAL_IS_I2C
 #define SERIAL_DEVICE_CLASS I2C
 #include "i2c/i2c.h"
-#else
+#endif
+
+#ifdef SERIAL_IS_SPI
 #define SERIAL_DEVICE_CLASS SPI
 #include "spi/spi.h"
 #endif
@@ -52,14 +58,3 @@ unsigned char Serial::transfer(ReadOrWrite direction,
 void Serial::selectSlave(unsigned int slave) { SERIAL_DEVICE_CLASS::selectSlave(slave); }
 void Serial::deselectSlave() { SERIAL_DEVICE_CLASS::deselectSlave(); }
 
-
-
-#ifdef NOT_USED
-
-Cruft from Energia SPI implementation
-
-Serial::setBitOrder(MSBFIRST);
-Serial::setDataMode(SPI_MODE0);
-Serial::setClockDivider(SPI_CLOCK_DIV128);
-
-#endif

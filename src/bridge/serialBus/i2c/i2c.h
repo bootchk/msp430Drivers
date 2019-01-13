@@ -1,12 +1,12 @@
 
 /*
- * Implements a SPI device interface.
- * Hides choice of SPI instance.
- */
-
-/*
+ * Implements Serial API for I2C bus.
+ *
+ * Hides choice of I2C instance.
+ *
  * See specifications at Serial.
  */
+
 #include "../serial.h"  // ReadOrWrite
 
 
