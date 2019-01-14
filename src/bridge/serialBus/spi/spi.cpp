@@ -108,6 +108,9 @@ unsigned char SPI::transfer(ReadOrWrite direction,  // not used for SPI
 	 */
 	while(EUSCI_A_SPI_isBusy(SPIInstanceAddress)) ;
 
+	/*
+	 * This does not involve bus clocking, only fetching data received on previous bus clocking.
+	 */
 	return EUSCI_A_SPI_receiveData(SPIInstanceAddress);
 }
 

@@ -54,10 +54,23 @@ public:
 	 * the caller should provide any meaningless value to write.
 	 *
 	 * Not asynch io; blocks.
+	 *
+	 * SPI only?
 	 */
-	static unsigned char transfer(
+	static unsigned char transferDuplex(
 	        ReadOrWrite,        // direction of transfer on bus
 	        unsigned char );    // value to transfer
+
+	/*
+	 *
+	 */
+	static void write(const RegisterAddress registerAddress,
+	                  unsigned char * const buffer,
+	                  const unsigned int count);
+	static void read(const RegisterAddress registerAddress,
+	                      unsigned char * const buffer,
+	                      const unsigned int count);
+
 
 	/*
 	 * Disable device and configure pins for low power

@@ -38,7 +38,16 @@ public:
 	 */
 	static void unconfigureMaster();
 
+
+
 	static unsigned char transfer(ReadOrWrite,  unsigned char);
+	static void write(const RegisterAddress registerAddress,
+	                      unsigned char * const buffer,
+	                      const unsigned int count);
+	static void read(const RegisterAddress registerAddress,
+	                          unsigned char * const buffer,
+	                          const unsigned int count);
+
 
 	// Is RX or TX interrupt flag set?
 	static bool isInterrupt();

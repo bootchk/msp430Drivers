@@ -44,10 +44,16 @@ void Serial::end() {
 }
 
 
+
+
+
+
+
+
 /*
  * Some implementations (SPI) may ignore the direction
  */
-unsigned char Serial::transfer(ReadOrWrite direction,
+unsigned char Serial::transferDuplex(ReadOrWrite direction,
                                unsigned char value) {
     // requires slave selected
     // requires configured
@@ -55,9 +61,23 @@ unsigned char Serial::transfer(ReadOrWrite direction,
 }
 
 
+
+void Serial::write(const RegisterAddress registerAddress,
+                      unsigned char * const buffer,
+                      const unsigned int count) {
+    SERIAL_DEVICE_CLASS::write(registerAddress, buffer, count);
+}
+void Serial::read(const RegisterAddress registerAddress,
+                      unsigned char * const buffer,
+                      const unsigned int count) {
+    SERIAL_DEVICE_CLASS::read(registerAddress, buffer, count);
+}
+
+
+
 void Serial::selectSlave(unsigned int slave) { SERIAL_DEVICE_CLASS::selectSlave(slave); }
 void Serial::deselectSlave() { SERIAL_DEVICE_CLASS::deselectSlave(); }
 
-RegisterAddress Serial::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) { SERIAL_DEVICE_CLASS::mangleRegisterAddress(readOrWrite, address); }
+RegisterAddress Serial::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) { return SERIAL_DEVICE_CLASS::mangleRegisterAddress(readOrWrite, address); }
 
 

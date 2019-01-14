@@ -29,7 +29,7 @@ void RTC::clearIRQInterrupt() {
 	 * AIRQ signal is configured to pin Fout/nIRQ.
 	 */
 
-	Bridge::write(static_cast<unsigned char>(RTCAddress::Status),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Status),
 	              0);
 }
 
@@ -79,7 +79,7 @@ void RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod() {
 
 	// OSEL on => BIT7;
 	// ACAL == 10 (17 minute autocalibration period) => BIT6
-	Bridge::write(static_cast<unsigned char>(RTCAddress::OscillatorControl),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::OscillatorControl),
 	              (unsigned char) 0b11000000 ); // (BIT7 | BIT6) );
 }
 
@@ -88,7 +88,7 @@ void RTC::enableAutocalibrationFilter() {
 	unlockMiscRegisters();
 
 	// Enable filter
-	Bridge::write(static_cast<unsigned char>(RTCAddress::AutocalibrationFilter),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::AutocalibrationFilter),
 	              (unsigned char) Key::AutocalibrationFilterEnable );
 }
 
@@ -104,7 +104,7 @@ void RTC::enablePulseInterruptForAlarm() {
 	 * Bit 2:  AIE: enable alarm interrupt
 	 * Bit 5,6: IM: == 11 1/4 second pulse width, requires least power
 	 */
-	Bridge::write(static_cast<unsigned char>(RTCAddress::InterruptMask),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
 	              0b01100100 );
 
 	// Polarity of interrupt is not configurable, is high-to-low
@@ -116,7 +116,7 @@ void RTC::connectFoutnIRQPinToAlarmSignal() {
 	 * Here, we connect only the rtc's internal nAIRQ signal (from alarm)
 	 * bits 0,1: OUT1S: == 11, pin is signal nAIRQ if AIE is set, else OUT
 	 */
-	Bridge::write(static_cast<unsigned char>(RTCAddress::Control2),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),
 	              0b11 );
 }
 
@@ -127,19 +127,19 @@ void RTC::enableAlarm() {
      * Bits [4:2]==1 => alarm once per year
      * Bits [4:2]==0 => alarm disabled
      */
-    Bridge::write(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
+    Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
 }
 
 
 
 
 void RTC::unlockMiscRegisters() {
-	Bridge::write(static_cast<unsigned char>(RTCAddress::ConfigurationKey), (unsigned char) Key::UnlockMiscRegisters );
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::ConfigurationKey), (unsigned char) Key::UnlockMiscRegisters );
 }
 
 
 void RTC::unlockOscControlRegister() {
-	Bridge::write(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
+	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
 	              (unsigned char) Key::UnlockOscillatorControl );
 }
 

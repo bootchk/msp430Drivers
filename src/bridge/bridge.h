@@ -6,16 +6,6 @@
  * Abstracts access across a bridge.
  * A bridge across a serial channel.
  *
- * Hides choice of two different serial channels: SPI or I2C
- * Change channel by substituting a different implementation.
- *
- * Hides any quirks of the remote device protocol:
- * - the upper bit(s) of register address have special meaning.
- * - send registerAddress, then values
- *
- * Hides handshaking: which is not necessary when slave is always ready for serial communication.
- * More handshaking is necessary when there are many masters.
- *
  * Hides slave select.
  *
  * Hides multi-byte transfers.
@@ -27,17 +17,29 @@
  *
  * A bridge is a bus having possibly many slaves.
  * A bridge is modal on the selected slave.
- * Slave is selected when Bridge is configured.
+ * Slave is selected when Bridge is configured.  TODO parameter for slave address
  * Different slaves can only use the Bridge sequentially, not concurrently.
  *
  * The Bridge class is a singleton.
  *
  * A registerAddress on remote device is an unsigned byte.
- * First you configure Bridge for a device (which on some busses has a slaveAddress.
+ * First you configure Bridge for a device (which on some busses has a slaveAddress.)
  * Then you address a registerAddress (a subaddress?) on the device.
- *
  */
 
+/*
+ * Lower level hiding:
+ *
+ * Serial hides choice of two different serial channels: SPI or I2C
+ * Change channel by substituting a different implementation.
+ *
+ * Hides any quirks of the remote device protocol:
+ * - the upper bit(s) of register address have special meaning.
+ * - send registerAddress, then values
+ *
+ * Hides handshaking: which is not necessary when slave is always ready for serial communication.
+ * More handshaking is necessary when there are many masters.
+ */
 
 typedef unsigned char RegisterAddress;
 
@@ -70,11 +72,13 @@ public:
 	 */
 	static void unconfigureMcuSide();
 
-	static unsigned char readByte(RegisterAddress registerAddress);
+
 
 	/*
 	 * Read/write many consecutive bytes
 	 */
+#ifdef OLD
+#endif
 	static void readBuffer(RegisterAddress registerAddress,
 	                                unsigned int length,
 	                                unsigned char * destination);
@@ -82,15 +86,23 @@ public:
 	                                    unsigned int length,
 	                                    unsigned char * source);
 
+
+	static void write(const RegisterAddress registerAddress,
+	                  unsigned char * const buffer,
+	                  const unsigned int count);
+
+
 	/*
+	 * Convenience (provides buffer for more general write())
 	 * Write one byte to remote register at RegisterAddress registerAddress.
 	 *
-	 * Assertions ensure register contains value.
+	 * Assertions can ensure written register contains value.
 	 * Said assertions read back the register.
 	 * This is not appropriate when a read will clear a register
 	 * (But there are no such registers on this RTC chip.)
 	 */
-	static void write(RegisterAddress registerAddress, unsigned char value);
+	static unsigned char readByte(RegisterAddress registerAddress);
+	static void writeByte(RegisterAddress registerAddress, unsigned char value);
 
 	/*
 	 * Convenience functions.
