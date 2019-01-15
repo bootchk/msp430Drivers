@@ -46,23 +46,9 @@ public:
 	 */
 	static void begin(unsigned int slave, bool isRWBitHighForRead);
 
-	/*
-	 * Writes AND reads at the same time.
-	 * When the higher level semantic is "write",
-	 * the caller should ignore the read value.
-	 * When the higher level semantic is "read",
-	 * the caller should provide any meaningless value to write.
-	 *
-	 * Not asynch io; blocks.
-	 *
-	 * SPI only?
-	 */
-	static unsigned char transferDuplex(
-	        ReadOrWrite,        // direction of transfer on bus
-	        unsigned char );    // value to transfer
 
 	/*
-	 *
+	 * Data moving methods.
 	 */
 	static void write(const RegisterAddress registerAddress,
 	                  unsigned char * const buffer,
@@ -90,6 +76,7 @@ public:
 	 */
 	static void selectSlave(unsigned int slave);
 	static void deselectSlave();
+	static bool isSlaveSelected();
 
 
 	static RegisterAddress mangleRegisterAddress(ReadOrWrite, RegisterAddress address );

@@ -17,8 +17,9 @@
  *
  * A bridge is a bus having possibly many slaves.
  * A bridge is modal on the selected slave.
- * Slave is selected when Bridge is configured.  TODO parameter for slave address
- * Different slaves can only use the Bridge sequentially, not concurrently.
+ * You choose a single slave when Bridge you configure.
+ * You can't use a different slave without reconfiguring Bridge.
+ * TODO parameter for slave address
  *
  * The Bridge class is a singleton.
  *
@@ -78,18 +79,22 @@ public:
 	 * Read/write many consecutive bytes
 	 */
 #ifdef OLD
-#endif
+
 	static void readBuffer(RegisterAddress registerAddress,
 	                                unsigned int length,
 	                                unsigned char * destination);
 	static void writeBuffer(RegisterAddress registerAddress,
 	                                    unsigned int length,
 	                                    unsigned char * source);
+#endif
 
 
-	static void write(const RegisterAddress registerAddress,
+	static void read(const RegisterAddress registerAddress,
 	                  unsigned char * const buffer,
 	                  const unsigned int count);
+	static void write(const RegisterAddress registerAddress,
+	                      unsigned char * const buffer,
+	                      const unsigned int count);
 
 
 	/*

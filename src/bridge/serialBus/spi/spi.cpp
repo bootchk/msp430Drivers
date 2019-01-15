@@ -85,8 +85,7 @@ void SPI::clearInterrupt() {
  * and master put data on MOSI on each clock cycle.
  * I.E. duplex communication.
  */
-unsigned char SPI::transfer(ReadOrWrite direction,  // not used for SPI
-                            unsigned char value) {
+unsigned char SPI::transferDuplex( unsigned char value) {
 
     /*
      * Requires any previous transfer complete.

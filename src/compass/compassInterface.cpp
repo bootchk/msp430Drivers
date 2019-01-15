@@ -42,9 +42,9 @@ void CompassInterface::readRawBytesOfMagneticData(unsigned char * destination) {
      */
     // TODO data ready
     // single transfer mode
-    Bridge::readBuffer(static_cast<unsigned char>(CompassAddress::MagXYZBytes),
-                       6,
-                       destination);
+    Bridge::read(static_cast<unsigned char>(CompassAddress::MagXYZBytes),
+                       destination,
+                       6);
 }
 
 

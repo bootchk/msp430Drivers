@@ -27,8 +27,8 @@
 /*
  * Serial bus implementation is either I2C OR SPI, but not both
  */
-#define SERIAL_IS_I2C
-//#define SERIAL_IS_SPI
+//#define SERIAL_IS_I2C
+#define SERIAL_IS_SPI
 
 
 /*

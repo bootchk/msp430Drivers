@@ -2,7 +2,7 @@
 #include "serial.h"
 
 #include "../../driverConfig.h"
-
+#include "../../assert/myAssert.h"
 
 
 
@@ -32,7 +32,7 @@ void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 	// TODO for i2c, don't enable until after set mode
 	SERIAL_DEVICE_CLASS::enable();
 
-	// ensure ready for transfer()
+	// ensure ready for slave select and data moving operations
 }
 
 
@@ -45,38 +45,37 @@ void Serial::end() {
 
 
 
-
-
-
-
-
-/*
- * Some implementations (SPI) may ignore the direction
- */
-unsigned char Serial::transferDuplex(ReadOrWrite direction,
-                               unsigned char value) {
-    // requires slave selected
-    // requires configured
-	return SERIAL_DEVICE_CLASS::transfer(direction, value);
-}
-
-
-
 void Serial::write(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
+    myRequire(isSlaveSelected());
     SERIAL_DEVICE_CLASS::write(registerAddress, buffer, count);
 }
+
+
 void Serial::read(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
+    myRequire(isSlaveSelected());
     SERIAL_DEVICE_CLASS::read(registerAddress, buffer, count);
 }
 
 
+namespace {
+// local state, for assertions
+bool _isSlaveSelected = false;
+}
 
-void Serial::selectSlave(unsigned int slave) { SERIAL_DEVICE_CLASS::selectSlave(slave); }
-void Serial::deselectSlave() { SERIAL_DEVICE_CLASS::deselectSlave(); }
+void Serial::selectSlave(unsigned int slave) {
+    _isSlaveSelected = true;
+    SERIAL_DEVICE_CLASS::selectSlave(slave);
+}
+void Serial::deselectSlave() {
+    _isSlaveSelected = false;
+    SERIAL_DEVICE_CLASS::deselectSlave();
+}
+bool Serial::isSlaveSelected() { return _isSlaveSelected; }
+
 
 RegisterAddress Serial::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) { return SERIAL_DEVICE_CLASS::mangleRegisterAddress(readOrWrite, address); }
 

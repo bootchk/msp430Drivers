@@ -71,9 +71,6 @@ void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
 
 	Serial::selectSlave(chosenDevice);
 
-	//RegisterAddress mangled;
-	//mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
-
 	unsigned char buffer[1];
 	buffer[0] = value;
 	Serial::write(registerAddress, buffer , 1);
@@ -114,14 +111,10 @@ void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
 
 
 unsigned char Bridge::readByte(RegisterAddress registerAddress) {
-	unsigned char result;
 
 	myRequire(isConfigured());
 
 	Serial::selectSlave(chosenDevice);
-
-    //RegisterAddress mangled;
-    //mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
 
 	unsigned char buffer[1];
 
@@ -129,40 +122,4 @@ unsigned char Bridge::readByte(RegisterAddress registerAddress) {
 
 	Serial::deselectSlave();
 	return buffer[0];
-}
-
-
-
-
-void Bridge::readBuffer(RegisterAddress registerAddress,
-                        unsigned int length,
-                        unsigned char * destination) {
-
-    myRequire(isConfigured());
-
-    Serial::selectSlave(chosenDevice);
-
-    //RegisterAddress mangled;
-    //mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
-
-    Serial::read(registerAddress, destination, length);
-
-    Serial::deselectSlave();
-}
-
-
-void Bridge::writeBuffer(RegisterAddress registerAddress,
-                        unsigned int length,
-                        unsigned char * source) {
-
-    myRequire(isConfigured());
-
-    Serial::selectSlave(chosenDevice);
-
-    //RegisterAddress mangled;
-    //mangled = Serial::mangleRegisterAddress(ReadOrWrite::Write, registerAddress);
-
-    Serial::write(registerAddress, source, length);
-
-    Serial::deselectSlave();
 }

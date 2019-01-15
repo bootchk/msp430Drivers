@@ -40,7 +40,37 @@ public:
 	static void unconfigureMaster();
 
 
-	static unsigned char transfer(ReadOrWrite, unsigned char);
+
+    /*
+     * A full duplex transaction on the SPI bus.
+     * Full duplex: Writes AND reads at the same time.
+     * A value is written and value read at same 8-bit clocking.
+     *
+     * For a read at the app level:
+     * The app should provide any value (bogus or dummy.)
+     * The value written is usually ignored by the slave for a read.
+     *
+     * For a write at the app level:
+     * and the value read may be ignored by the app.
+     * (Is it the same value as was written?)
+     *
+     * Not asynch io; blocks.
+     */
+	static unsigned char transferDuplex(unsigned char);
+
+
+    // Write data to register.
+    static void write( const RegisterAddress registerAddress,
+            unsigned char * const dataOut,
+            const unsigned int count);
+
+    // Read from register into buffer
+    static void read( const RegisterAddress registerAddress,
+            unsigned char * const bufferIn,
+            const unsigned int count);
+
+
+
 
 	// Is RX or TX interrupt flag set?
 	static bool isInterrupt();
