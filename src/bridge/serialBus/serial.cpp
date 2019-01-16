@@ -29,7 +29,7 @@ void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 
 	SERIAL_DEVICE_CLASS::selectSlave(slave);
 
-	// TODO for i2c, don't enable until after set mode
+	// TODO for i2c, don't enable until after set mode???
 	SERIAL_DEVICE_CLASS::enable();
 
 	// ensure ready for slave select and data moving operations
@@ -57,6 +57,7 @@ void Serial::read(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
     myRequire(isSlaveSelected());
+    myRequire(SERIAL_DEVICE_CLASS::isEnabled());
     SERIAL_DEVICE_CLASS::read(registerAddress, buffer, count);
 }
 
