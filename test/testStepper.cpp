@@ -7,7 +7,7 @@
 
 #define StepsPerTest 25
 
-void singleStepForward() {
+void manySingleStepForward() {
     for (int i = StepsPerTest; i > 0; i--)
     {
         Stepper::singleStepForward();
@@ -17,8 +17,7 @@ void singleStepForward() {
 
 void testStepper()
 {
-    Stepper
-    ::reset();
+    Stepper::reset();
     // assert GPIO configured
 
     PMM_unlockLPM5();
@@ -28,18 +27,18 @@ void testStepper()
     // defaults to braking, low torque
 
     // braking, low torque
-    singleStepForward();
+    manySingleStepForward();
 
     return;
 
     // coasting, low torque
     Stepper::setCoastingMode(false);
-    singleStepForward();
+    manySingleStepForward();
 
 
     // single step forward, braking, low torque
     Stepper::setHighTorqueMode(true);
-    singleStepForward();
+    manySingleStepForward();
 
     Stepper::setCoastingMode(true);
     Stepper::setHighTorqueMode(true);

@@ -6,6 +6,12 @@
 #include <cassert>
 
 
+/*
+ * Test one alarm goes off.
+ *
+ * Use EnergyTrace and expect one energy pulse after 10 seconds of sleep.
+ * !!! The code below won't set a second alarm unless the ISR is modified to exit LPM.
+ */
 
 
 void testAlarm()

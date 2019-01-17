@@ -19,5 +19,8 @@
 #define DrivePowerSwitch BIT7
 #endif
 
-
+// Units cycles
+// At 1Mhz system clock:
+// 10k is 10mSec
+// 500 is .5mSec
 #define SingleStepDelay 500 //10000

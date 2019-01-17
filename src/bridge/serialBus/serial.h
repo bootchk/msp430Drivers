@@ -46,6 +46,16 @@ public:
 	 */
 	static void begin(unsigned int slave, bool isRWBitHighForRead);
 
+    /*
+     * Disable device and configure pins for low power
+     * (MISO was input, make it output to insure no current draw.
+     * Since the remote device RTC should be driving it,
+     * the pin should not be floating and so would not draw current.
+     * So this might be unecessary.)
+     */
+    static void end();
+
+
 
 	/*
 	 * Data moving methods.
@@ -58,14 +68,7 @@ public:
 	                      const unsigned int count);
 
 
-	/*
-	 * Disable device and configure pins for low power
-	 * (MISO was input, make it output to insure no current draw.
-	 * Since the remote device RTC should be driving it,
-	 * the pin should not be floating and so would not draw current.
-	 * So this might be unecessary.)
-	 */
-	static void end();
+
 
 	/*
 	 * Select slave on serial bus.

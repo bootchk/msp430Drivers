@@ -175,10 +175,14 @@
 #define SPI_CLK_PORT  GPIO_PORT_P2
 #define SPI_CLK_PIN   GPIO_PIN4
 
-
+#ifdef USE_SPI
 // P1.3
 #define AlarmSignalPort GPIO_PORT_P1
 #define AlarmSignalPin  GPIO_PIN3
+#else
+#define AlarmSignalPort GPIO_PORT_P1
+#define AlarmSignalPin  GPIO_PIN4
+#endif
 
 // P1.2
 #define RTCSelectPort GPIO_PORT_P1

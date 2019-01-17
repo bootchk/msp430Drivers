@@ -45,6 +45,9 @@ void Serial::end() {
 
 
 
+
+
+
 void Serial::write(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
@@ -62,6 +65,9 @@ void Serial::read(const RegisterAddress registerAddress,
 }
 
 
+
+
+
 namespace {
 // local state, for assertions
 bool _isSlaveSelected = false;
@@ -76,6 +82,10 @@ void Serial::deselectSlave() {
     SERIAL_DEVICE_CLASS::deselectSlave();
 }
 bool Serial::isSlaveSelected() { return _isSlaveSelected; }
+
+
+
+
 
 
 RegisterAddress Serial::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address ) { return SERIAL_DEVICE_CLASS::mangleRegisterAddress(readOrWrite, address); }

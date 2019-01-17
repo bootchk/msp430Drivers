@@ -78,17 +78,6 @@ public:
 	/*
 	 * Read/write many consecutive bytes
 	 */
-#ifdef OLD
-
-	static void readBuffer(RegisterAddress registerAddress,
-	                                unsigned int length,
-	                                unsigned char * destination);
-	static void writeBuffer(RegisterAddress registerAddress,
-	                                    unsigned int length,
-	                                    unsigned char * source);
-#endif
-
-
 	static void read(const RegisterAddress registerAddress,
 	                  unsigned char * const buffer,
 	                  const unsigned int count);
@@ -108,6 +97,9 @@ public:
 	 */
 	static unsigned char readByte(RegisterAddress registerAddress);
 	static void writeByte(RegisterAddress registerAddress, unsigned char value);
+
+
+
 
 	/*
 	 * Convenience functions.

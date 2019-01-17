@@ -66,23 +66,6 @@ void Bridge::unconfigureMcuSide() {
 
 
 
-void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
-    myRequire(isConfigured());
-
-	Serial::selectSlave(chosenDevice);
-
-	unsigned char buffer[1];
-	buffer[0] = value;
-	Serial::write(registerAddress, buffer , 1);
-
-	Serial::deselectSlave();
-
-	// reread and return the value  that was written, so caller may ensure it was written correctly
-	unsigned char finalValue = Bridge::readByte(registerAddress);
-#ifdef VERIFY_BRIDGE_WRITES
-	myAssert(finalValue == value);
-#endif
-}
 
 
 /*
@@ -108,6 +91,27 @@ void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
     Bridge::writeByte(registerAddress, initialValue & ~mask );
 }
 
+
+
+
+
+void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
+    myRequire(isConfigured());
+
+    Serial::selectSlave(chosenDevice);
+
+    unsigned char buffer[1];
+    buffer[0] = value;
+    Serial::write(registerAddress, buffer , 1);
+
+    Serial::deselectSlave();
+
+    // reread and return the value  that was written, so caller may ensure it was written correctly
+    unsigned char finalValue = Bridge::readByte(registerAddress);
+#ifdef VERIFY_BRIDGE_WRITES
+    myAssert(finalValue == value);
+#endif
+}
 
 
 unsigned char Bridge::readByte(RegisterAddress registerAddress) {

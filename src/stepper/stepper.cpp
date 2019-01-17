@@ -1,4 +1,9 @@
 #include "stepper.h"
+#include "makeBreak.h"
+
+
+#include "../pinFunction/stepperPins.h"
+
 #include <msp430.h>
 #include <cassert>
 
@@ -6,7 +11,7 @@
 
 #include "config.h"
 
-#include "makeBreak.h"
+
 
 
 
@@ -62,8 +67,14 @@ void Stepper::reset()
     configureIOPortForMotorControl();
 }
 
+
+
+
+
 void Stepper::configureIOPortForMotorControl()
 {
+    StepperPins::configure();
+
     // Set direction of all port pins to output
     //MotorA1.configAsOutput();
     //MotorA1.configAsOutput();
