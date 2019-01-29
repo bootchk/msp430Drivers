@@ -65,7 +65,10 @@
 
 
 
-
+typedef struct {
+    int port;
+    int pin;
+} MotorCoilEnd;
 
 
 
@@ -163,19 +166,9 @@ public:
     static void turnOffCoils();
     
     
-    /*
-    Unpower, to save energy.
-    Switch Vcc to motor driver chip.
-    Typically high-side switch (better than low-side switch i.e. switched ground.)
+    
+    
 
-    Requires switch enabled high (typically a load switch, a PMOS with inverting control mosfet.)
-    Caller must wait appropriate time defined by driver chip datasheet
-    for time from powerup to ready to step.
-    */
-    static void turnPowerOn();
-    static void turnPowerOff();
-    
-    
   private:
     
     // private class methods
@@ -200,8 +193,8 @@ public:
      * Energize coil defined by bits.
      * end1Bit low, end2Bit high
      */
-    static void energizeCoil(unsigned int end1Bit, unsigned int end2Bit);
-    static void deenergizeCoil(unsigned int end1Bit, unsigned int end2Bit);
+    static void energizeCoil(const MotorCoilEnd end1Bit, const MotorCoilEnd end2Bit);
+    static void deenergizeCoil(const MotorCoilEnd end1Bit, const MotorCoilEnd end2Bit);
     /*
     Forward and reverse current direction on coils A and B
     

@@ -32,3 +32,15 @@ static const unsigned int MinCyclesInLightToDischargeLEDCapacitance = 90;
  */
 static const unsigned int MaxCyclesInDarkToDischargeLEDCapacitance = 100;
 };
+
+
+
+/*
+ * Stepper:  how long to energize coil for single step
+ */
+// Units cycles
+// At 1Mhz system clock:
+// 10k is 10mSec
+// 500 is .5mSec
+
+static const unsigned int SingleStepDelay = 500;

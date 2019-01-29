@@ -298,3 +298,24 @@
 
 
 
+
+/*
+ * Stepper
+ */
+
+
+#define MotorCoilA1Port GPIO_PORT_P1
+#define MotorCoilA2Port GPIO_PORT_P1
+#define MotorCoilB1Port GPIO_PORT_P1
+#define MotorCoilB2Port GPIO_PORT_P1
+
+// consecutive pins of Launchpad EXP-MSP430FR2433
+#define MotorCoilA1Pin GPIO_PIN0
+#define MotorCoilA2Pin GPIO_PIN5
+#define MotorCoilB1Pin GPIO_PIN4
+#define MotorCoilB2Pin GPIO_PIN6
+
+
+#define StepperDrivePowerSwitchPort   GPIO_PORT_P1
+#define StepperDrivePowerSwitchPin   GPIO_PIN7
+

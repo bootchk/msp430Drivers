@@ -7,6 +7,7 @@
 
 void breakOpen(unsigned int breakBit)
 {
+    //GPIO_setOutputLowOnPin(RTCSelectPort, RTCSelectPin);
     // bit clear
     P1OUT &= ~breakBit;
 }

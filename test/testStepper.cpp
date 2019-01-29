@@ -1,5 +1,8 @@
 
 #include "../src/stepper/stepper.h"
+// TODO stepper should have stepperDriver API and delegate
+#include "../src/stepper/stepperDriver.h"
+
 
 // DriverLib
 #include <pmm.h>
@@ -22,7 +25,7 @@ void testStepper()
 
     PMM_unlockLPM5();
 
-    Stepper::turnPowerOn();
+    StepperDriver::turnPowerOn();
 
     // defaults to braking, low torque
 

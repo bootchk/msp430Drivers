@@ -3,16 +3,15 @@
 
 
 #include "../pinFunction/stepperPins.h"
+#include "stepperDriver.h"
 
-#include <msp430.h>
+
 #include <cassert>
 
-//#include "../gpio/gpio.h"
 
-#include "config.h"
+#include "board.h"  // motor coil pins
 
-
-
+#include "../driverParameters.h"    // SingleStepDelay
 
 
 
@@ -22,18 +21,23 @@ int Stepper::currentStep = 0;
 bool Stepper::isCoastingMode = false;
 bool Stepper::isHighTorqueMode = false;
 
-#ifdef FUTURE
-// Define GPIO port and pins of control signals
-Gpio MotorA1(1, 0);
-Gpio MotorA2(1, 0);
-Gpio MotorB1(1, 0);
-Gpio MotorB2(1, 0);
-#endif
+
 
 
 // Setters
 void Stepper::setCoastingMode(bool value) { isCoastingMode = value; }
 void Stepper::setHighTorqueMode(bool value) { isCoastingMode = value; }
+
+
+
+
+const MotorCoilEnd MotorA1 = {MotorCoilA1Port, MotorCoilA1Pin };
+const MotorCoilEnd MotorA2 = {MotorCoilA2Port, MotorCoilA2Pin };
+const MotorCoilEnd MotorB1 = {MotorCoilB1Port, MotorCoilB1Pin };
+const MotorCoilEnd MotorB2 = {MotorCoilB2Port, MotorCoilB2Pin };
+
+
+
 
 
 
@@ -57,7 +61,7 @@ int Stepper::getStepNext(int direction)
 void Stepper::reset()
 {
     // state comprises all GPIO pin states, and class data
-    turnPowerOff();
+    StepperDriver::turnPowerOff();
     turnOffCoils();
 
     currentStep = 0;// This may not match the physical position of rotor!
@@ -74,18 +78,8 @@ void Stepper::reset()
 void Stepper::configureIOPortForMotorControl()
 {
     StepperPins::configure();
-
-    // Set direction of all port pins to output
-    //MotorA1.configAsOutput();
-    //MotorA1.configAsOutput();
-    P1DIR |= MotorA1 | MotorA2 | MotorB1 | MotorB2 | DrivePowerSwitch;
-
-    // Select function: all pins as digital IO
-    // Bit clear.  Meaning of 0 is: IO function for pin
-    // FR2433 has P1SEL0 and 1
-    P1SEL0 &= ~(MotorA1 | MotorA2 | MotorB1 | MotorB2 | DrivePowerSwitch);
-
-    // P1OUT is not set by this method
+    // output value is not set by this method
+    // Does not ensure configuration is effective (if LPM5 is locked.)
 }
 
 
@@ -158,15 +152,6 @@ void Stepper::turnOffCoils()
 
 
 
-void Stepper::turnPowerOn()
-{   P1OUT |= DrivePowerSwitch;}
-
-void Stepper::turnPowerOff()
-{   P1OUT &= ~DrivePowerSwitch;}
-
-
-
-
 // private class methods
 
 /*
@@ -192,30 +177,30 @@ int Stepper::positiveModulo(int a, int modulus)
  * Clear breakBit and set makeBit.
  * Order of clearing and setting depends on coasting mode.
  */
-void Stepper::energizeCoil(unsigned int breakBit, unsigned int makeBit)
+void Stepper::energizeCoil(const MotorCoilEnd breakEnd, const MotorCoilEnd makeEnd)
 {
     if (Stepper::isCoastingMode)
     {
-        breakThenMake(breakBit, makeBit);
+        breakThenMake(breakEnd.pin, makeEnd.pin);
     }
     else
     {
-        makeThenBreak(breakBit, makeBit);
+        makeThenBreak(breakEnd.pin, makeEnd.pin);
     }
-    // assert makeBit 1 high, breakBit 0 low
+    // assert makeEnd 1 high, breakEnd 0 low
 }
 
-void Stepper::deenergizeCoil(unsigned int bit1, unsigned int bit2)
+void Stepper::deenergizeCoil(const MotorCoilEnd coilEnd1, const MotorCoilEnd coilEnd2)
 {
     if (Stepper::isCoastingMode)
     {
         // Both IN/IN low is both grounded, coasting
-        breakBits(bit1, bit2);
+        breakBits(coilEnd1.pin, coilEnd2.pin);
     }
     else
     {
         // both high is both floating, braking
-        makeBits(bit1, bit2);
+        makeBits(coilEnd1.pin, coilEnd2.pin);
     }
 }
 
