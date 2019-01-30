@@ -302,6 +302,7 @@
 /*
  * Stepper
  */
+#define USE_STEPPER
 
 
 #define MotorCoilA1Port GPIO_PORT_P1

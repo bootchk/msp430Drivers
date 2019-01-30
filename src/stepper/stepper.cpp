@@ -14,7 +14,7 @@
 #include "../driverParameters.h"    // SingleStepDelay
 
 
-
+#ifdef USE_STEPPER
 
 // Define class data
 int Stepper::currentStep = 0;
@@ -77,7 +77,7 @@ void Stepper::reset()
 
 void Stepper::configureIOPortForMotorControl()
 {
-    StepperPins::configure();
+    StepperPins::configureStepperCoilPins();
     // output value is not set by this method
     // Does not ensure configuration is effective (if LPM5 is locked.)
 }
@@ -303,3 +303,5 @@ void Stepper::advanceStepHalfPower(int nextStep)
     // ensure at most one coil driven in some direction
 }
 
+
+#endif
