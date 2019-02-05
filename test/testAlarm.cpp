@@ -20,6 +20,9 @@ void testAlarm()
 
     Alarm::configureForAlarming();
     // assert ready for setAlarm()
+    // assert serial bus (Bridge) ready, was configured
+
+    Alarm::clearAlarm();
 
     Alarm::clearAlarm();
 

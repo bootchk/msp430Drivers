@@ -14,10 +14,10 @@ int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
-	testStepper();
+	//testStepper();
 	//testCompass();
 	//testRTC();
 	//testCompass2();
-	//testAlarm();
+	testAlarm();
 	//testTimer();
 }

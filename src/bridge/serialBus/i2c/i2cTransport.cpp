@@ -23,22 +23,37 @@
 #include "../../../assert/myAssert.h"
 
 
-void I2CMaster::enable() { EUSCI_B_I2C_enable(I2CInstanceAddress); }
-void I2CMaster::disable() { EUSCI_B_I2C_disable(I2CInstanceAddress); }
+
+//#define USE_DRIVER_LIB
+
+
+
+
+namespace {
+bool _isInitialized = false;
+}
+
+
+
+void I2CTransport::enable() { EUSCI_B_I2C_enable(I2CInstanceAddress); }
+void I2CTransport::disable() { EUSCI_B_I2C_disable(I2CInstanceAddress); }
 
 // not UCSWRST reset bit is set
-bool I2CMaster::isEnabled() { return not (UCB0CTLW0 & UCSWRST); }
+bool I2CTransport::isEnabled() { return not (UCB0CTLW0 & UCSWRST); }
 
 
 
 
-void I2CMaster::read(
+
+
+void I2CTransport::read(
                         const RegisterAddress registerAddress,
                         unsigned char * const buffer,
                         unsigned int count)
 {
-    // require init() was called
+    myRequire( isInitialized() );
 
+    I2CStateMachine::waitUntilPriorTransportComplete();
     I2CStateMachine::init(registerAddress, buffer, count, false);  // false means a read
     I2CStateMachine::initialTransition();
 
@@ -46,12 +61,14 @@ void I2CMaster::read(
 }
 
 
-void I2CMaster::write(
+void I2CTransport::write(
         const RegisterAddress registerAddress,
         unsigned char * const buffer, // buffer data is const but stateMachine wants a buffer that is changeable
         const unsigned int count)
 {
+    myRequire( isInitialized() );
 
+    I2CStateMachine::waitUntilPriorTransportComplete();
     I2CStateMachine::init(registerAddress, buffer, count, true);    // true means write
     I2CStateMachine::initialTransition();
 }
@@ -61,9 +78,9 @@ void I2CMaster::write(
 
 
 
-void I2CMaster::configurePins()
+void I2CTransport::configurePins()
 {
-#define USE_DRIVER_LIB
+
 #ifdef USE_DRIVER_LIB
     I2CPins::configure();
 
@@ -85,37 +102,62 @@ void I2CMaster::configurePins()
 #endif
 }
 
-void I2CMaster::unconfigurePins()
+void I2CTransport::unconfigurePins()
 {
     I2CPins::unconfigure();
+    _isInitialized = false;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
  * SMCLK defaults to DCO freq of 1Mhz
  *
  * FUTURE fast data rate
- * FUTURE persist in FRAM
+ *
+ * I found:
+ * bus length of 3 inches, and internal pullup of 30kohms, max data rate is less than 100kbps (say 10kbps)
+ * bus length of 1 inches, and internal pullup of 30kohms, max data rate is less than 100kbps (say 50kbps)
+ * Probably should just use external 10kohm pullups.
  */
+#pragma PERSISTENT
 EUSCI_B_I2C_initMasterParam params = {
-                                      EUSCI_B_I2C_CLOCKSOURCE_SMCLK,
-                                      1000000,    // supplied clock freq
-                                      EUSCI_B_I2C_SET_DATA_RATE_100KBPS,    // desired data rate
+                                      EUSCI_B_I2C_CLOCKSOURCE_SMCLK,        // clock is: submain
+                                      1000000,                              // supplied clock freq
+                                      50000, // EUSCI_B_I2C_SET_DATA_RATE_100KBPS,    // desired data rate
+                                      0,                                    // autostop threshold
                                       EUSCI_B_I2C_NO_AUTO_STOP
 };
 
-void I2CMaster::initI2CPeripheral(unsigned char slaveAddress)
+
+
+#define USE_DRIVER_LIB
+void I2CTransport::initI2CPeripheral(unsigned char slaveAddress)
 {
     myRequire(not isEnabled());
 
-#define   USE_DRIVER_LIB
+
 #ifdef USE_DRIVER_LIB
-    EUSCI_B_I2C_initMaster(I2CInstanceAddress,
-                           &params);
+    EUSCI_B_I2C_initMaster(I2CInstanceAddress,  &params);
 
     EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, slaveAddress);
 
-    // Enable NACK interrupt.
-    // So we can catch bus errors.
+    // Enable NACK interrupt.  So we can catch bus errors.
     EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_NAK_INTERRUPT);
 
     /*
@@ -127,6 +169,11 @@ void I2CMaster::initI2CPeripheral(unsigned char slaveAddress)
 #else
     // Works.  Code from TI.
     UCB0CTLW0 |= UCSWRST;  // disable
+    /*
+     * UCMODE_3 => I2C
+     * UCMST => master
+     * UCSYNC => synchronous
+     */
     UCB0CTLW0 |= UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC; // I2C master mode, SMCLK
     UCB0BRW = 160;                            // fSCL = SMCLK/160 = ~100kHz
     UCB0I2CSA = slaveAddress;                   // Slave Address
@@ -134,6 +181,8 @@ void I2CMaster::initI2CPeripheral(unsigned char slaveAddress)
     UCB0CTLW0 &= ~UCSWRST;                    // Clear SW reset, resume operation
 #endif
 
+    _isInitialized = true;
 }
 
 
+bool I2CTransport::isInitialized() { return _isInitialized; }

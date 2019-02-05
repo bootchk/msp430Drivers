@@ -35,8 +35,8 @@
 
 
 // Choose configuration
-//#define MYPCB_BOARD_R3
-#define FULL_PROTO_LAUNCHPAD
+#define MYPCB_BOARD_R3
+//#define FULL_PROTO_LAUNCHPAD
 
 
 
@@ -117,6 +117,10 @@
 // Configuration of PCB
 // And also configuration of one prototype on launchpad
 
+
+
+
+#ifdef SERIAL_IS_SPI
 #define SPIInstanceAddress      EUSCI_A1_BASE
 
 // msp430fr2433 and Launchpad MSP-EXP430FR2433, using instance UCA1:
@@ -132,14 +136,23 @@
 #define SPI_CLK_PORT  GPIO_PORT_P2
 #define SPI_CLK_PIN   GPIO_PIN4
 
-
-// P2.3
-#define AlarmSignalPort GPIO_PORT_P2
-#define AlarmSignalPin  GPIO_PIN3
-
 // P2.2
 #define RTCSelectPort GPIO_PORT_P2
 #define RTCSelectPin  GPIO_PIN2
+
+#endif
+
+
+
+
+
+// In various revision of my board, was P2.3
+#define AlarmSignalPort GPIO_PORT_P1
+#define AlarmSignalPin  GPIO_PIN1
+
+
+
+
 
 
 // P1.7

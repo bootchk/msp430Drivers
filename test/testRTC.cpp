@@ -12,7 +12,7 @@ void testRTC()
     PMM_unlockLPM5();
 
     Bridge::configureMcuSide(false);
-    // assert SPI bus ready
+    // assert serial bus ready
 
     // Test sanity
     // Registers are readable even before RTC is configured

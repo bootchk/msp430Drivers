@@ -62,7 +62,7 @@
  * since I haven't tested how other interrupts and delays might affect the ISR for I2C.
  */
 
-class I2CMaster {
+class I2CTransport {
 
 
 public:
@@ -73,10 +73,16 @@ public:
     static void unconfigurePins();
 
     /*
+     * Prepare for use with a particular slave.
+     * Also must configure pins.
+     * There is no unconfigure, but unconfigurePins uninitializes.
+     *
      * Class is modal on slave adress.
      * Only 7 bits of slaveAddress are valid.
      */
     static void initI2CPeripheral(unsigned char slaveAddress);
+    static bool isInitialized();
+
 
     static void enable();
     static void disable();

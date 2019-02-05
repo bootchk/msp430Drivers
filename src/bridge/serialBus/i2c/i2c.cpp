@@ -47,11 +47,11 @@ bool _isEnabled = false;
 
 void I2C::enable() {
     _isEnabled = true;
-    I2CMaster::enable();
+    I2CTransport::enable();
 }
 void I2C::disable() {
     _isEnabled= false;
-    I2CMaster::disable();
+    I2CTransport::disable();
 }
 // FUTURE make this access the peripheral registers
 bool I2C::isEnabled() { return _isEnabled; }
@@ -62,10 +62,10 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
     // require disabled to config
     myRequire( not isEnabled() );
 
-    I2CMaster::configurePins();
+    I2CTransport::configurePins();
 
     // TODO hardcoded
-    I2CMaster::initI2CPeripheral(RTCBusAddress);
+    I2CTransport::initI2CPeripheral(RTCBusAddress);
 }
 
 
@@ -74,13 +74,13 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
 void I2C::write(const RegisterAddress registerAddress,
                           unsigned char * const buffer,
                           const unsigned int count) {
-    I2CMaster::write(registerAddress, buffer, count);
+    I2CTransport::write(registerAddress, buffer, count);
 }
 
 void I2C::read(const RegisterAddress registerAddress,
                           unsigned char * const buffer,
                           const unsigned int count) {
-    I2CMaster::read(registerAddress, buffer, count);
+    I2CTransport::read(registerAddress, buffer, count);
 }
 
 
@@ -90,7 +90,7 @@ void I2C::unconfigureMaster() {
      * Don't need to unconfigure I2C master (eUSCI), since disabled, is reset.
      * Only unconfigure pins.
      */
-    I2CMaster::unconfigurePins();
+    I2CTransport::unconfigurePins();
 }
 
 

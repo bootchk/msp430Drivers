@@ -106,9 +106,9 @@ void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
 
     Serial::deselectSlave();
 
-    // reread and return the value  that was written, so caller may ensure it was written correctly
-    unsigned char finalValue = Bridge::readByte(registerAddress);
 #ifdef VERIFY_BRIDGE_WRITES
+    // reread to ensure slave has same value written (no glitch noise on wires)
+    unsigned char finalValue = Bridge::readByte(registerAddress);
     myAssert(finalValue == value);
 #endif
 }

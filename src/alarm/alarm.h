@@ -6,7 +6,7 @@
  * Provides an alarm from a remote RTC chip (not the RTC on the MSP430).
  * Thus the mcu can enter lowest power mode (LPM4.5).
  *
- * Understands both sides of an interface from mcu to rtc using SPI bus and one other pin.
+ * Understands both sides of an interface from mcu to rtc using serial bus and alarm interrupt pin.
  *
  * Any other mcu device/pin configuration is the domain of the app.
  *
@@ -16,8 +16,8 @@
  *
  * waitSPIReadyOrReset must be called after power on and return true before other methods are called.
  *
- * configureMcuSPIInterface must precede configureRTC
- * configureMcuAlarmInterface can be done before or after (configureMcuSPIInterface, configureRTC)
+ * configureMcuBusInterface must precede configureRTC
+ * configureMcuAlarmInterface can be done before or after (configureMcuBusInterface, configureRTC)
  *
  * configureRTC and configureMcuAlarmInterface must precede setAlarm
  *
@@ -80,21 +80,18 @@ class Alarm {
 
 
 	/*
-	 * Configure all pins used by Alarm:
-	 * - slave select
-	 * - alarm
-	 * - 3 SPI pins
+	 * Configure all pins used by Alarm: serial bus and alarm interrupt pin
 	 */
 	static void configureMcuSide();
 
 	/*
-	 * Configure a set of mcu's GPIO pins for the mcu's SPI peripheral/module,
-	 * and configure the mcu's SPI peripheral with parameters matching the rtc's SPI.
+	 * Configure a set of mcu's GPIO pins for one of the mcu's serial bus peripheral/module,
+	 * and configure the mcu's serial peripheral with parameters matching the rtc's serial bus.
 	 * Does NOT configure the alarm pin.
 	 *
 	 * The library does not support use of said GPIO pins for other purposes while the library is in use.
 	 */
-	static void configureMcuSPIInterface();
+	static void configureMcuBusInterface();
 
 	/*
 	 * Was pin configured as input for Alarm?
@@ -102,7 +99,7 @@ class Alarm {
 	static bool isConfiguredMcuAlarmInterface();
 
     /*
-     * Over SPI, configure RTC clock mode and alarm interrupt.
+     * Over serial bus, configure RTC clock mode and alarm interrupt.
      * Configuration is arbitrary (you could change it).
      */
 	static void configureRTC();
@@ -118,7 +115,7 @@ class Alarm {
 	 * Ensures RTC is not asserting signal Fout/nIRQ low because of an alarm.
 	 *
 	 * Returns false if error:
-	 *  - SPI write error
+	 *  - bus write error
 	 *  - signal fails to become high
 	 *
 	 *  This does NOT require isSPIReady() == true.
@@ -232,13 +229,13 @@ public:
      * - on cold reset: configureForAlarming()
      * - on wake for alarm:
      *
-     * The interface: 3 SPI pins and SlaveSelect.
+     * The interface: serial bus pins (SPI: 3 pins and SlaveSelect pin,   I2C: 2 pins SDA and SCL.)
      * This does not check configuration of alarm pin.
      */
     static bool isConfiguredForAlarming();
 
     /*
-     * After a wake from LPM4.5 by alarm, configure MCU SPI pins interface to RTC.
+     * After a wake from LPM4.5 by alarm, configure MCU serial bus pins interface to RTC.
      * Does not reconfigure the RTC (it should still be powered.)
      *
      * May reset on failure.
@@ -246,12 +243,12 @@ public:
     static void configureAfterWake();
 
     /*
-     * Change SPI interface to a low power condition.
-     * When called, exists a set of in and out GPIO for SPI.
+     * Change bus interface to a low power condition.
+     * When called, exists a set of in and out GPIO for serial bus.
      * Ensure all all are low power (inputs not floating.)
      * Since RTC is expected to be alive and driving input pins, this might not do anything.
      */
-    static void unconfigureMcuSPIInterface();
+    static void unconfigureMcuBusInterface();
 
 
     /*

@@ -39,10 +39,10 @@ bool Alarm::isConfiguredForAlarming() {
  * RTC could be in some bizarre state.
  */
 void Alarm::configureForAlarming() {
-    // GPIO must be unlocked because we configure SPI pins and use them
+    // GPIO must be unlocked because we configure bus pins and use them
     // myAssert(not PMM::isLockedLPM5());
 
-    // Configure interface (SPI) and driver (eUSCI)
+    // Configure bus interface and driver (e.g I2C and eUSCI_B)
     // Side effect is unlock
     Alarm::configureMcuSide();
 
@@ -63,7 +63,7 @@ void Alarm::configureForAlarming() {
 
 void Alarm::configureAfterWake() {
 
-    Alarm::configureMcuSPIInterface();
+    Alarm::configureMcuBusInterface();
 
     /*
      * When RTC is not readable, fatal.
@@ -82,24 +82,26 @@ void Alarm::configureAfterWake() {
 
 
 void Alarm::configureMcuSide() {
+    // Two parts: alarm interrupt pins and bus pin
+
     // Must precede waitSPIReadyOrReset
     Alarm::configureMcuAlarmInterface();
 
-    // Must precede use of SPI to configure rtc
-    Alarm::configureMcuSPIInterface();
+    // Must precede use of bus to configure rtc
+    Alarm::configureMcuBusInterface();
 
     PMM::unlockLPM5();
 }
 
 // TODO this should be done somewhere else when there are two slaves
-void Alarm::configureMcuSPIInterface(){
-    // TODO hardcoded for AB0815, false means RW bit is not high (is low) for a read
+void Alarm::configureMcuBusInterface(){
+    // TODO hardcoded for AB0815 SPI, false means RW bit is not high (is low) for a read
     Bridge::configureMcuSide(false);
 }
 
 
 
-void Alarm::unconfigureMcuSPIInterface() {
+void Alarm::unconfigureMcuBusInterface() {
     Bridge::unconfigureMcuSide();
     _isConfiguredForAlarming = false;
 }

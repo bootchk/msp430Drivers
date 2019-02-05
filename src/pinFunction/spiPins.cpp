@@ -7,6 +7,8 @@
 #include <board.h>
 
 
+// Only compile if implementation of Serial uses SPI
+#ifdef SERIAL_IS_SPI
 
 void SPIPins::configure() {
     // Data pins are part of the module
@@ -81,3 +83,5 @@ void SPIPins::configureDataSPIPins() {
     // One input pin
     GPIO_setAsPeripheralModuleFunctionInputPin(MISO_PORT,     MISO_PIN,    GPIO_PRIMARY_MODULE_FUNCTION);
 }
+
+#endif

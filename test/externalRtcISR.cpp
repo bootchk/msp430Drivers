@@ -62,6 +62,9 @@ __interrupt void Port2_ISR(void)
 __interrupt void Port1_ISR(void)
 {
     Alarm::clearAlarmOnMCU();
+
+    // !!! for testing with LPM3 versus LPM4.5
+    _low_power_mode_off_on_exit();
 }
 
 #elif GPIO_PORT_P3 == AlarmSignalPort

@@ -27,6 +27,10 @@
 
 
 
+
+// Only compile if Serial implementation uses SPI
+#ifdef SERIAL_IS_SPI
+
 /*
  * To change to another instance, edit board.h and include different driverlib
  */
@@ -235,3 +239,5 @@ RegisterAddress SPI::mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddr
 }
 
 
+
+#endif
