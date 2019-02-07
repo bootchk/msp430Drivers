@@ -48,6 +48,15 @@
 
 
 
+void  SPI::configureToSleepState() {
+    /*
+     * The slave select pin must be held output, slave not selected (high) during mcu sleep.
+     */
+    SPIPins::configureSelectSlavePin();
+}
+
+
+
 void SPI::enable() {
 	EUSCI_A_SPI_enable(SPIInstanceAddress);
 }

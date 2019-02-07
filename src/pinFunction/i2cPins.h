@@ -10,6 +10,14 @@ public:
      *
      * No pins (signals) dedicated to slave select.
      */
+
+    /*
+     * Ensures pins dedicated to I2C module and pullups appropriate to board design.
+     */
     static void configure();
+
+    /*
+     * Ensures pins appropriate for idle state of bus (SCLK and SDA high)
+     */
     static void unconfigure();
 };

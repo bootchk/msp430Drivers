@@ -25,6 +25,13 @@ bool _isConfigured = false;
 
 
 
+// Pure delegation
+void Bridge::configureToSleepState() {
+    Serial::configureToSleepState();
+}
+
+
+
 bool Bridge::isConfigured() { return _isConfigured; }
 
 

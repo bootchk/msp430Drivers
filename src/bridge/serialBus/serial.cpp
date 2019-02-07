@@ -20,6 +20,14 @@
 
 
 
+
+void Serial::configureToSleepState() {
+    SERIAL_DEVICE_CLASS::configureToSleepState();
+}
+
+
+
+
 void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
 
     SERIAL_DEVICE_CLASS::disable(); // Can only configure when disabled.

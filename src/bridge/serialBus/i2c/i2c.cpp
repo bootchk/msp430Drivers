@@ -13,6 +13,22 @@
 #include "../../../assert/myAssert.h"
 
 
+
+
+
+
+void  I2C::configureToSleepState() {
+    /*
+     * I2C CLK and SDA must be held high during idle (while mcu is asleep.)
+     * Self mcu is the master.
+     * If there are external pullups, pins can be floating inputs, without pullups.
+     * If mcu is providing pullup, pins should be held as outputs, value high.
+     */
+    I2CTransport::unconfigurePins();
+}
+
+
+
 /*
  * For I2C, selection is modal (does not need to be selected for each read/write.)
  *

@@ -10,9 +10,9 @@ private:
 
 public:
     /*
-     * configure slave select pin, which is active during sleep (not selected state.)
+     * pin, which is active during sleep (not selected state.)
      */
-    static void configureSelectSPIPin();
+    static void configureSelectSlavePin();
 
     /*
      * Configure all pins needed for SPI

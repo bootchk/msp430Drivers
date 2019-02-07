@@ -36,6 +36,11 @@ enum class ReadOrWrite {
 
 class Serial {
 public:
+    /*
+     * Configure serial bus (mcu pins) to sleeping state.
+     */
+    static void configureToSleepState();
+
 	/*
 	 * Start a session.
 	 *

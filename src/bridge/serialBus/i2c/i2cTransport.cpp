@@ -20,6 +20,8 @@
 // Implementation is by a stateMachine (which implements link layer)
 #include "stateMachine.h"
 
+#include "../../../driverParameters.h"  // I2C bus speed
+
 #include "../../../assert/myAssert.h"
 
 
@@ -139,7 +141,7 @@ void I2CTransport::unconfigurePins()
 EUSCI_B_I2C_initMasterParam params = {
                                       EUSCI_B_I2C_CLOCKSOURCE_SMCLK,        // clock is: submain
                                       1000000,                              // supplied clock freq
-                                      50000, // EUSCI_B_I2C_SET_DATA_RATE_100KBPS,    // desired data rate
+                                      DriverConstant::I2CBusSpeed,          // desired data rate
                                       0,                                    // autostop threshold
                                       EUSCI_B_I2C_NO_AUTO_STOP
 };

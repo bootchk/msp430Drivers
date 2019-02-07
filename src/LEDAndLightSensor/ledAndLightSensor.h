@@ -35,6 +35,9 @@ public:
      * LED function
      */
 
+    /*
+     * Initialization
+     */
     static void toOffFromUnconfigured();
 
     static void toOnFromOff();

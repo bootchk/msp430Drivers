@@ -18,7 +18,7 @@ public:
  * Typical loop iterations when LED is in strong light.
  * Depends on the LED.
  */
-static const unsigned int MinCyclesInLightToDischargeLEDCapacitance = 90;
+static const unsigned int MinItersInLightToDischargeLEDCapacitance = 100;
 
 /*
  * Maximum loop iterations we will attempt to discharge LED capacitance.
@@ -30,7 +30,13 @@ static const unsigned int MinCyclesInLightToDischargeLEDCapacitance = 90;
  * See the code for sensing light.
  * We count up.  This value should be only about ten percent higher than the above value.
  */
-static const unsigned int MaxCyclesInDarkToDischargeLEDCapacitance = 100;
+static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
+
+
+/*
+ * 50kbps seems to work with internal pullups of 30kohm and jumpers less than an inch.
+ */
+static const unsigned long I2CBusSpeed = 50000;
 };
 
 

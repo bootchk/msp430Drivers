@@ -47,6 +47,17 @@ typedef unsigned char RegisterAddress;
 
 class Bridge {
 public:
+    /*
+     * Configure pins to state while mcu is sleeping LPM4.5
+     * The state should hold any slaves quiet.
+     * E.g. SPI slave select should be state: not select
+     * E.g. I2C should be state bus idle.
+     */
+    static void configureToSleepState();
+
+    /*
+     * Is ready for use?
+     */
     static bool isConfigured();
 
 	/*
@@ -56,6 +67,8 @@ public:
 	 * - GPIO pins
 	 * -- data and clock pins
 	 * -- slave select pins (for some bridges)
+	 *
+	 * Ensures bridge ready for use.
 	 */
 	static void configureMcuSide(bool isRWBitHighForRead);
 

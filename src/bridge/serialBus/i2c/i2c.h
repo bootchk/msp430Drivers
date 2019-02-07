@@ -19,6 +19,8 @@ private:
 	static void unconfigureMasterPins();
 
 public:
+	static void configureToSleepState();
+
 	static void enable();
 	static void disable();
 	static bool isEnabled();

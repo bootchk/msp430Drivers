@@ -14,7 +14,7 @@ void SPIPins::configure() {
     // Data pins are part of the module
     configureDataSPIPins();
     // Slave select pins is outside of module, just a GPIO
-    configureSelectSPIPin();
+    configureSelectSlavePin();
 }
 
 
@@ -54,7 +54,7 @@ void SPIPins::deselectSlave(){
 
 // Public because RTC is always alive so pin must remain configured during sleep
 
-void SPIPins::configureSelectSPIPin() {
+void SPIPins::configureSelectSlavePin() {
     /*
      * PxOut resets to undefined.
      * Set value high (not selected) before we enable pin.

@@ -33,6 +33,13 @@ void I2CPins::configure() {
 
 
 void I2CPins::unconfigure() {
+    /*
+     * Set value high before converting to output.
+     * Idle state of bus requires high.
+     */
+    GPIO_setOutputHighOnPin(I2C_SDA_PORT, I2C_SDA_PIN);
+    GPIO_setOutputHighOnPin(I2C_SDA_PORT, I2C_SCL_PIN);
+
     GPIO_setAsOutputPin(I2C_SDA_PORT,   I2C_SDA_PIN);
     GPIO_setAsOutputPin(I2C_SCL_PORT,   I2C_SCL_PIN);
 

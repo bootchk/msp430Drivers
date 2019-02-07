@@ -42,20 +42,7 @@ bool isDarkFromLEDLightSensorUsingReverseBias() {
 
 
 /*
- * FUTURE: probably need to use another technique
- * where we reverse bias the LED
- * and then count time to discharge.
- *
- * Since the technique below is not reliable.
- */
-
-/*
- * Implementation using ADC to LED as voltage generating solar cell.
- *
- * Prior implementation using ADC to solar cell was flawed,
- * since the solar cell to an analog pin powered the MCU backdoor through protection diodes of the analog pin,
- * when the MCU was supposed to be unpowered,
- * thereby draining all the solar cell power indefinitely.
+ * Choose a implementation
  */
 bool LightSensor::isDark() {
     // return isDarkFromLEDLightSensorUsingADC();
@@ -63,8 +50,19 @@ bool LightSensor::isDark() {
 }
 
 
-
+/*
+ * Implementation using ADC to LED as voltage generating solar cell.
+ *
+ * Implementation using ADC to solar cell is flawed,
+ * since the solar cell to an analog pin powered the MCU backdoor through protection diodes of the analog pin,
+ * when the MCU was supposed to be unpowered,
+ * thereby draining all the solar cell power indefinitely.
+ */
 #ifdef OBSOLETE
+
+
+
+
 /* Vcc varies.
  * Min Vcc is 1.9V else would not be booted.
  * Max Vcc is 3.6V.

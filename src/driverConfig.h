@@ -34,4 +34,8 @@
 /*
  * Whether to verify by reading back everything that was written across Bridge.
  */
-//#define VERIFY_BRIDGE_WRITES
+#define VERIFY_BRIDGE_WRITES
+
+
+
+
