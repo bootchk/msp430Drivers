@@ -10,6 +10,7 @@ void testAlarm();
 void testTimer();
 void testLEDSensor();
 void testLEDSensor2();
+void testStepperDriver();
 
 
 
@@ -24,5 +25,6 @@ int main(void)
 	//testAlarm();
 	//testTimer();
 	//testLEDSensor();
-    testLEDSensor2();
+    //testLEDSensor2();
+    testStepperDriver();
 }
