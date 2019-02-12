@@ -5,7 +5,8 @@
 
 
 
-#include "stepperIndexer.h"
+#include "../src/stepperIndexer/stepperIndexer.h"
+#include "../src/stepperIndexer/driverChipInterface.h"
 
 
 
@@ -108,8 +109,8 @@ GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
  * 800 pulses per second would be rev per second, i.e. 60 rpm
  */
 void step360() {
-    for (unsigned int i = StepperIndexer::stepsPerRev(); i>0; i--) {
-        StepperIndexer::microstep();
+    for (unsigned int i = DriverChipInterface::stepsPerRev(); i>0; i--) {
+        StepperIndexer::stepMicrostep();
         delayOneMilliSecond();
     }
 }
@@ -119,10 +120,10 @@ void step360() {
  */
 void step360Incrementally() {
     // 1/4 microstep
-    for (unsigned int i = StepperIndexer::stepsPerRev(); i>0; i--) {
+    for (unsigned int i = DriverChipInterface::stepsPerRev(); i>0; i--) {
         // ??? wake and sleep make this not work
         //wake();
-        StepperIndexer::microstep();
+        StepperIndexer::stepMicrostep();
         //fourStep();
         //sleep();
         delayTenthSecond();
@@ -141,7 +142,7 @@ void wakefourStep() {
 
 void step360IncrementallyFull()
 {
-    for (unsigned int i = StepperIndexer::stepsPerRev(); i > 0; i--)
+    for (unsigned int i = DriverChipInterface::stepsPerRev(); i > 0; i--)
     {
         // ??? wake and sleep make this not work
         //wake();
@@ -161,14 +162,14 @@ void testBackAndForth() {
      * expect flag to stop at same place every time.
      */
     step360Incrementally();
-    StepperIndexer::toggleDirection();
+    DriverChipInterface::toggleDirection();
     StepperIndexer::sleep();
     delayOneSecond();
     StepperIndexer::wake();
 
     step360Incrementally();
     delayOneSecond();
-    StepperIndexer::toggleDirection();
+    DriverChipInterface::toggleDirection();
 }
 
 
@@ -256,7 +257,7 @@ void testStepperDriver() {
     // assert in home state
 
     //StepperIndexer::toQuarterStepMode();
-    StepperIndexer::toHalfStepMode();
+    DriverChipInterface::toHalfStepMode();
 
 
     // Uncomment to test disabling

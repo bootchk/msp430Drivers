@@ -6,8 +6,13 @@
 
 #include "stepperIndexer.h"
 
+// Uses chip driver
+#include "driverChipInterface.h"
+
+
+
 // DriverLib
-#include <gpio.h>
+// #include <gpio.h>
 
 
 
@@ -35,6 +40,13 @@ unsigned int shadowStepOfDriver = 2;
  * and we advance shadowStepOfDriver to match the remembered stepOfMotor.
  */
 unsigned int stepOfMotor;
+
+
+
+void delayOneMilliSecond() { __delay_cycles(1000); }
+
+
+
 }
 
 
@@ -60,11 +72,17 @@ void StepperIndexer::restoreDriverToMotorStep() {
 
     StepperIndexer::setShadowStepOfDriver(2);
 
-    disableOutput();
+    DriverChipInterface::disableOutput();
 
-    while ( not (shadowStepOfDriver == stepOfMotor) ) microstep();
+    while ( not (shadowStepOfDriver == stepOfMotor) ) {
+        /*
+         * Here we don't need a delay for speed, since motor is not turning, but we do need update shadow.
+         */
+        // TODO eliminate the speed delay
+        stepMicrostep();
+    }
 
-    enableOutput();
+    DriverChipInterface::enableOutput();
 }
 
 
@@ -73,21 +91,12 @@ void StepperIndexer::restoreDriverToMotorStep() {
 
 
 
-void StepperIndexer::microstep() {
-    /*
-     * Pulse high the "step" pin.
-     * If microstepping, not a full step.
-     */
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-    // driver requires > 1.7uSec pulse high
-    // assume procedure call overhead is enough
-    //__delay_cycles(2);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-    // driver requires > 1.7uSec pulse low
-    //__delay_cycles(2);
+void StepperIndexer::stepMicrostep() {
+
+    // tell driver
+    DriverChipInterface::stepMicrostep();
 
     delayAccordingToSpeed();
-
 
     /*
      * Shadow the driver's microstep index.
@@ -101,8 +110,47 @@ void StepperIndexer::microstep() {
 }
 
 
+
+
 // TODO this for half
 void StepperIndexer::stepDetent() {
-    microstep();
-    microstep();
+    // !!! Call to self, not to DriverChipInterface
+    stepMicrostep();
+    stepMicrostep();
 }
+
+
+
+/*
+ * sleep/wake
+ */
+void StepperIndexer::wake() {
+
+    DriverChipInterface::wake();
+
+    // assert DriverChip in state 2
+    // assert motor is at remembered motor step
+
+    restoreDriverToMotorStep();
+    // assert DriverChip is at same step as motor
+}
+
+
+void StepperIndexer::sleep() {
+    DriverChipInterface::sleep();
+
+    rememberMotorStep();
+}
+
+
+
+
+
+
+
+void StepperIndexer::delayAccordingToSpeed() {
+    delayOneMilliSecond();
+    delayOneMilliSecond();
+}
+
+

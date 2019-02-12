@@ -1,5 +1,5 @@
 
-#include "stepperIndexer.h"
+#include "driverChipInterface.h"
 
 // DriverLib
 #include <gpio.h>
@@ -8,9 +8,8 @@
 
 
 /*
- * Test TI DRV8834 stepper motor driver
- *
- * Pulse the step pin repeatedly.
+ * Connections:
+ * MSP430 to TI DRV8834 stepper motor driver
  *
  * Pins:
  * Step: P1.2
@@ -19,12 +18,15 @@
  * M0: P1.5
  * Enable: P1.6
  *
- * Config pin of driver is high i.e. indexer mode
+ * Config pin of driver chip is high i.e. indexer mode
  */
 
 
 
 
+// depends on motor
+//#define STEPS_PER_REV 200
+#define MOTOR_STEPS_PER_REV 20
 
 
 namespace {
@@ -44,7 +46,7 @@ void delayOneMilliSecond() { __delay_cycles(1000); }
 void delayOneMicroSecond() { __delay_cycles(1); }
 
 /*
- * A required delay after any wake.
+ * Chip spec requires delay after any wake before chip is active.
  * Ensure 1 milliSec before any subsequent step.
  */
 void delayForWakeChange() {
@@ -58,6 +60,10 @@ void delayForCommandChange() {
     delayOneMicroSecond();
 }
 
+
+
+
+
 }
 
 
@@ -66,9 +72,32 @@ void delayForCommandChange() {
 /*
  * Depends on motor and stepping mode (full or micro-stepping)
  */
-unsigned int StepperIndexer::stepsPerRev() {
+unsigned int DriverChipInterface::stepsPerRev() {
     return MOTOR_STEPS_PER_REV * static_cast<int> (stepMode);
 }
+
+
+
+
+
+/*
+ * Toggle NotSleep pin.
+ *
+ * Low-level, not concerned with shadowing.
+ */
+void DriverChipInterface::wake() {
+    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN4);
+
+    delayForWakeChange();
+
+    // assert DriverChip in state 2
+    // assert motor is at remembered motor step, not necessarily 2
+}
+
+void DriverChipInterface::sleep() {
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
+}
+
 
 
 
@@ -85,19 +114,19 @@ unsigned int StepperIndexer::stepsPerRev() {
  * Requires current limit of driver set low enough (in hardware potentionmeter)
  * otherwise may skip microsteps
  */
-void StepperIndexer::toFullStepMode() {
+void DriverChipInterface::toFullStepMode() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN5);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
     stepMode = StepMode::Full;
 }
-void StepperIndexer::toHalfStepMode() {
+void DriverChipInterface::toHalfStepMode() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN5);
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
     stepMode = StepMode::Half;
 }
-void StepperIndexer::toQuarterStepMode() {
+void DriverChipInterface::toQuarterStepMode() {
     // Make pin float
     GPIO_setAsInputPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
@@ -108,34 +137,7 @@ void StepperIndexer::toQuarterStepMode() {
 
 
 
-/*
- * Toggle NotSleep pin.
- */
-void StepperIndexer::wake() {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN4);
-
-    delayForWakeChange();
-
-    // assert DriverChip in state 2
-    // assert motor is at remembered motor step
-
-    restoreDriverToMotorStep();
-    // assert DriverChip is at same step as motor
-}
-
-void StepperIndexer::sleep() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
-
-    rememberMotorStep();
-}
-
-
-
-
-
-
-
-void StepperIndexer::toggleDirection() {
+void DriverChipInterface::toggleDirection() {
     if (direction) {
         GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN3);
         direction = false;
@@ -149,16 +151,20 @@ void StepperIndexer::toggleDirection() {
 
 
 
+
+
+
+
 /*
  * Pin is NotEnable: low is enabled, high is disabled.
  *
  * DriverChip has internal pulldown i.e. unconnected pin is in "enable" state
  */
-void StepperIndexer::disableOutput() {
+void DriverChipInterface::disableOutput() {
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN6);
     delayForCommandChange();
 }
-void StepperIndexer::enableOutput() {
+void DriverChipInterface::enableOutput() {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN6);
     delayForCommandChange();
 }
@@ -166,9 +172,18 @@ void StepperIndexer::enableOutput() {
 
 
 
-void StepperIndexer::delayAccordingToSpeed() {
-    delayOneMilliSecond();
-    delayOneMilliSecond();
+void DriverChipInterface::stepMicrostep() {
+    /*
+     * Pulse high the "step" pin.
+     * If microstepping, not a full step.
+     */
+    /*
+     * Chip spec requires > 1.7uSec pulse high and low.
+     * We assume procedure call overhead is enough
+     * i.e. cpu speed is about 1Mhz and procedure call requires greater than two uSec.
+     */
+    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
+    // assert 2 uSec have passed
+    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
+    // assert 2 uSec have passed
 }
-
-
