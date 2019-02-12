@@ -61,9 +61,48 @@ public:
 
 
 
+    /*
+     * Speed
+     */
+    static void delayAccordingToSpeed();
+
 
     /*
-     * Step
+     * Shadow step
      */
-    static void step();
+
+
+
+    /*
+     * Tell driver to step one microstep.
+     *
+     * !!! This will not actually step motor if driver is disabled.
+     * But it always advances the shadow step.
+     */
+    // TODO rename stepMicrostep
+    static void microstep();
+
+    /*
+     * Step microsteps equivalent to a whole step, one that will detent if coils deenergized.
+     */
+    static void stepDetent();
+
+
+    /*
+     * Shadowing
+     */
+
+    static void rememberMotorStep();
+
+    /*
+     * When you call this, you assert that motor step is in sync with given step.
+     * Usually, you have wake() so that driver is on home step
+     * and you have called microstep() through at least one cycle.
+     */
+    static void setShadowStepOfDriver(unsigned int);
+
+    /*
+     * Advance shadow state from home step to current step without energizing coils.
+     */
+    static void restoreDriverToMotorStep();
 };

@@ -71,18 +71,20 @@ void delayOneMilliSecond() { __delay_cycles(1000); }
 
 
 
-void fullStep() {
-    StepperIndexer::step();
-    StepperIndexer::step();
-    StepperIndexer::step();
-    StepperIndexer::step();
+void fourStep() {
+    // Four detent steps, i.e. 8 microsteps
+    StepperIndexer::stepDetent();
+    StepperIndexer::stepDetent();
+    StepperIndexer::stepDetent();
+    StepperIndexer::stepDetent();
+    // Assert returned to microstep and detent step on entry
 }
 
-
+#ifdef NOT_USED
 /*
  * Full step without procedure call delays
  */
-void fullStepSmooth()
+void fourStepSmooth()
 {
 GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
 GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
@@ -96,16 +98,18 @@ GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
 GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
 GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
 }
+#endif
+
 
 
 /*
- * Default config of breakout board is 1/4 step.
+ * Default config of breakout board is 1/4 StepMode.
  * Motor is 200 steps.
  * 800 pulses per second would be rev per second, i.e. 60 rpm
  */
 void step360() {
     for (unsigned int i = StepperIndexer::stepsPerRev(); i>0; i--) {
-        StepperIndexer::step();
+        StepperIndexer::microstep();
         delayOneMilliSecond();
     }
 }
@@ -118,19 +122,22 @@ void step360Incrementally() {
     for (unsigned int i = StepperIndexer::stepsPerRev(); i>0; i--) {
         // ??? wake and sleep make this not work
         //wake();
-        StepperIndexer::step();
-        //fullStep();
+        StepperIndexer::microstep();
+        //fourStep();
         //sleep();
         delayTenthSecond();
     }
 }
 
 
-void wakeFullStep() {
+#ifdef NOT_USED
+void wakefourStep() {
     StepperIndexer::wake();
-    fullStepSmooth();
+    fourStepSmooth();
     StepperIndexer::sleep();
 }
+#endif
+
 
 void step360IncrementallyFull()
 {
@@ -138,7 +145,7 @@ void step360IncrementallyFull()
     {
         // ??? wake and sleep make this not work
         //wake();
-        fullStep();
+        fourStep();
         //sleep();
         delayTenthSecond();
     }
@@ -165,46 +172,63 @@ void testBackAndForth() {
 }
 
 
+#ifdef NOT_USED
 void testWakeStep() {
     /*
      * Forever step, then sleep.
      */
     while (true) {
-        wakeFullStep();
+        wakefourStep();
     }
 }
-
+#endif
 
 
 void testHomeState() {
 
+    // assert DriverChip just powered up and is awake (NotSleep pin defaults to low)
     StepperIndexer::sleep();
     StepperIndexer::wake();
-    // assert in home state (step 2 for half step)
+    // assert DriverChip in home state (microstep 2 for Half StepMode)
+    // assert motor is on unknown step, but stepOfMotor is also HomeStep == 2
 
-    fullStepSmooth();
-    fullStepSmooth();
-    // assert motor in sync with step
-    // assert in home state (step 2 for half step)
+    /*
+     * Sync motor with DriverChip
+     */
+    fourStep();
+    fourStep();
+    // assert motor in sync with microstep
+    // assert in home state (microstep 2 for Half StepMode)
+    // assert microstep is a DetentStep
+
+    StepperIndexer::setShadowStepOfDriver(2);
 
     // advance to state 3 where only one coil energized (detent state?)
-    StepperIndexer::step();
+    //StepperIndexer::microstep();
 
     while (true)
     {
         StepperIndexer::sleep();
-        StepperIndexer::wake();
-        // assert in state 2
 
-        // Quietly advance driver state to state 3
-        StepperIndexer::disableOutput();
-        StepperIndexer::step();
-        StepperIndexer::enableOutput();
+        StepperIndexer::wake();
+        // assert wake restored driver to motor step
+
+        // WAS StepperIndexer::restoreDriverToMotorStep();
+        // Quietly advance driver state to current shadow step
+
+        // Step one detent
+        StepperIndexer::stepDetent();
 
         // Advance another detent (8 steps)
-        fullStepSmooth();
-        fullStepSmooth();
+        //fourStep();
+        //fourStep();
         // assert in state 3
+
+        delayTenthSecond();
+        delayTenthSecond();
+        delayTenthSecond();
+
+        // assert shadow state advanced by microsteps per detent step
     }
 
 

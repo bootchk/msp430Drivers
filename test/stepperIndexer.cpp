@@ -113,10 +113,20 @@ void StepperIndexer::toQuarterStepMode() {
  */
 void StepperIndexer::wake() {
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN4);
+
     delayForWakeChange();
+
+    // assert DriverChip in state 2
+    // assert motor is at remembered motor step
+
+    restoreDriverToMotorStep();
+    // assert DriverChip is at same step as motor
 }
+
 void StepperIndexer::sleep() {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
+
+    rememberMotorStep();
 }
 
 
@@ -155,16 +165,10 @@ void StepperIndexer::enableOutput() {
 
 
 
-void StepperIndexer::step() {
-    /*
-     * Pulse high the "step" pin.
-     * If microstepping, not a full step.
-     */
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-    // driver requires > 1.7uSec pulse high
-    // assume procedure call overhead is enough
-    //__delay_cycles(2);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-    // driver requires > 1.7uSec pulse low
-    //__delay_cycles(2);
+
+void StepperIndexer::delayAccordingToSpeed() {
+    delayOneMilliSecond();
+    delayOneMilliSecond();
 }
+
+
