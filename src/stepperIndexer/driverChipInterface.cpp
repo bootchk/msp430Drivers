@@ -11,14 +11,16 @@
  * Connections:
  * MSP430 to TI DRV8834 stepper motor driver
  *
- * Pins:
- * Step: P1.2
- * Dir:  P1.3
+ * Chip Pin : MSP430pin
+ * --------------------
+ * Step     : P1.2
+ * Dir      : P1.3
  * Not sleep: P1.4
- * M0: P1.5
- * Enable: P1.6
+ * M0       : P1.5
+ * Enable   : P1.6
  *
- * Config pin of driver chip is high i.e. indexer mode
+ * Config pin: unconnected, is internal high i.e. indexer mode
+ * M1       : unconnected, is internal low
  */
 
 
@@ -32,12 +34,19 @@
 namespace {
 
 /*
- * If M0 is connected to P1.5 and P1.5 is low, mode is half
+ * When:
+ * - M0 is connected to P1.5 and P1.5 is low
+ * - M1 is unconnected and internally pulled down
+ * => mode is half
  */
+#pragma PERSISTENT
 StepMode stepMode = StepMode::Half;
 
-// initially: DIR pin  low, direction is false
-bool direction = false;
+/*
+ * initially: DIR pin  low, direction is forward???
+ */
+#pragma PERSISTENT
+MotorDirection _direction = MotorDirection::Forward;
 
 
 
@@ -72,8 +81,12 @@ void delayForCommandChange() {
 /*
  * Depends on motor and stepping mode (full or micro-stepping)
  */
-unsigned int DriverChipInterface::stepsPerRev() {
+unsigned int DriverChipInterface::microstepsPerRev() {
     return MOTOR_STEPS_PER_REV * static_cast<int> (stepMode);
+}
+
+unsigned int DriverChipInterface::detentstepsPerRev() {
+    return MOTOR_STEPS_PER_REV;
 }
 
 
@@ -97,6 +110,8 @@ void DriverChipInterface::wake() {
 void DriverChipInterface::sleep() {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
 }
+
+
 
 
 
@@ -137,19 +152,23 @@ void DriverChipInterface::toQuarterStepMode() {
 
 
 
-void DriverChipInterface::toggleDirection() {
-    if (direction) {
+
+
+void DriverChipInterface::setDirection(MotorDirection direction) {
+    switch(direction) {
+    case MotorDirection::Forward:
         GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN3);
-        direction = false;
-    }
-    else {
+        break;
+    case MotorDirection::Backward:
         GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN3);
-        direction = true;
+        break;
     }
     delayForCommandChange();
+    _direction = direction;
 }
 
 
+MotorDirection DriverChipInterface::getDirection() { return _direction; }
 
 
 

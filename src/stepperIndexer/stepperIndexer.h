@@ -1,8 +1,47 @@
 
 /*
- * Drives a stepper motor using a DriverChip that implements "indexer" mode.
+ * Drives a "sleepable" stepper motor using a DriverChip that implements "indexer" mode.
  *
- * DriverChip
+ * Indexer mode: means main calls are setDirection() and stepDetent()
+ * (instead of phase/enable)
+ *
+ * Sleepable: means that it can be slept in low power mode yet still single step from the detent motor position.
+ * Includes ability to sleep in LMP4.5 (cpu totally unpowered) using MSP430 persistent FRAM.
+ *
+ *
+ *
+ * Missing features:
+ *
+ * No settable speed.
+ * The application is single-stepping only (or at most a few steps).  Application does not care to accelerate motor speed faster than startup speed.
+ * Speed is hard-coded at a low speed to match the max startup speed of the motor.
+ * Each motor has a maximum startup speed specified, you should check that the hard-coded speed is less than the max your motor instance supports.
+ *
+ * Hides microstepping.  The API only allows detentSteps.
+ * Microstepping is used in lower layers.
+ * But you can't sleep at anything other than a detentStep, so API does not expose microsteps operation.
+ *
+ * No microstepping mode control.
+ * Hard-coded to half-step mode.  I.E. is always two microsteps per detent step.
+ * (The API is there to choose a different step mode, but the implementation assumes half-step mode.)
+ *
+ * Probably closed-loop feedback is still required.
+ * The driver's notion of the motor position might not be reliable over a very long time.
+ * (Motor might miss some steps.)
+ *
+ * No dependence on DriverLib.  Depends on DriverChipInterface, which has only a DriverLib implementation.
+ *
+ *
+ * Algebra:
+ *
+ * At cold start, all pins should be set output low as soon as possible.
+ * This sleeps the driver.
+ *
+ * At boot time, call initialWake(), syncDriverWithMotor()
+ * Thereafter: sleep, wake, stepDetent, sleep, wake, setDirection, stepDetent, sleep, ....
+ *
+ * Also possible, to just spin the motor:
+ * initialWake(), stepDetent(), stepDetent(), ...
  */
 
 
@@ -11,41 +50,10 @@
 
 
 class StepperIndexer {
-public:
+private:
+    static void maintainShadowStep();
 
-
-
-
-    static void wake();
-    static void sleep();
-
-
-
-    /*
-     * Speed
-     */
     static void delayAccordingToSpeed();
-
-
-    /*
-     * Shadow step
-     */
-
-
-
-
-
-    /*
-     * Step microsteps equivalent to a whole step, one that will detent if sleep (coils deenergized.)
-     */
-    static void stepDetent();
-
-    /*
-     * Does not enforce sleepable.
-     * If you call it an odd count of times, then sleep, motor will twitch into a detent position.
-     */
-    static void stepMicrostep();
-
 
     /*
      * Shadowing
@@ -58,10 +66,48 @@ public:
      * Usually, you have wake() so that driver is on home step
      * and you have called microstep() through at least one cycle.
      */
-    static void setShadowStepOfDriver(unsigned int);
+    static void setShadowMicrostepOfDriver(unsigned int);
 
     /*
      * Advance shadow state from home step to current step without energizing coils.
+     * This disables the driver outputs while stepping, to advance DriverChip internal state w/o moving motor.
      */
     static void restoreDriverToMotorStep();
+
+
+
+    /*
+     * Speed controlled microstep: built in delay.
+     *
+     * Does not enforce sleepable.
+     * If you call it an odd count of times, then sleep, motor will twitch into a detent position.
+     */
+    static void stepMicrostep();
+
+    /*
+     * Step driver as fast as possible.
+     * Driver should be disabled.
+     * Motor does not move.
+     */
+    static void fastStepDetent();
+
+
+
+public:
+
+    /*
+     * During this call, the motor will turn somewhat unpredictably.
+     */
+    static void syncDriverWithMotor();
+
+    static void initialWake();
+    static void wake();
+    static void sleep();
+
+
+    /*
+     * Step microsteps equivalent to a whole step, one that will detent if sleep (coils deenergized.)
+     */
+    static void stepDetent();
+
 };

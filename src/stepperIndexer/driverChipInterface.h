@@ -14,11 +14,17 @@ enum class StepMode {
 };
 
 
+enum class MotorDirection {
+    Forward,
+    Backward
+};
+
 
 class DriverChipInterface {
 public:
 
-    static unsigned int stepsPerRev();
+    static unsigned int microstepsPerRev();
+    static unsigned int detentstepsPerRev();
 
 
     // Stepping mode
@@ -31,7 +37,8 @@ public:
     static void sleep();
 
 
-    static void toggleDirection();
+    static void setDirection(MotorDirection);
+    static MotorDirection getDirection();
 
     /*
      * Disabled allows advancing current step in driver without moving motor.

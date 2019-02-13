@@ -72,60 +72,28 @@ void delayOneMilliSecond() { __delay_cycles(1000); }
 
 
 
-void fourStep() {
-    // Four detent steps, i.e. 8 microsteps
-    StepperIndexer::stepDetent();
-    StepperIndexer::stepDetent();
-    StepperIndexer::stepDetent();
-    StepperIndexer::stepDetent();
-    // Assert returned to microstep and detent step on entry
-}
-
-#ifdef NOT_USED
-/*
- * Full step without procedure call delays
- */
-void fourStepSmooth()
-{
-GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-
-GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-
-GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-
-GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
-GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-}
-#endif
-
-
-
 /*
  * Default config of breakout board is 1/4 StepMode.
  * Motor is 200 steps.
  * 800 pulses per second would be rev per second, i.e. 60 rpm
  */
 void step360() {
-    for (unsigned int i = DriverChipInterface::stepsPerRev(); i>0; i--) {
-        StepperIndexer::stepMicrostep();
-        delayOneMilliSecond();
+    for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
+        StepperIndexer::stepDetent();
+        // No delay here.  stepDetent delays between microsteps appropriate to speed
+        // This may still appear a little jerky because of loop overhead.
     }
 }
 
 /*
- * Sleep between steps
+ * Sleep between steps, i.e. jerky
  */
 void step360Incrementally() {
-    // 1/4 microstep
-    for (unsigned int i = DriverChipInterface::stepsPerRev(); i>0; i--) {
-        // ??? wake and sleep make this not work
-        //wake();
-        StepperIndexer::stepMicrostep();
-        //fourStep();
-        //sleep();
+    for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
+
+        StepperIndexer::stepDetent();
+
+        // Delay after each step, so it is jerky
         delayTenthSecond();
     }
 }
@@ -140,18 +108,6 @@ void wakefourStep() {
 #endif
 
 
-void step360IncrementallyFull()
-{
-    for (unsigned int i = DriverChipInterface::stepsPerRev(); i > 0; i--)
-    {
-        // ??? wake and sleep make this not work
-        //wake();
-        fourStep();
-        //sleep();
-        delayTenthSecond();
-    }
-}
-
 
 
 
@@ -162,14 +118,14 @@ void testBackAndForth() {
      * expect flag to stop at same place every time.
      */
     step360Incrementally();
-    DriverChipInterface::toggleDirection();
+    DriverChipInterface::setDirection(MotorDirection::Forward);
     StepperIndexer::sleep();
     delayOneSecond();
     StepperIndexer::wake();
 
     step360Incrementally();
     delayOneSecond();
-    DriverChipInterface::toggleDirection();
+    DriverChipInterface::setDirection(MotorDirection::Backward);
 }
 
 
@@ -185,63 +141,47 @@ void testWakeStep() {
 #endif
 
 
+void wakeStepSleep() {
+           StepperIndexer::sleep();
+
+           delayTenthSecond();
+
+            StepperIndexer::wake();
+            // assert wake restored driver to motor step
+
+            // Step one detent
+            StepperIndexer::stepDetent();
+
+            delayTenthSecond();
+            delayTenthSecond();
+
+            // assert shadow state advanced by microsteps per detent step
+}
+
+
 void testHomeState() {
 
     // assert DriverChip just powered up and is awake (NotSleep pin defaults to low)
-    StepperIndexer::sleep();
-    StepperIndexer::wake();
-    // assert DriverChip in home state (microstep 2 for Half StepMode)
-    // assert motor is on unknown step, but stepOfMotor is also HomeStep == 2
 
-    /*
-     * Sync motor with DriverChip
-     */
-    fourStep();
-    fourStep();
-    // assert motor in sync with microstep
-    // assert in home state (microstep 2 for Half StepMode)
-    // assert microstep is a DetentStep
-
-    StepperIndexer::setShadowStepOfDriver(2);
+    StepperIndexer::syncDriverWithMotor();
 
     // advance to state 3 where only one coil energized (detent state?)
     //StepperIndexer::microstep();
 
     while (true)
     {
-        StepperIndexer::sleep();
-
-        StepperIndexer::wake();
-        // assert wake restored driver to motor step
-
-        // WAS StepperIndexer::restoreDriverToMotorStep();
-        // Quietly advance driver state to current shadow step
-
-        // Step one detent
-        StepperIndexer::stepDetent();
-
-        // Advance another detent (8 steps)
-        //fourStep();
-        //fourStep();
-        // assert in state 3
-
-        delayTenthSecond();
-        delayTenthSecond();
-        delayTenthSecond();
-
-        // assert shadow state advanced by microsteps per detent step
+        DriverChipInterface::setDirection(MotorDirection::Forward);
+        wakeStepSleep();
+        DriverChipInterface::setDirection(MotorDirection::Backward);
+        // undo forward, then 90 backwards
+        wakeStepSleep();
+        // 5 steps is 90 degrees
+        wakeStepSleep();
+        wakeStepSleep();
+        wakeStepSleep();
+        wakeStepSleep();
+        wakeStepSleep();
     }
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
@@ -253,7 +193,7 @@ void testStepperDriver() {
 
     PMM_unlockLPM5();
 
-    StepperIndexer::wake();
+    StepperIndexer::initialWake();
     // assert in home state
 
     //StepperIndexer::toQuarterStepMode();
