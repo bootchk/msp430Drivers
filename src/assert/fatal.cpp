@@ -3,6 +3,8 @@
 
 #include "../SoC/SoC.h"
 
+#include "../logger/logger.h"
+
 #include <cassert>
 
 #include "../driverConfig.h"
@@ -22,14 +24,21 @@
 #endif
 
 
+/*
+ * myAssert writes line number to FRAM.
+ * Multiple routines so we can debug by line number.
+ *
+ * In production, assert will SW reset SoC
+ */
 
 
 
-
-void Fatal::reboot() {
+void Fatal::reboot(unsigned int reason) {
     // LED on briefly, you may fail to see
     //LEDAndLightSensor::toOnFromOff();
     //__delay_cycles(500000);
+
+    Logger::log(reason);
 
     SoC::triggerSoftwareReset();
     /*
@@ -43,20 +52,28 @@ void Fatal::reboot() {
 
 #ifdef FATAL_TESTING
 
-void Fatal::fatalReset()                   { Fatal::warbleGreenLEDForever(); }
+void Fatal::fatalHWFault()                 { Fatal::warbleGreenLEDForever(); }
+void Fatal::fatalSWFault()                 { Fatal::warbleGreenLEDForever(); }
 void Fatal::fatalAssert(unsigned int line) { Fatal::warbleRedLEDForever(); }
 
 
 #elif defined(FATAL_PRODUCTION)
 
-void Fatal::fatalReset()                   { reboot(); }
-void Fatal::fatalAssert(unsigned int line) { reboot(); }
+void Fatal::fatalHWFault()                 { reboot(1); }
+void Fatal::fatalSWFault()                 { reboot(2); }
+void Fatal::fatalAssert(unsigned int line) { reboot(3); }
 
 #elif defined(FATAL_DEBUGGING)
 
+// No actual need to log, its here to test logging
+
 // Delegate to C assert
-void Fatal::fatalReset()                   { assert(false); }
-void Fatal::fatalAssert(unsigned int line) { assert(false); }
+void Fatal::fatalHWFault()                 { Logger::log(1); assert(false); }
+void Fatal::fatalSWFault()                 { Logger::log(2); assert(false); }
+void Fatal::fatalAssert(unsigned int line) {
+    Logger::log(3);
+    assert(false);
+}
 
 #endif
 

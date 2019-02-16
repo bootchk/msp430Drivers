@@ -2,6 +2,7 @@
 
 
 
+
 void testStepper();
 void testCompass();
 void testCompass2();
@@ -11,6 +12,8 @@ void testTimer();
 void testLEDSensor();
 void testLEDSensor2();
 void testStepperDriver();
+void testLogging();
+
 
 
 
@@ -26,5 +29,7 @@ int main(void)
 	//testTimer();
 	//testLEDSensor();
     //testLEDSensor2();
-    testStepperDriver();
+    //testStepperDriver();
+
+	testLogging();
 }

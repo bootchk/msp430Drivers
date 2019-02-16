@@ -1,16 +1,12 @@
 
 #include "softFault.h"
 
-#include "../assert/myAssert.h"
+#include "../assert/fatal.h"
 
-/*
- * The assert writes line number to FRAM.
- * Multiple routines so we can debug by line number.
- *
- * In production, assert will SW reset SoC
- */
-void SoftFault::failSetAlarm()   { Logger::log(1); myAssert(false);}
 
-void SoftFault::failClearAlarm() { Logger::log(1); myAssert(false);}
 
-void SoftFault::failReadTime()   { Logger::log(1); myAssert(false);}
+void SoftFault::failSetAlarm()   { Fatal::fatalSWFault(); }
+
+void SoftFault::failClearAlarm() { Fatal::fatalSWFault(); }
+
+void SoftFault::failReadTime()   { Fatal::fatalSWFault(); }

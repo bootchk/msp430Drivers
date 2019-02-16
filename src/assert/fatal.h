@@ -30,10 +30,18 @@ public:
      */
     static void abortGreenLED();
 
-    // Software reset
-    static void reboot();
-    // Fatal condition discovered in ordinary code
-    static void fatalReset();
-    // Fatal condition discovered by myAssert()
+    // Do a software reset and log given reason
+    static void reboot(unsigned int reason);
+
+    /*
+     * Fatal conditions
+     */
+    // Discovered in ordinary code
+    static void fatalSWFault();
+
+    // Discovered by CPU e.g. bus error or vacant memory address
+    static void fatalHWFault();
+
+    // Discovered by myAssert()
     static void fatalAssert(unsigned int);
 };
