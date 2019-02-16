@@ -43,8 +43,8 @@ public:
     /*
      * Disabled allows advancing current step in driver without moving motor.
      */
-    static void disableOutput();
-    static void enableOutput();
+    static void disableCoilDrive();
+    static void enableCoilDrive();
 
 
     /*
@@ -52,6 +52,8 @@ public:
      *
      * !!! This will not actually step motor if driver output is disabled.
      * This does not understand shadow step.
+     *
+     * This does not have any delays to control speed.
      */
     static void stepMicrostep();
 };

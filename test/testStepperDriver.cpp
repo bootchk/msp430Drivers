@@ -129,22 +129,13 @@ void testBackAndForth() {
 }
 
 
-#ifdef NOT_USED
-void testWakeStep() {
-    /*
-     * Forever step, then sleep.
-     */
-    while (true) {
-        wakefourStep();
-    }
-}
-#endif
 
 
+/*
+ * Expect: motor move one step (say 1/20 rev i.e. 18 degrees)
+ */
 void wakeStepSleep() {
-           StepperIndexer::sleep();
-
-           delayTenthSecond();
+           //StepperIndexer::sleep();
 
             StepperIndexer::wake();
             // assert wake restored driver to motor step
@@ -152,35 +143,41 @@ void wakeStepSleep() {
             // Step one detent
             StepperIndexer::stepDetent();
 
-            delayTenthSecond();
-            delayTenthSecond();
+            StepperIndexer::sleep();
 
-            // assert shadow state advanced by microsteps per detent step
+            delayTenthSecond();
+            delayTenthSecond();
 }
 
 
-void testHomeState() {
-
-    // assert DriverChip just powered up and is awake (NotSleep pin defaults to low)
-
-    StepperIndexer::syncDriverWithMotor();
-
-    // advance to state 3 where only one coil energized (detent state?)
-    //StepperIndexer::microstep();
-
-    while (true)
-    {
-        DriverChipInterface::setDirection(MotorDirection::Forward);
-        wakeStepSleep();
-        DriverChipInterface::setDirection(MotorDirection::Backward);
-        // undo forward, then 90 backwards
-        wakeStepSleep();
+void stepQuarterRev() {
         // 5 steps is 90 degrees
         wakeStepSleep();
         wakeStepSleep();
         wakeStepSleep();
         wakeStepSleep();
         wakeStepSleep();
+}
+
+/*
+ * Expect motor twitch back and forth one step i.e. 18 degrees.
+ */
+void testHomeState() {
+
+    // assert DriverChip just powered up and is awake (NotSleep pin defaults to low)
+
+    StepperIndexer::syncDriverWithMotor();
+    // assert is wake
+
+    while (true)
+    {
+        DriverChipInterface::setDirection(MotorDirection::Forward);
+        wakeStepSleep();
+        DriverChipInterface::setDirection(MotorDirection::Backward);
+        // undo forward
+        wakeStepSleep();
+
+        stepQuarterRev();
     }
 }
 
@@ -198,6 +195,8 @@ void testStepperDriver() {
 
     //StepperIndexer::toQuarterStepMode();
     DriverChipInterface::toHalfStepMode();
+
+    StepperIndexer::syncDriverWithMotor();
 
 
     // Uncomment to test disabling

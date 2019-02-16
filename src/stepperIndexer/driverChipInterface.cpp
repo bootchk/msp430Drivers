@@ -39,13 +39,22 @@ namespace {
  * - M1 is unconnected and internally pulled down
  * => mode is half
  */
-#pragma PERSISTENT
+/*
+ * Not persistent.
+ * Currently code assumes Half (except stepsPerRev references it)
+ * In many cases, the pins will be hardwired to a certain stepMode.
+ */
 StepMode stepMode = StepMode::Half;
 
 /*
  * initially: DIR pin  low, direction is forward???
  */
-#pragma PERSISTENT
+/*
+ * Not persistent.
+ * A sleep-then-wake will not alter the direction.
+ * A LPM4.5 sleep of mcu would probably alter the pins controlling direction,
+ * but I assume you will set direction explicitly before any stepping.
+ */
 MotorDirection _direction = MotorDirection::Forward;
 
 
@@ -179,11 +188,11 @@ MotorDirection DriverChipInterface::getDirection() { return _direction; }
  *
  * DriverChip has internal pulldown i.e. unconnected pin is in "enable" state
  */
-void DriverChipInterface::disableOutput() {
+void DriverChipInterface::disableCoilDrive() {
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN6);
     delayForCommandChange();
 }
-void DriverChipInterface::enableOutput() {
+void DriverChipInterface::enableCoilDrive() {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN6);
     delayForCommandChange();
 }

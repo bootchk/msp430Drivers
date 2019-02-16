@@ -43,6 +43,24 @@ unsigned int shadowMicrostepOfMotor;
 
 void delayOneMilliSecond() { __delay_cycles(1000); }
 
+void delayFiveMilliSecond() { __delay_cycles(5000); }
+
+void delayTenMilliSecond() { __delay_cycles(10000); }
+
+/*
+ * Delay so motor turns at 100PPS (pulses per second).
+ * For 20 step motor, that is 5 steps a second, or 300 RPM.
+ *
+ * This is called for each microstep.
+ * PPS is for whole steps.
+ * We are in half step mode.
+ * So each delay is half of the delay for one pulse.
+ */
+void delaySo100PPS() {
+    delayFiveMilliSecond();
+}
+
+
 }
 
 
@@ -63,11 +81,13 @@ void StepperIndexer::setShadowMicrostepOfDriver(unsigned int aStep) {
 // quietly => non-energized
 void StepperIndexer::restoreDriverToMotorStep() {
     // assert motor is on a detentStep
+    // assert driverchip is wake, in fact just waked from sleep and reset
 
+    // 2 is the state after reset when half step mode
     StepperIndexer::setShadowMicrostepOfDriver(2);
 
     // Prevent motor movement
-    DriverChipInterface::disableOutput();
+    DriverChipInterface::disableCoilDrive();
 
     while ( not (shadowMicrostepOfDriver == shadowMicrostepOfMotor) ) {
         /*
@@ -76,15 +96,28 @@ void StepperIndexer::restoreDriverToMotorStep() {
         fastStepDetent();
     }
 
-    DriverChipInterface::enableOutput();
+    DriverChipInterface::enableCoilDrive();
 }
 
 
 
-
+/*
+ * Delay per microstep
+ *
+ * For:
+ * 20 step motor
+ * half step mode
+ *
+ * Max microstep frequency of DRV8834 is 250kHz
+ * 1 mSec delay is 1000 microsteps/sec, 500 detentstep/sec, 30k detent steps/min, 1500 rpm
+ * 2 mSec delay is 500 microsteps/sec, 250 detentstep/sec, 15k detent steps/min, 750 rpm
+ * 3 mSec delay is 333 microsteps/sec, 166 detentstep/sec, 10k detent steps/min, 500 rpm
+ */
 void StepperIndexer::delayAccordingToSpeed() {
-    delayOneMilliSecond();
-    delayOneMilliSecond();
+    //delayOneMilliSecond();
+    //delayOneMilliSecond();
+    //delayOneMilliSecond();
+    delaySo100PPS();
 }
 
 
@@ -121,11 +154,14 @@ void StepperIndexer::maintainShadowStep() {
     // assert we just microstepped twice (one detentStep)
     switch(DriverChipInterface::getDirection()) {
     case MotorDirection::Forward:
+    //case MotorDirection::Backward:
         shadowMicrostepOfDriver += 2;
         if (shadowMicrostepOfDriver > 7)
                 shadowMicrostepOfDriver = 0;
         break;
     case MotorDirection::Backward:
+    //case MotorDirection::Forward:
+
         if (shadowMicrostepOfDriver == 0)
                 shadowMicrostepOfDriver = 8;
         shadowMicrostepOfDriver -= 2;

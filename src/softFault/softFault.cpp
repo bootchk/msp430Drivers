@@ -9,8 +9,8 @@
  *
  * In production, assert will SW reset SoC
  */
-void SoftFault::failSetAlarm() {myAssert(false);}
+void SoftFault::failSetAlarm()   { Logger::log(1); myAssert(false);}
 
-void SoftFault::failClearAlarm() {myAssert(false);}
+void SoftFault::failClearAlarm() { Logger::log(1); myAssert(false);}
 
-void SoftFault::failReadTime() {myAssert(false);}
+void SoftFault::failReadTime()   { Logger::log(1); myAssert(false);}

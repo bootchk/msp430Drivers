@@ -15,7 +15,9 @@
  * No settable speed.
  * The application is single-stepping only (or at most a few steps).  Application does not care to accelerate motor speed faster than startup speed.
  * Speed is hard-coded at a low speed to match the max startup speed of the motor.
- * Each motor has a maximum startup speed specified, you should check that the hard-coded speed is less than the max your motor instance supports.
+ * Each motor has a maximum startup speed specified (in PPS, pulse per second).
+ * You should check that the hard-coded speed is less than the max your motor instance supports.
+ * Generally, the lower the speed the more torque load it will start.
  *
  * Hides microstepping.  The API only allows detentSteps.
  * Microstepping is used in lower layers.
@@ -29,7 +31,13 @@
  * The driver's notion of the motor position might not be reliable over a very long time.
  * (Motor might miss some steps.)
  *
- * No dependence on DriverLib.  Depends on DriverChipInterface, which has only a DriverLib implementation.
+ * Depends on DriverChipInterface, provided.
+ * The provided DriverChipInterface only has a DriverLib implementation.
+ *
+ *
+ *
+ * Tested using MSP430 mcu and DRV8834 driver chip.
+ * See
  *
  *
  * Algebra:
@@ -97,6 +105,9 @@ public:
 
     /*
      * During this call, the motor will turn somewhat unpredictably.
+     * Will sleep(reset) and wake
+     *
+     * Ensures driver is wake.
      */
     static void syncDriverWithMotor();
 
