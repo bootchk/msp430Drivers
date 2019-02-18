@@ -55,8 +55,9 @@ void shutdownTimerResources() {
     // Let VLO stop when RTC stops using it
     CS_enableVLOAutoOff();
 
-    // Stop RTC
     RTC_stop(RTC_BASE);
+
+    // ensure VLO and RTC are off i.e. low power
 }
 
 
@@ -101,9 +102,10 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
 
 
 // 50k * 100uSec tick is 5 meg uSec is 5 seconds
-void LowPowerTimer::delayFiveSeconds() { LowPowerTimer::delayTicksOf100uSec(50000); }
-
+void LowPowerTimer::delayFiveSeconds()        { LowPowerTimer::delayTicksOf100uSec(50000); }
+void LowPowerTimer::delayHalfSecond()         { LowPowerTimer::delayTicksOf100uSec(5000); }
 void LowPowerTimer::delayTwentyMilliSeconds() { LowPowerTimer::delayTicksOf100uSec(200); }
+void LowPowerTimer::delayTenMilliSeconds()    { LowPowerTimer::delayTicksOf100uSec(100); }
 
-void LowPowerTimer::delayHalfSecond() { LowPowerTimer::delayTicksOf100uSec(5000); }
+
 

@@ -137,6 +137,10 @@ void I2CTransport::unconfigurePins()
  * bus length of 1 inches, and internal pullup of 30kohms, max data rate is less than 100kbps (say 50kbps)
  * Probably should just use external 10kohm pullups.
  */
+/*
+ * This is constant, but the function to which it is passed does not allow const.
+ * So we declare persistent so it goes in FRAM.
+ */
 #pragma PERSISTENT
 EUSCI_B_I2C_initMasterParam params = {
                                       EUSCI_B_I2C_CLOCKSOURCE_SMCLK,        // clock is: submain
