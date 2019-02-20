@@ -38,7 +38,9 @@ void ADCConfigure::configureVoltageBandgapReference() {
     PMM_enableInternalReference();
 }
 
-// TODO disable???
+void ADCConfigure::disableVoltageBandgapReference() {
+    PMM_disableInternalReference();
+}
 
 
 void ADCConfigure::configureCommon() {
@@ -101,6 +103,14 @@ void ADCConfigure::configureForVccMeasure() {
     //
     waitForVoltageBandgapReference();
     // Assert ready to read
+}
+
+void ADCConfigure::unconfigureForVccMeasure() {
+    /*
+     * The ADC itself will enter low power automatically,
+     * but we must disable the VBG???
+     */
+    disableVoltageBandgapReference();
 }
 
 

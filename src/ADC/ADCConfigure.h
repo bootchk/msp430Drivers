@@ -23,6 +23,8 @@ class ADCConfigure {
 
     static void waitForVoltageBandgapReference();
 
+    static void disableVoltageBandgapReference();
+
 public:
     // Both configurations of external pin hijack the GPIO function of the pin
 
@@ -37,6 +39,13 @@ public:
     // configure to measure Vcc in centiVolts
     // Does not hijack GPIO
     static void configureForVccMeasure();
+    /*
+     * Not sure this is necessary?
+     * Make the ADC low power.
+     * The ADC will automatically be low power after a single read.
+     * But the voltage bandgap reference in the PMM might draw power, so this disables it.
+     */
+    static void unconfigureForVccMeasure();
 
     // Undo ADC hijacking the GPIO function of pin
     static void releaseExternalPin();

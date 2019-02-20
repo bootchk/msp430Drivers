@@ -38,6 +38,8 @@ unsigned int ADC::measureVccCentiVolts() {
 
     unsigned int adcResult = read();
 
+    ADCConfigure::unconfigureForVccMeasure();
+
     return convert8BitADCReadToCentiVolts(adcResult);
 }
 
