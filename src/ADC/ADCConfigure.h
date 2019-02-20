@@ -49,4 +49,6 @@ public:
 
     // Undo ADC hijacking the GPIO function of pin
     static void releaseExternalPin();
+
+    static void disableADC();
 };

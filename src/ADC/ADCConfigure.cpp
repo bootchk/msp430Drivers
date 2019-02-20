@@ -1,10 +1,12 @@
 
 #include "ADCConfigure.h"
 
+#include "voltBandgapRef.h"
+
 // DriverLib
 #include <gpio.h>
 #include <adc.h>
-#include <pmm.h>
+
 
 // App
 #include <board.h>
@@ -29,18 +31,7 @@ void ADCConfigure::releaseExternalPin() {
 #endif
 
 
-void ADCConfigure::waitForVoltageBandgapReference() {
-    // spin
-    while (not PMM_getVariableReferenceVoltageStatus == PMM_REFGEN_READY) ;
-}
 
-void ADCConfigure::configureVoltageBandgapReference() {
-    PMM_enableInternalReference();
-}
-
-void ADCConfigure::disableVoltageBandgapReference() {
-    PMM_disableInternalReference();
-}
 
 
 void ADCConfigure::configureCommon() {
@@ -84,8 +75,8 @@ void ADCConfigure::configureCommon() {
 //ADC_INPUT_DVSS
 
 void ADCConfigure::configureForVccMeasure() {
-    configureVoltageBandgapReference();
-    // We wait for it later
+    VBG::enable();
+    // We wait for ready later
 
     configureCommon();
 
@@ -100,8 +91,7 @@ void ADCConfigure::configureForVccMeasure() {
                 ADC_VREFPOS_AVCC,
                 ADC_VREFNEG_AVSS);
 
-    //
-    waitForVoltageBandgapReference();
+    VBG::waitForReady();
     // Assert ready to read
 }
 
@@ -110,7 +100,13 @@ void ADCConfigure::unconfigureForVccMeasure() {
      * The ADC itself will enter low power automatically,
      * but we must disable the VBG???
      */
-    disableVoltageBandgapReference();
+    VBG::disable();
+
+    disableADC();
+}
+
+void ADCConfigure::disableADC() {
+    ADC_disable(ADC_BASE);
 }
 
 
