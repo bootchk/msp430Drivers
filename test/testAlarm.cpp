@@ -1,5 +1,7 @@
 #include "../src/alarm/alarm.h"
 
+#include "../src/pinFunction/allPins.h"
+
 // DriverLib
 #include <pmm.h>
 
@@ -16,6 +18,8 @@
 
 void testAlarm()
 {
+    AllPins::setHighOutput();
+
     PMM_unlockLPM5();
 
     Alarm::configureForAlarming();

@@ -91,9 +91,9 @@ void SoC::triggerSoftwareReset() { PMM::triggerSoftwareBORReset(); }
 bool SoC::isResetAWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }
 
 
-void SoC::disableXT1() {
-    CS_turnOffXT1();
-}
+
+void SoC::disableXT1() { CS_turnOffXT1(); }
+void SoC::turnOffSMCLK()  { CS_turnOffSMCLK(); }
 
 bool  SoC::areGPIOGeneralPurpose() {
     return (P1SEL0 == 0) and (P1SEL1 == 0)

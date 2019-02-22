@@ -25,11 +25,10 @@ int main(void)
 	//testCompass();
 	//testRTC();
 	//testCompass2();
-	//testAlarm();
+	testAlarm();
 	//testTimer();
 	//testLEDSensor();
     //testLEDSensor2();
     //testStepperDriver();
-
-	testLogging();
+	//testLogging();
 }

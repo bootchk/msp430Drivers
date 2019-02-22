@@ -14,7 +14,7 @@
 
 class RTCInterface {
 private:
-    static void setAddress(RTCAddress subaddress);
+    //static void setAddress(RTCAddress subaddress);
 
 public:
     static void readTime(RTCTime*);
