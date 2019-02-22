@@ -20,6 +20,7 @@ private:
 
 public:
 	static void configureToSleepState();
+	static bool isInSleepState();
 
 	static void enable();
 	static void disable();

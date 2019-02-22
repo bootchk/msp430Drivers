@@ -55,6 +55,7 @@ void shutdownTimerResources() {
     // Let VLO stop when RTC stops using it
     CS_enableVLOAutoOff();
 
+    // This DriverLib implementation sets the clock source to 00 which I presume means none, and RTC disabled?
     RTC_stop(RTC_BASE);
 
     // ensure VLO and RTC are off i.e. low power

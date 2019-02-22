@@ -71,16 +71,19 @@ public:
      */
     static void configurePins();
     static void unconfigurePins();
+    static bool isUnconfigurePins();
 
     /*
      * Prepare for use with a particular slave.
      * Also must configure pins.
      * There is no unconfigure, but unconfigurePins uninitializes.
      *
-     * Class is modal on slave adress.
+     * Class is modal on slave address defined in board.h
      * Only 7 bits of slaveAddress are valid.
+     *
+     * TODO parameterized on slave address
      */
-    static void initI2CPeripheral(unsigned char slaveAddress);
+    static void initI2CPeripheral();
     static bool isInitialized();
 
 

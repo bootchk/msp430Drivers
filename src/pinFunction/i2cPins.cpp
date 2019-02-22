@@ -44,6 +44,6 @@ void I2CPins::unconfigure() {
     GPIO_setAsOutputPin(I2C_SCL_PORT,   I2C_SCL_PIN);
 
     /*
-     * TODO comments about why output pins have no pullup.
+     * Why output pins have no pullup: see the AND gate on the GPIO.  If PxDIR == 1 (output), resistor cannot be active even if PxREN == 1.
      */
 }

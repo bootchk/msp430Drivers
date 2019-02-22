@@ -26,7 +26,7 @@
 
 
 
-//#define USE_DRIVER_LIB
+#define USE_DRIVER_LIB
 
 
 
@@ -110,7 +110,15 @@ void I2CTransport::unconfigurePins()
     _isInitialized = false;
 }
 
-
+bool I2CTransport::isUnconfigurePins() {
+    // TODO hardcoded
+    return ( // not (P1REN & (BIT2 | BIT3)) and  // No pullup
+             ((P1SEL0 & (BIT2 | BIT3)) == 0 ) and// both general purpose (0,0)
+             ((P1SEL1 & (BIT2 | BIT3)) == 0 ) and
+             ((P1DIR & (BIT2 | BIT3)) == (BIT2 | BIT3)) and  // both out
+             ((P1OUT & (BIT2 | BIT3)) == (BIT2 | BIT3))  // both high
+             );
+}
 
 
 
@@ -153,7 +161,7 @@ EUSCI_B_I2C_initMasterParam params = {
 
 
 #define USE_DRIVER_LIB
-void I2CTransport::initI2CPeripheral(unsigned char slaveAddress)
+void I2CTransport::initI2CPeripheral()
 {
     myRequire(not isEnabled());
 
@@ -161,7 +169,8 @@ void I2CTransport::initI2CPeripheral(unsigned char slaveAddress)
 #ifdef USE_DRIVER_LIB
     EUSCI_B_I2C_initMaster(I2CInstanceAddress,  &params);
 
-    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, slaveAddress);
+    // slave address from board.h
+    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, RTCBusAddress);
 
     // Enable NACK interrupt.  So we can catch bus errors.
     EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_NAK_INTERRUPT);

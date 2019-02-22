@@ -7,9 +7,6 @@
 
 #include "i2cTransport.h"
 
-// TODO should not depend on board.h
-#include "board.h"
-
 #include "../../../assert/myAssert.h"
 
 
@@ -26,6 +23,13 @@ void  I2C::configureToSleepState() {
      */
     I2CTransport::unconfigurePins();
 }
+
+
+bool I2C::isInSleepState() {
+    // sleep state is master disabled and I2C pins configured outputs high
+    return ( (not isEnabled()) and I2CTransport::isUnconfigurePins());
+}
+
 
 
 
@@ -61,6 +65,11 @@ namespace {
 bool _isEnabled = false;
 }
 
+
+
+
+
+
 void I2C::enable() {
     _isEnabled = true;
     I2CTransport::enable();
@@ -81,7 +90,7 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
     I2CTransport::configurePins();
 
     // TODO hardcoded
-    I2CTransport::initI2CPeripheral(RTCBusAddress);
+    I2CTransport::initI2CPeripheral();
 }
 
 
