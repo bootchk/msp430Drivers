@@ -38,7 +38,9 @@ void testAlarm2()
 
         Alarm::clearBothSidesOfSignal();
 
-        Alarm ::setAlarmDurationSecondsFromNow(10);
+        const Duration duration = {10};
+
+        Alarm ::setAlarmDurationSecondsFromNow(duration);
 
         /*
          * To test that the alarm causes an interrupt, sleep.

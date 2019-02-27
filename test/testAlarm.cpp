@@ -42,8 +42,8 @@ void testAlarm()
 
     while (true)
     {
-        Alarm
-        ::setAlarmDurationSecondsFromNow(10);
+        static const Duration duration = {10};
+        Alarm::setAlarmDurationSecondsFromNow(duration);
 
         /*
          * To test that the alarm causes an interrupt, sleep.
