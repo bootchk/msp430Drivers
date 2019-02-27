@@ -13,8 +13,8 @@
 
 
 
-void Alarm::clearAlarm() {
-        // May fail reset since RTC is remote device.
+void Alarm::clearBothSidesOfSignal() {
+        // May fail with a reset since RTC is remote device.
         Alarm::clearAlarmOnRTCOrReset();
 
         Alarm::clearAlarmOnMCU();
@@ -34,7 +34,8 @@ bool Alarm::clearAlarmOnRTC() {
 	// TODO delay needed?
 	RTC::clearIRQInterrupt();
 
-	result = isAlarmInterruptSignalHigh();
+	// Signal is high
+	result = isRTCReady();
 
     // assert alarm signal high or result is false
 	return result;
@@ -56,8 +57,12 @@ void Alarm::clearAlarmOnMCU() {
 	AlarmPin::clearInterrupt();
 }
 
+bool Alarm::isClearOnMCUSide() {
+    return AlarmPin::isInterruptClear();
+}
 
-bool Alarm::isAlarmInterruptSignalHigh() {
+
+bool Alarm::isRTCReady() {
 	// requires pin configured as input
 
 	return AlarmPin::isHigh();
@@ -86,6 +91,8 @@ bool Alarm::setAlarmDurationSecondsFromNow(Duration duration) {
 }
 
 
+
+#ifdef OLD
 bool Alarm::setAlarmToTime(EpochTime time) {
     bool result;
 
@@ -100,4 +107,5 @@ bool Alarm::setAlarmToTime(EpochTime time) {
     // ensure alarm is set or result is false
     return result;
 }
+#endif
 

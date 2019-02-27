@@ -12,9 +12,14 @@ public:
      */
 
     /*
-     * Ensures pins dedicated to I2C module and pullups appropriate to board design.
+     * Ensures pins dedicated to I2C module and internal pullups appropriate to board without external pullups.
      */
-    static void configure();
+    static void configureWithInternalPullup();
+
+    /*
+     * Ensures pins dedicated to I2C module and no internal pullups appropriate to board with external pullups.
+     */
+    static void configureWithExternalPullup();
 
     /*
      * Ensures pins appropriate for idle state of bus (SCLK and SDA high)

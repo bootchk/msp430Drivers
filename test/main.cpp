@@ -8,6 +8,7 @@ void testCompass();
 void testCompass2();
 void testRTC();
 void testAlarm();
+void testAlarm2();
 void testTimer();
 void testLEDSensor();
 void testLEDSensor2();
@@ -25,7 +26,8 @@ int main(void)
 	//testCompass();
 	//testRTC();
 	//testCompass2();
-	testAlarm();
+	//testAlarm();
+    testAlarm2();
 	//testTimer();
 	//testLEDSensor();
     //testLEDSensor2();

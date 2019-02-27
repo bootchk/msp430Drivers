@@ -24,9 +24,9 @@ void testLEDSensor()
     // assert ready for setAlarm()
     // assert serial bus (Bridge) ready, was configured
 
-    Alarm::clearAlarm();
+    Alarm::clearBothSidesOfSignal();
 
-    assert (not Alarm::isAlarmInterruptSignalHigh() );
+    assert (Alarm::isRTCReady() );
 
     // Configure
     LEDAndLightSensor::toOffFromUnconfigured();
@@ -48,7 +48,7 @@ void testLEDSensor()
          * ISR already cleared alarm interrupt on mcu.
          * Clear it on RTC.
          */
-        Alarm::clearAlarm();
+        Alarm::clearBothSidesOfSignal();
 
 
         // purpose of test

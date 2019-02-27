@@ -16,6 +16,7 @@
 #include <inttypes.h>
 
 #include "stateMachine.h"
+#include "i2cTransport.h"
 
 #include "../../../assert/myAssert.h"
 
@@ -89,6 +90,10 @@ void I2CStateMachine::init(const uint8_t registerAddress,
                uint8_t * const buffer,
                uint8_t count,
                bool isTransactionSend ) {
+
+    // Require driver enabled
+    myAssert(I2CTransport::isEnabled());
+
     state = SendingStart;
     command = registerAddress;
     byteCounter = count;

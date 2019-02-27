@@ -69,10 +69,4 @@ public:
 
 
     static void turnOffSMCLK();
-
-    /*
-     * Are all GPIO pins configured for their general purpose IO function (not a module.)
-     * For assertions.
-     */
-    static bool areGPIOGeneralPurpose();
 };

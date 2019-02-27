@@ -7,13 +7,19 @@
 #include <board.h>
 
 
+/*
+ * I2C is open collector bus design.
+ * Thus requires a pullup on each signal, somewhere.
+ */
 
-void I2CPins::configure() {
+void I2CPins::configureWithInternalPullup() {
 
     /*
      * Internal pullups   30k on MSP430FR2433
+     * Here we assume the PCB does not have a discrete pullup.
      *
-     * I2C requires a pullup on each signal, somewhere.  Here we assume the PCB does not have a discrete pullup.
+     * !!!! This is questionable, even for 100kbps bus rate.
+     * It may work if bus capacitance is < 50 pF, i.e. for short bus and only master and slave device.
      *
      * Modifies PxDIR to "input" PxOUT to "pullup" and PxREN to "enable pulllup"
      * !!! This also changes PxSEL (changesthe pin function to general purpose)
@@ -29,6 +35,16 @@ void I2CPins::configure() {
     GPIO_setAsPeripheralModuleFunctionInputPin(I2C_SDA_PORT,   I2C_SDA_PIN,  GPIO_PRIMARY_MODULE_FUNCTION);
     GPIO_setAsPeripheralModuleFunctionInputPin(I2C_SCL_PORT,   I2C_SCL_PIN,  GPIO_PRIMARY_MODULE_FUNCTION);
 }
+
+
+/*
+ * From DriverLib example.  !!! InputPin, not OutputPin
+ */
+void I2CPins::configureWithExternalPullup() {
+    GPIO_setAsPeripheralModuleFunctionInputPin(I2C_SDA_PORT,   I2C_SDA_PIN,  GPIO_PRIMARY_MODULE_FUNCTION);
+    GPIO_setAsPeripheralModuleFunctionInputPin(I2C_SCL_PORT,   I2C_SCL_PIN,  GPIO_PRIMARY_MODULE_FUNCTION);
+}
+
 
 
 

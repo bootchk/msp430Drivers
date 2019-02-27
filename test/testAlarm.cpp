@@ -2,17 +2,23 @@
 
 #include "../src/pinFunction/allPins.h"
 
+#include <cassert>
+
 // DriverLib
 #include <pmm.h>
 
-#include <cassert>
+
 
 
 /*
- * Test one alarm goes off.
+ * Test multiple alarms go off.
  *
- * Use EnergyTrace and expect one energy pulse after 10 seconds of sleep.
+ * Use EnergyTrace and expect one energy pulse every 10 seconds of sleep.
  * !!! The code below won't set a second alarm unless the ISR is modified to exit LPM.
+ *
+ * This fails.
+ * Something about the configuration of eUSCI not surviving a LPM3.
+ * Failure symptom is erratic power curver after first wake.
  */
 
 
@@ -26,11 +32,13 @@ void testAlarm()
     // assert ready for setAlarm()
     // assert serial bus (Bridge) ready, was configured
 
-    Alarm::clearAlarm();
+    Alarm::clearBothSidesOfSignal();
 
-    Alarm::clearAlarm();
+    Alarm::clearBothSidesOfSignal();
 
-    assert (not Alarm::isAlarmInterruptSignalHigh() );
+    assert (Alarm::isClearOnMCUSide());
+
+    assert (Alarm::isRTCReady() );
 
     while (true)
     {
@@ -46,10 +54,15 @@ void testAlarm()
         _low_power_mode_3();
         __no_operation();
 
+        // Test whether delay affects crash on clearAlarm
+        //__delay_cycles(1000);
+
+        assert (Alarm::isRTCReady() );
+
         /*
          * ISR already cleared alarm interrupt on mcu.
          * Clear it on RTC.
          */
-        Alarm::clearAlarm();
+        Alarm::clearBothSidesOfSignal();
     }
 }

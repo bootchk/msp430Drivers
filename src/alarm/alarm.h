@@ -158,21 +158,23 @@ class Alarm {
 	 */
 	static void clearAlarmOnRTCOrReset();
 
-
 public:
     /*
      * Is logical state of signal high?
+     * Since this is RTC pin FOUT/nIRQ, high means: chip is active and interrupt is not in progress.
+     * Because the MCU pin is configured for rising edge,
+     * and the RTC is configured to generate a downward pulse,
+     * an interrupt is generated on an upward edge of downward pulse.
+     *
      * Does not mean the mcu interrupt flag is not set.
-     * The interrupt is usually generated on an upward edge of downward pulse on signal.
-     * The interrupt exists after the signal goes high again.
      *
      * The signal is on a net of two pins:
      *  - RTC Fout/nIRQ pin
      *  - some GPIO pin of the mcu
      *
-     * Mainly public for testing.
      */
-    static bool isAlarmInterruptSignalHigh();
+    static bool isRTCReady();
+
 
 
 
@@ -185,9 +187,11 @@ public:
 	static void clearAlarmOnMCU();
 
     /*
-     * Clear alarm on both sides of interface.
+     * Clear alarm on MCU and RTC sides of interface.
      */
-    static void clearAlarm();
+    static void clearBothSidesOfSignal();
+
+    static bool isClearOnMCUSide();
 
 
 

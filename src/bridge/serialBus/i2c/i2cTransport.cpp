@@ -84,7 +84,12 @@ void I2CTransport::configurePins()
 {
 
 #ifdef USE_DRIVER_LIB
-    I2CPins::configure();
+
+#ifdef I2C_HAS_EXTERNAL_PULLUPS
+    I2CPins::configureWithExternalPullup();
+#else
+    I2CPins::configureWithInternalPullup();
+#endif
 
 #else
     // Works.  Code from TI.
@@ -157,6 +162,11 @@ EUSCI_B_I2C_initMasterParam params = {
                                       0,                                    // autostop threshold
                                       EUSCI_B_I2C_NO_AUTO_STOP
 };
+
+/*
+ * A DriverLib example sets clock freq :  param.i2cClk = CS_getSMCLK();
+ * I assume that is also the desired frequency, not the actual measured frequency.
+ */
 
 
 
