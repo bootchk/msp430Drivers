@@ -31,8 +31,10 @@ void testAlarm2()
 
     while (true)
     {
+        // TODO this is broken
+        // WAS Alarm::configureForAlarming();
+        Alarm::configureAfterColdReset();
 
-        Alarm::configureForAlarming();
         // assert ready for setAlarm()
         // assert serial bus (Bridge) ready, was configured
 

@@ -1,7 +1,6 @@
 
 #include "alarm.h"
 
-#include "../PMM/powerMgtModule.h"
 #include "../bridge/bridge.h"       //  hides serial io
 #include "../realTimeClock/realTimeClock.h"
 
@@ -10,6 +9,7 @@
 
 
 #include "../assert/myAssert.h"
+#include "../PMM/powerMgtModule.h"  // for assertions only
 
 
 
@@ -38,15 +38,12 @@ bool Alarm::isConfiguredForAlarming() {
  * RTC might not have powered down and up.
  * RTC could be in some bizarre state.
  */
-void Alarm::configureForAlarming() {
+void Alarm::configureAfterColdReset() {
     // GPIO must be unlocked because we configure bus pins and use them
-    // myAssert(not PMM::isLockedLPM5());
+    myRequire(not PMM::isLockedLPM5());
 
     // Configure bus interface and driver (e.g I2C and eUSCI_B)
-    // Side effect is unlock
     Alarm::configureMcuSide();
-
-    // assert not isLocked because we want to use SPI now
 
     // TODO needed?
     ///Test::delayBriefly();
@@ -57,12 +54,15 @@ void Alarm::configureForAlarming() {
     Alarm::configureRTC();
 
     _isConfiguredForAlarming = true;
-    // Ensure MCU SPI interface and RTC are configured for alarming
+    // Ensure MCU bus interface and RTC chip are configured for alarming
 }
 
 
 void Alarm::configureAfterWake() {
 
+    /*
+     * Only need to configure bus; alarm pin is still configured.
+     */
     Alarm::configureMcuBusInterface();
 
     /*
@@ -73,7 +73,7 @@ void Alarm::configureAfterWake() {
      */
     myAssert(RTC::isReadable());
     // An older design checks the FOUT/nIRQ pin to test readiness of RTC
-    // OLD Alarm::resetIfSPINotReady();
+    // OLD Alarm::resetIfRTCNotReady();
 
     // RTC is still configured
     _isConfiguredForAlarming = true;
@@ -84,18 +84,21 @@ void Alarm::configureAfterWake() {
 void Alarm::configureMcuSide() {
     // Two parts: alarm interrupt pins and bus pin
 
-    // Must precede waitSPIReadyOrReset
+    // Must precede isRTCReady (which reads the alarm pin)
+    // TODO this has already been done by duty cycle framework???
     Alarm::configureMcuAlarmInterface();
 
     // Must precede use of bus to configure rtc
     Alarm::configureMcuBusInterface();
-
-    PMM::unlockLPM5();
 }
 
 // TODO this should be done somewhere else when there are two slaves
 void Alarm::configureMcuBusInterface(){
-    // TODO hardcoded for AB0815 SPI, false means RW bit is not high (is low) for a read
+    /*
+     * TODO hardcoded.
+     * This works for AB0815 SPI, false means RW bit is not high (is low) for a read
+     * Also works for AB0805 I2C, which ignores the actual parameter.
+     */
     Bridge::configureMcuSide(false);
 }
 
@@ -123,7 +126,7 @@ bool Alarm::isConfiguredMcuAlarmInterface() {
 
 
 void Alarm::configureRTC() {
-    // require configureMcuSPIInterface
+    // require RTC bus interface configured
     /*
      * Require alarm is behind the counter.
      * Otherwise, by chance it could soon match,
@@ -137,6 +140,7 @@ void Alarm::configureRTC() {
 
     RTC::configureAlarmInterruptToFoutnIRQPin();
 
+    // Tell RTC chip to trigger interrupt on alarm register match
     RTC::enableAlarm();
 }
 

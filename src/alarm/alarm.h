@@ -100,7 +100,8 @@ class Alarm {
 
     /*
      * Over serial bus, configure RTC clock mode and alarm interrupt.
-     * Configuration is arbitrary (you could change it).
+     * Configuration is somewhat arbitrary (you could change it).
+     * Except 24-hour mode required for EpochClock and time functions.
      */
 	static void configureRTC();
 
@@ -221,9 +222,10 @@ public:
      *
      * May lose time on RTC.
      *
-     * Configures bus pins, and alarm pin
+     * Configures bus pins.
+     * Does not configure alarm pin, already configured.
      */
-    static void configureForAlarming();
+    static void configureAfterColdReset();
 
     /*
      * Is interface and RTC configured?
@@ -241,6 +243,7 @@ public:
     /*
      * After a wake from LPM4.5 by alarm, configure MCU serial bus pins interface to RTC.
      * Does not reconfigure the RTC (it should still be powered.)
+     * Does not configure the alarm pin (it is still an input, configured to interrupt on rising edge.)
      *
      * May reset on failure.
      */

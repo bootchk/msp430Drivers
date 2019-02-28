@@ -20,7 +20,10 @@ void testLEDSensor()
 {
     PMM_unlockLPM5();
 
-    Alarm::configureForAlarming();
+    // TODO broken
+    // WAS Alarm::configureForAlarming();
+    Alarm::configureAfterColdReset();
+
     // assert ready for setAlarm()
     // assert serial bus (Bridge) ready, was configured
 

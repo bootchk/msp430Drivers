@@ -38,14 +38,18 @@ public:
      * True if sleeping before this reset.
      * False if not sleeping, and therefore a power on or software reset or other reset.
      *
-     * Decodes and clears all reasons for sleep.
+     * Decodes and clears all reasons for sleep, in the IVG interrupt vector generator.
+     * Does not clear the IFG for wake from sleep.
+     *
+     * May assert if reset reason is not an expected one,
+     * e.g. some fault and not a wake from sleep reset or a coldstart reset.
      */
-    static bool isResetAWakeFromSleep();
+    static bool isResetWakeFromSleep();
 
     /*
      * Clear IFG for wake from LPMx.5
      */
-    static void clearIsResetAWakeFromSleep();
+    static void clearIFGForResetWakeFromSleep();
 
     /*
      * Unlocks GPIO state and makes effective any prior configuration.
@@ -54,7 +58,7 @@ public:
      * Must follow isResetAWakeFromSleep
      * Once unlocked, you can't tell whether reset was from sleep.
      */
-    static void unlockMCUFromSleep();
+    static void unlockGPIOFromSleep();
 
 
     static void triggerSoftwareReset();

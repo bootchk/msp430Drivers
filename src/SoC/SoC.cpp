@@ -80,15 +80,15 @@ void SoC::disableFRAMWriteProtect() {
 /*
  * Delegate to PMM
  */
-void SoC::clearIsResetAWakeFromSleep() { PMM::clearIsResetAWakeFromSleep(); }
-void SoC::unlockMCUFromSleep(){ PMM::unlockLPM5(); }
+void SoC::clearIFGForResetWakeFromSleep() { PMM::clearIsResetAWakeFromSleep(); }
+void SoC::unlockGPIOFromSleep(){ PMM::unlockLPM5(); }
 void SoC::triggerSoftwareReset() { PMM::triggerSoftwareBORReset(); }
 
 /*
  * Delegate to ResetReason
  * (Another version delegates to PMM)
  */
-bool SoC::isResetAWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }
+bool SoC::isResetWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); }
 
 
 
