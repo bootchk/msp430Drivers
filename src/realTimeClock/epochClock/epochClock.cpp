@@ -6,7 +6,10 @@
 
 
 
+
 EpochTime EpochClock::timeNow() {
+    // This requirement is valid but implemented lower down.
+    // myRequire(RTC::isConfigured);
     return RTC::timeNowOrReset();
 }
 

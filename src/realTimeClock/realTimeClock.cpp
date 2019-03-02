@@ -146,8 +146,27 @@ void RTC::unlockOscControlRegister() {
 bool RTC::isReadable() {
     /*
      * Sane if upper byte of part ID reads as 08, from 08xx part family.
-     * Read will return 0 if SPI or RTC not working.
-     * The RTC does not need to be configured first.
+     *
+     * Read will return 0 if RTC chip is non-responsive (HW failure in RTC chip.)
+     * The Master is clocking.  Slave non-responsive means failing to drive data line with ID value.
+     * For SPI bus, this seems to work.
+     * For I2C bus, the Slave may Nack a written byte and that asserts in the I2C state machine.
+     *
+     * For I2C bus, if the Slave stretches the clock, this does not use the timeout capability of the driver, and thus may hang.
+     *
+     * Not require RTC chip itself configured.
+     * Require bus interface configured.
+     *
+     * Note there is no redundant timing based check here.
+     * If the bus hangs, this may never return.
+     * The bus could hang through faulty SW design
+     * or failure to account for timing using delays.
+     *
+     * If it does hang, it should consume power and eventually brownout the system
+     * and then the system (mcu and RTC chip) reset when power is restored.
+     *
+     * This costs a bus transfer.
+     * It is optional: if omitted, later RTC operations should fail anyway.
      */
     unsigned char ID;
 

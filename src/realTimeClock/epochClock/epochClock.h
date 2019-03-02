@@ -5,8 +5,10 @@
 /*
  * EpochTime clock implemented on RTC.
  *
+ * Requires RTC accessible.  When RTC is external chip, requires bus to RTC configured prior.
+ *
  * The RTC clock runs.
- * This clock does not run, it only reads the RTC to compute a now time as necessary.
+ * EpochClock does not run, it only reads the RTC to compute a now time as necessary.
  *
  * The RTC starts at 0.
  * This clock's epoch is the real time the RTC is started.

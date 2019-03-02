@@ -99,9 +99,11 @@ class Alarm {
 	static bool isConfiguredMcuAlarmInterface();
 
     /*
-     * Over serial bus, configure RTC clock mode and alarm interrupt.
+     * Configure RTC clock mode and alarm interrupt.
      * Configuration is somewhat arbitrary (you could change it).
      * Except 24-hour mode required for EpochClock and time functions.
+     *
+     * Over serial bus, may hang and then brownout.
      */
 	static void configureRTC();
 
@@ -158,6 +160,12 @@ class Alarm {
 	 * RTC is remote device that may fail.
 	 */
 	static void clearAlarmOnRTCOrReset();
+
+	/*
+	 * Attempt to read a ID from RTC.
+	 * See more comments in implementation.
+	 */
+	static void verifyRTCReadable();
 
 public:
     /*

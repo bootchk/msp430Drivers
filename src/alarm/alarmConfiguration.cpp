@@ -30,6 +30,27 @@ bool Alarm::isConfiguredForAlarming() {
 }
 
 
+/*
+ * Test RTC is readable.
+ *
+ * myAssert() will reset the mcu.
+ * Although that probably will not alleviate the fatal condition, since it doesn't reset the RTC.
+ *
+ * Note also that design errors could cause this to never return: see isReadable()
+ */
+void Alarm::verifyRTCReadable() {
+    // TODO needed?
+    ///Test::delayBriefly();
+    ///__delay_cycles(10000);
+
+    // assert can talk to RTC
+    myAssert(RTC::isReadable());
+
+    // An older design checks the FOUT/nIRQ pin to test readiness of RTC
+    // OLD Alarm::resetIfRTCNotReady();
+}
+
+
 
 /*
  * Configuration after coldstart.
@@ -42,14 +63,14 @@ void Alarm::configureAfterColdReset() {
     // GPIO must be unlocked because we configure bus pins and use them
     myRequire(not PMM::isLockedLPM5());
 
-    // Configure bus interface and driver (e.g I2C and eUSCI_B)
+    /*
+     * Configure:
+     * - bus interface and driver (e.g I2C and eUSCI_B)
+     * - alarm pin
+     */
     Alarm::configureMcuSide();
 
-    // TODO needed?
-    ///Test::delayBriefly();
-
-    // assert can talk to RTC
-    myAssert(RTC::isReadable());
+    verifyRTCReadable();
 
     Alarm::configureRTC();
 
@@ -58,24 +79,17 @@ void Alarm::configureAfterColdReset() {
 }
 
 
+
+
 void Alarm::configureAfterWake() {
 
-    /*
-     * Only need to configure bus; alarm pin is still configured.
-     */
+    // Only need to configure bus; alarm pin is still configured.
     Alarm::configureMcuBusInterface();
 
-    /*
-     * When RTC is not readable, fatal.
-     * myAssert() will reset the mcu.
-     * Although that probably will not alleviate the fatal condition,
-     * since it doesn't reset the RTC.
-     */
-    myAssert(RTC::isReadable());
-    // An older design checks the FOUT/nIRQ pin to test readiness of RTC
-    // OLD Alarm::resetIfRTCNotReady();
+    verifyRTCReadable();
 
-    // RTC is still configured
+    // No need to configure RTC chip itself; assume is still configured
+
     _isConfiguredForAlarming = true;
 }
 
