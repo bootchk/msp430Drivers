@@ -5,6 +5,7 @@
 #include <cs.h>
 #include <rtc.h>
 
+#include "../assert/myAssert.h"
 
 /*
  * Use internal RTC instead of TIMER_A.
@@ -108,5 +109,9 @@ void LowPowerTimer::delayHalfSecond()         { LowPowerTimer::delayTicksOf100uS
 void LowPowerTimer::delayTwentyMilliSeconds() { LowPowerTimer::delayTicksOf100uSec(200); }
 void LowPowerTimer::delayTenMilliSeconds()    { LowPowerTimer::delayTicksOf100uSec(100); }
 
-
+void LowPowerTimer::delaySeconds(unsigned int count) {
+    // max unsigned int is 64k
+    myAssert(count < 7);
+    LowPowerTimer::delayTicksOf100uSec(count*10000);
+}
 

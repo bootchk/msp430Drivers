@@ -31,4 +31,5 @@ public:
     static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();
 
+    static void delaySeconds(unsigned int count);
 };
