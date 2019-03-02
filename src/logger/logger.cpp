@@ -1,6 +1,7 @@
 
 #include "logger.h"
 
+#include "../assert/myAssert.h"
 
 namespace {
 
@@ -22,4 +23,9 @@ void Logger::log(unsigned int value) {
         logData[logIndex] = value;
         logIndex++;
     }
+}
+
+void Logger::logError(unsigned int value) {
+    log(value);
+    myAssert(false);
 }

@@ -18,6 +18,14 @@
 
 class Logger {
 public:
-    // Requires FRAM not write protected
+    /*
+     * Typically debugging, might be just a trace.
+     */
     static void log(unsigned int);
+
+    /*
+     * Severe error.
+     * Does not return.
+     */
+    static void logError(unsigned int);
 };

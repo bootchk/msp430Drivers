@@ -5,6 +5,13 @@
 
 #include "../assert/myAssert.h"
 
+#include "../logger/logger.h"
+
+/*
+ * Called when the system is newly reset.
+ * GPIO is locked. and GPIO to say LED's can't be used (unless you unlock and configure.)
+ */
+
 
 /*
  * SYSRSTIV is a generator: reading clears one reason but hw generates new reasons immediately
@@ -38,6 +45,8 @@ bool ResetReason::isResetAWakeFromSleep() {
   bool done = false;
   bool result = false;
 
+  Logger::log(13);
+
   while (! done)
   {
     // not using even_in_range() which is just an optimization, and dissappeared from compiler?
@@ -45,13 +54,11 @@ bool ResetReason::isResetAWakeFromSleep() {
     switch (resetReason)
     {
     case SYSRSTIV_NONE:
-        /// Won't work, LPM5 locked TestMain::blinkGreenLED(1);
       done = true;  // stop loop - all reset reasons are cleared
       break;
 
     // Expected
     case SYSRSTIV_LPM5WU:
-      /// Won't work, LPM5 locked TestMain::blinkGreenLED(2);
       result = true;
       break;
 
@@ -64,13 +71,13 @@ bool ResetReason::isResetAWakeFromSleep() {
     // Security. Accessing BSL that is protected. Probably errant
     case SYSRSTIV_SECYV:     // Security violation
        //assert(false);
-        /// Won't work, LPM5 locked TestMain::blinkGreenLED(4);
        break;
 
      // WDT Time out
+     // Not expected since we stop WD
      case SYSRSTIV_WDTTO:
 
-    // Software initiated
+    // Software initiated POR
     // But our software never initiates.
     case SYSRSTIV_DOPOR:
 
@@ -86,7 +93,6 @@ bool ResetReason::isResetAWakeFromSleep() {
     case SYSRSTIV_FLLUL:     // FLL unlock
 
     default:
-        /// Won't work, LPM5 locked TestMain::blinkGreenLED(5);
       myAssert(false);
       break;
     }
