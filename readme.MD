@@ -21,12 +21,11 @@ Then the TI Resource Explorer will find it when you restart CCS.
 
 Or download the BSD licensed source anywhere (say to your download folder.)
 
-Once installed, create a linked folder "driverlib" in your project to the installed location of MSPWare,
-specifically the version for your processor family 
-
-The above fails?  So just copy the driverlib directory into the project
-into a top level directory e.g. a directory named "MSP430FR2xx_4xx"
-and add an include path to the project properties.
+Once installed, create a linked folder in your project to the installed location of MSPWare,
+specifically the version for your processor family,  say "MSP430FR2xx_4xx".
+That makes the DriverLib source visible in the project and Eclipse will compile it.
+But you also need to add an include path (in the project properties) to the downloaded location.
+(A include path to the linked folder doesn't seem to work, you need an include path to the DriverLib directory.)
 
 
 Configuration
