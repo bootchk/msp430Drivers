@@ -11,6 +11,11 @@
 // App
 #include <board.h>
 
+#include "../assert/myAssert.h"
+
+
+
+
 
 /*
  * Private
@@ -46,8 +51,10 @@ void ADCConfigure::configureCommon() {
     ADC_SAMPLEHOLDSOURCE_SC,
              ADC_CLOCKSOURCE_ADCOSC,
              ADC_CLOCKDIVIDER_1);
+    // assert ADC is off
 
     ADC_enable(ADC_BASE);
+    // assert ADC is on
 
     /*
      * Base Address for the ADC Module
@@ -105,9 +112,33 @@ void ADCConfigure::unconfigureForVccMeasure() {
     disableADC();
 }
 
+
+
+
+
+
+
+/*
+ * Change the state of the ADC.
+ * off->on->conversionEnabled->conversionDisabled->off
+ */
+
 void ADCConfigure::disableADC() {
+    // require conversion disabled
+    myRequire(isConversionDisabled());
     ADC_disable(ADC_BASE);
 }
+
+
+bool ADCConfigure::isConversionDisabled() {
+    return not (ADCCTL0 & ADCENC);
+}
+
+void ADCConfigure::disableConversions() {
+    ADC_disableConversions(ADC_BASE, false);    // false=>no prempt
+}
+
+
 
 
 #ifdef OBSOLETE

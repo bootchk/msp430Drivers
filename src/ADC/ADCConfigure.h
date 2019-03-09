@@ -50,5 +50,17 @@ public:
     // Undo ADC hijacking the GPIO function of pin
     static void releaseExternalPin();
 
+    /*
+     * Unpower the ADC module.
+     * Requires isConversionDisabled()
+     */
     static void disableADC();
+    /*
+     * !!! Set ADC module to a mode that allows configuration and turning off.
+     * We don't have enableConversions() because the DriverLib implementation of startConversion
+     * automatically enables conversion.
+     */
+
+    static void disableConversions();
+    static bool isConversionDisabled();
 };

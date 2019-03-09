@@ -46,7 +46,6 @@ unsigned int ADC::measureVccCentiVolts() {
 
 /*
  * Compare voltage on solar cell to Vcc
- *
  */
 unsigned int ADC::measureExternalPinProportionToVcc() {
     ADCConfigure::configureForExternalPinVoltageProportionToVcc();
@@ -87,10 +86,16 @@ unsigned long ADC::measureExternalPinCentiVolts() {
 
 
 /*
- * Private read routine
+ * Private read routine.
+ *
+ * Requires prior configuration.
+ * Ensures isDisabledConversion()
+ * Does not ensure ADC is off.
  */
 unsigned int ADC::read()
 {
+    unsigned int result;
+
     // Require configuration
 
     //Enable and Start conversion  in Single-Channel, Single Conversion Mode
@@ -99,7 +104,12 @@ unsigned int ADC::read()
     // Spin until result ready
     while (ADC_isBusy(ADC_BASE) == ADC_BUSY) ;
 
-    return ADC_getResults(ADC_BASE);
+    result = ADC_getResults(ADC_BASE);
+
+    // disable conversions so that we can later turn off ADC
+    ADCConfigure::disableConversions();
+
+    return result;
 }
 
 

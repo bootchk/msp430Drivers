@@ -2,14 +2,35 @@
 /*
  * Voltage measurement using ADC.
  *
+ * This is high-level.  Not "reads" but "measures".
+ * Not designed for multiple, consecutive measurements of the same input.
+ * Each "measure" initializes, configures, and completely turns off the ADC.
+ *
+ * Configuration is a lower level, see ADCConfigure,
+ * which configure resources ( VBG, ADC and pin multiplexing) to support the above.
+ *
  * Responsibilities:
  * - measure Vcc in centiVolts
  * - measure proportion of V on external pin to various references
  * -- 1.5VBG
  * -- Vcc
- * - configure resources ( VBG, ADC and pin multiplexing) to support the above.
+ * - conversion of raw results to units centiVolts
  *
  * A proper use of these routines can leave all GPIO's in their original use.
+ *
+ * 8-bit resolution only.
+ *
+ * Algebra of calls:  measureVccCentiVolts, ....
+ *
+ * That is the only thing working.
+ * Again, it leaves the ADC in sleeping state (off) after every call!!!
+ */
+
+
+/*
+ * OLD needs revamping, most of this moved to ADCConfigure
+ *
+ *
  * TODO disable VBG to save power?
  * The ADC will not draw power when not being sampled.
  *
@@ -37,9 +58,9 @@
  * When measuring an external pin that is multiplexed with GPIO:
  * Sequence: configure(), delay() (for signal to stabilize) , read(),..., read(), unconfigure(), <use pin for GPIO>
  *
- * Unconfiguration can be moot when you are entering LPMx.5, which resets configuration anyway.
+ * Unconfiguration can be moot when you are entering LPMx.5, which resets configuration anyway???
  *
- * 8-bit resolution only.
+ *
  */
 
 
