@@ -106,11 +106,24 @@ void LowPowerTimer::delaySecond() {
 }
 
 
+void LowPowerTimer::delayTenMilliSeconds() {
+   // See comments above
+    VeryLowOscillator::start();
+    IntervalTimer::initForIntervalOfTenMillisecond();
+    IntervalTimer::start();
+    _low_power_mode_3();
+    __no_operation();
+    VeryLowOscillator::allowOff();
+    IntervalTimer::stop();
+}
+
 /*
  * Implentation is iteration, with setup/shutdown and interrupt in each iteration.
  */
-void LowPowerTimer::delaySeconds(unsigned int count) {
-    for (unsigned int i = count; i >0; i--) delaySecond();
-}
+void LowPowerTimer::delaySeconds(unsigned int count) { for (unsigned int i = count; i >0; i--) delaySecond(); }
+
+void LowPowerTimer::delayFiveSeconds() { for (unsigned int i = 5; i >0; i--) delaySecond(); }
+
+
 
 #endif

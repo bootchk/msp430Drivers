@@ -17,6 +17,16 @@ void IntervalTimer::initForIntervalOfOneSecond() {
 }
 
 
+void IntervalTimer::initForIntervalOfTenMillisecond() {
+    /*
+         * Using VLO at 10khz and divider of 64 yields 6.4 milli seconds
+         */
+        WDT_A_initIntervalTimer(WDT_A_BASE,
+                                WDT_A_CLOCKSOURCE_VLOCLK,
+                                WDT_A_CLOCKDIVIDER_64);
+}
+
+
 void IntervalTimer::start() {
     WDT_A_start(WDT_A_BASE);
 

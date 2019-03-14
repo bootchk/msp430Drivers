@@ -24,9 +24,17 @@ void testTimer()
          * Expect half second duration power step while in active mode
          */
 
-        LowPowerTimer::delaySeconds(2);
+        LowPowerTimer::delaySeconds(1);
         /*
-         * Expect 2 second lower power
+         * Expect 1 second lower power
+         */
+
+        __delay_cycles(500000);
+
+        LowPowerTimer::delayTenMilliSeconds();
+        /*
+         * Expect 2 millisecond lower power
+         * ??? Might not be visible in EnergyTrace, too high a frequency?
          */
     }
 }

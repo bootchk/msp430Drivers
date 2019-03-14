@@ -15,6 +15,7 @@ public:
      * Only a limited set of intervals
      */
     static void initForIntervalOfOneSecond();
+    static void initForIntervalOfTenMillisecond();
 
     static void start();
     static void stop();
