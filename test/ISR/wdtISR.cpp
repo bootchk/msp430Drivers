@@ -4,10 +4,13 @@
 
 /*
  * ISR to support LowPowerTimer using WDT implementation (msp430Drivers)
+ *
+ * !!! Two WDT interrupt vectors.
+ * This is for interval timer mode
  */
 
 
-#pragma vector = WDT_A_VECTOR
+#pragma vector = WDT_VECTOR
 __interrupt void WDT_A_ISR(void)
 {
     /*

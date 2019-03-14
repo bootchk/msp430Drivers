@@ -27,17 +27,17 @@
 
 
 
-void launchpadLEDOff() {
+static void launchpadLEDOff() {
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN1);
 }
 
-void setAllOutputsLow() {
+static void setAllOutputsLow() {
     P1OUT = 0x00; P2OUT = 0x00; P3OUT = 0x00;
 }
 
  // configure all GPIO out to ensure low power
-void configureGPIOLowPower() {
+static void configureGPIOLowPower() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN1);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN2);
@@ -66,12 +66,12 @@ void configureGPIOLowPower() {
 }
 
 
-void delayOneSecond() {
+static void delayOneSecond() {
     __delay_cycles(1000000);    // 1 second at 1Mhz clock
 }
 
 
-void testTimer() {
+void testTimer2() {
 
     //launchpadLEDOff();
     setAllOutputsLow();

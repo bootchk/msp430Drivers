@@ -2,6 +2,7 @@
 
 // DriverLib
 #include "wdt_a.h"
+#include <sfr.h>
 
 
 
@@ -28,10 +29,14 @@ void IntervalTimer::initForIntervalOfTenMillisecond() {
 
 
 void IntervalTimer::start() {
+    // Make counter start counting
     WDT_A_start(WDT_A_BASE);
 
+    // Enable interrupt from counter
+    SFR_enableInterrupt(SFR_WATCHDOG_INTERVAL_TIMER_INTERRUPT);
 }
 void IntervalTimer::stop() {
     WDT_A_hold(WDT_A_BASE);
+    SFR_disableInterrupt(SFR_WATCHDOG_INTERVAL_TIMER_INTERRUPT);
 }
 

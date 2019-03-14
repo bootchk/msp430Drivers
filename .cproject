@@ -280,7 +280,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/ADC/voltBandgapRef.cpp|test/internalRtcISR.cpp|src/ADC/ADCConfigure.cpp|src/ADC/adc.cpp|src/timer/countdownTimer.cpp|MSP430FR2xx_4xx|lnk_msp430fr2433.cmd|cruft/bridgeSPI.cpp|cruft/i2c.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="test/ISR/internalRtcISR.cpp|src/ADC/voltBandgapRef.cpp|src/ADC/ADCConfigure.cpp|src/ADC/adc.cpp|src/timer/countdownTimer.cpp|MSP430FR2xx_4xx|lnk_msp430fr2433.cmd|cruft/bridgeSPI.cpp|cruft/i2c.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
