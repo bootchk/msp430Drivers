@@ -43,3 +43,9 @@
 //#define I2C_HAS_EXTERNAL_PULLUPS
 
 
+
+/*
+ * LowPowerTimer use RTC or WDT
+ */
+#define LOW_POWER_TIMER_USE_RTC 1
+//#define LOW_POWER_TIMER_USE_WDT 1

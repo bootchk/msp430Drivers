@@ -2,10 +2,11 @@
 #include "timer.h"
 
 #include "../clock/veryLowOscillator.h"
+#include "countdownTimer.h"
 
-// Implementation uses Driverlib
-//#include <cs.h>
-#include <rtc.h>
+#include <msp430.h> // LPM3 macro
+
+#include "../driverConfig.h"    // choose implementation
 
 #include "../assert/myAssert.h"
 
@@ -17,49 +18,6 @@
  */
 
 
-namespace {
-
-/*
- * On MSP430 unsigned int is 16 bits max 65,535
- * Thus max duration yields pause of 650k uSec i.e. about .65 sec
- * 5000 ticks is .05 seconds
- * 500k cycles at 8mHz SMCLK is .05 seconds
- *
- */
-void initRTC(unsigned int durationInRTCTicks)
-{
-    // Since clock is VLO at approx 10kHz, a tick is about 100uSec
-    RTC_init(
-        RTC_BASE,
-        durationInRTCTicks,  // compare reg value at which will trigger interrupt
-        RTC_CLOCKPREDIVIDER_1);
-}
-
-
-
-void startRTC() {
-    RTC_clearInterrupt(RTC_BASE,
-            RTC_OVERFLOW_INTERRUPT_FLAG);
-
-    RTC_enableInterrupt(RTC_BASE,
-            RTC_OVERFLOW_INTERRUPT);
-
-    RTC_start(RTC_BASE, RTC_CLOCKSOURCE_VLOCLK);
-}
-
-void shutdownTimerResources() {
-    // Let VLO stop when RTC stops using it
-    VeryLowOscillator::allowOff();
-
-    // This DriverLib implementation sets the clock source to 00 which I presume means none, and RTC disabled?
-    RTC_stop(RTC_BASE);
-
-    // ensure VLO and RTC are off i.e. low power
-}
-
-
-
-}
 
 
 /*
@@ -76,15 +34,16 @@ void shutdownTimerResources() {
  */
 
 
+#ifdef LOW_POWER_TIMER_USE_RTC
 
 void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     // Init the clock each time
     VeryLowOscillator::start();
 
     // Init RTC each time
-    initRTC(ticks);
+    CountdownTimer::init(ticks);
 
-    startRTC();
+    CountdownTimer::start();
 
     // Enter low power until interrupt for RTC.
     // Does not return until RTC interrupt.
@@ -93,7 +52,11 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     _low_power_mode_3();
     __no_operation();
 
-    shutdownTimerResources();
+    // shutdown resources(
+    // Let VLO stop when RTC stops using it
+    VeryLowOscillator::allowOff();
+    CountdownTimer::stop();
+
     // Assert VLO clock is off and RTC counter is off
 }
 
@@ -110,3 +73,4 @@ void LowPowerTimer::delaySeconds(unsigned int count) {
     LowPowerTimer::delayTicksOf100uSec(count*10000);
 }
 
+#endif
