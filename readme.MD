@@ -45,3 +45,23 @@ Loosely speaking, there are high level drivers and low-level drivers.
 The high-level drivers should be platform independent.
 The low-level drivers target a specific platform family.
 But a platform specific library of lower-level drivers (e.g. DriverLib for the MSP430) are independent of specific family member.
+
+
+Target Differences
+==================
+
+MSP430FR2433            MSP430FR6989
+   DriverLib
+      rtc.h  (RTC)       rtc_c
+      adc.h  (ADC10)     adc12_b.h
+      
+      
+RTC devices are different across targets.
+Library does not use RTC, instead uses WDT to implement LowPowerTimer
+timer/countdownTimer (which is RTC device) not buildable on build configuration (DebugFR6989)
+Not exist an implementation using RTC_C.
+
+ADC devices are different across target.
+Library adc/adc.cpp is only buildable on MSP430FR2433 build configuration (Debug)
+
+

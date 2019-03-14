@@ -39,6 +39,11 @@ SYSRSTIV_UBDIFG        (0x001C)        SYSRSTIV : FRAM Uncorrectable bit Error
 SYSRSTIV_PERF          (0x001E)        SYSRSTIV : peripheral/config area fetch
 SYSRSTIV_PMMPW         (0x0020)        SYSRSTIV : PMM Password violation
 SYSRSTIV_FLLUL         (0x0024)        SYSRSTIV : FLL unlock
+
+MSP430FR6989
+
+SYSRSTIV_FLLUL omitted
+
  */
 
 bool ResetReason::isResetAWakeFromSleep() {
@@ -90,7 +95,9 @@ bool ResetReason::isResetAWakeFromSleep() {
 
     case SYSRSTIV_PERF:      // peripheral/config area fetch
     case SYSRSTIV_PMMPW:     // PMM Password violation
+#ifdef __MSP430FR2433__
     case SYSRSTIV_FLLUL:     // FLL unlock
+#endif
 
     default:
       myAssert(false);

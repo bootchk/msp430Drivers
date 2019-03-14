@@ -30,5 +30,10 @@
 			<type>2</type>
 			<location>/home/bootch/msp430ware_3_80_04_05/driverlib/driverlib/MSP430FR2xx_4xx</location>
 		</link>
+		<link>
+			<name>MSP430FR5xx_6xx</name>
+			<type>2</type>
+			<location>/home/bootch/msp430ware_3_80_04_05/driverlib/driverlib/MSP430FR5xx_6xx</location>
+		</link>
 	</linkedResources>
 </projectDescription>

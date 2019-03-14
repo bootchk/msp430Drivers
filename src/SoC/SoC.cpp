@@ -64,16 +64,20 @@ void SoC::enableBSLOffAndVacantMemoryNMI() {
     // bit set
     SFRIE1 |= VMAIE;
 
+#ifdef __MSP430FR2433__
     // BSL memory behave as vacant memory
     // bit set
     SYSBSLC |= SYSBSLOFF;
+#endif
 
 }
 
 
 void SoC::disableFRAMWriteProtect() {
+#ifdef __MSP430FR2433__
     // By default, writes cause NMI.  To disable, enable writing.
     SysCtl_enableFRAMWrite(SYSCTL_FRAMWRITEPROTECTION_DATA | SYSCTL_FRAMWRITEPROTECTION_PROGRAM);
+#endif
 }
 
 
@@ -92,7 +96,15 @@ bool SoC::isResetWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); 
 
 
 
-void SoC::disableXT1() { CS_turnOffXT1(); }
+void SoC::disableXT1() {
+#ifdef __MSP430FR2433__
+    CS_turnOffXT1();
+#else
+    CS_turnOffLFXT();
+#endif
+
+}
+
 void SoC::turnOffSMCLK()  { CS_turnOffSMCLK(); }
 
 
