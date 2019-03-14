@@ -27,8 +27,8 @@ int main(void)
 	//testRTC();
 	//testCompass2();
 	//testAlarm();
-    testAlarm2();
-	//testTimer();
+    //testAlarm2();
+	testTimer();
 	//testLEDSensor();
     //testLEDSensor2();
     //testStepperDriver();

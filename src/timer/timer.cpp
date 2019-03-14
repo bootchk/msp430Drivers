@@ -1,8 +1,10 @@
 
 #include "timer.h"
 
+#include "../clock/veryLowOscillator.h"
+
 // Implementation uses Driverlib
-#include <cs.h>
+//#include <cs.h>
 #include <rtc.h>
 
 #include "../assert/myAssert.h"
@@ -14,15 +16,8 @@
  * !!! Note internal RTC vs external RTC
  */
 
-namespace {
 
-void initVLOClock()
-{
-    CS_initClockSignal(
-         CS_FLLREF,
-         CS_VLOCLK_SELECT  ,
-         CS_CLOCK_DIVIDER_1);
-}
+namespace {
 
 /*
  * On MSP430 unsigned int is 16 bits max 65,535
@@ -54,7 +49,7 @@ void startRTC() {
 
 void shutdownTimerResources() {
     // Let VLO stop when RTC stops using it
-    CS_enableVLOAutoOff();
+    VeryLowOscillator::allowOff();
 
     // This DriverLib implementation sets the clock source to 00 which I presume means none, and RTC disabled?
     RTC_stop(RTC_BASE);
@@ -84,7 +79,7 @@ void shutdownTimerResources() {
 
 void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     // Init the clock each time
-    initVLOClock();
+    VeryLowOscillator::start();
 
     // Init RTC each time
     initRTC(ticks);
