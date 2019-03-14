@@ -2,7 +2,12 @@
 #include "timer.h"
 
 #include "../clock/veryLowOscillator.h"
+
+#ifdef LOW_POWER_TIMER_USE_RTC
 #include "countdownTimer.h"
+#else
+#include "intervalTimer.h"
+#endif
 
 #include <msp430.h> // LPM3 macro
 
@@ -71,6 +76,41 @@ void LowPowerTimer::delaySeconds(unsigned int count) {
     // max unsigned int is 64k
     myAssert(count < 7);
     LowPowerTimer::delayTicksOf100uSec(count*10000);
+}
+
+#endif
+
+
+#ifdef LOW_POWER_TIMER_USE_WDT
+
+void LowPowerTimer::delaySecond() {
+    // Init the clock each time
+    VeryLowOscillator::start();
+    // Init RTC each time
+    IntervalTimer::initForIntervalOfOneSecond();
+
+    IntervalTimer::start();
+
+    // Enter low power until interrupt for RTC.
+    // Does not return until RTC interrupt.
+    // Since ISR exits low power, continues after this call.
+
+    _low_power_mode_3();
+    __no_operation();
+
+    // shutdown resources(
+    // Let VLO stop when RTC stops using it
+    VeryLowOscillator::allowOff();
+    IntervalTimer::stop();
+
+}
+
+
+/*
+ * Implentation is iteration, with setup/shutdown and interrupt in each iteration.
+ */
+void LowPowerTimer::delaySeconds(unsigned int count) {
+    for (unsigned int i = count; i >0; i--) delaySecond();
 }
 
 #endif

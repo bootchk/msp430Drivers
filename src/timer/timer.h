@@ -9,11 +9,11 @@
  * !!! Requires separate ISR.
  * The ISR is not in this project because it then would not get linked in.
  * The ISR must:
- * - clear interrupt flag for overflow
+ * - clear any interrupt flag (overflow for RTC, none for WDT)
  * - exit LPM on exit
  *
  * The implementation:
- * - uses a clock (usually VLO)and an internal module (say the RTC.)
+ * - uses a clock (usually VLO)and an internal module (say the RTC or WDT.)
  * - starts them and shuts them down for each call.
  *
  * There are two different implementations:
@@ -28,6 +28,10 @@
  *
  * In other words, this API is intended to be general,
  * for two different implementations.
+ *
+ * All durations are VERY approximate.
+ * For some implementations, accuracy is less than 50%.
+ * E.G. one second may be 0.6 seconds.
  */
 
 class LowPowerTimer {
@@ -39,7 +43,10 @@ public:
      */
     static void delayTicksOf100uSec(unsigned int);
 
-    // Convenience functions that call the above.
+    static void delaySecond();
+
+    // Can be convenience functions that call the above.
+    // Depends on implementation
     static void delayFiveSeconds();
     static void delayHalfSecond();
     static void delayTwentyMilliSeconds();
