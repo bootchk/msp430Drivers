@@ -13,7 +13,11 @@
 
 void AlarmPin::configurePullupLoToHiInterrupt() {
     GPIO_setAsInputPinWithPullUpResistor(AlarmSignalPort, AlarmSignalPin);
-    GPIO_selectInterruptEdge(AlarmSignalPort, AlarmSignalPin, GPIO_LOW_TO_HIGH_TRANSITION);
+    /*
+     * RTC holds signal high until alarm, and holds it low for a short duration.
+     */
+    //GPIO_selectInterruptEdge(AlarmSignalPort, AlarmSignalPin, GPIO_LOW_TO_HIGH_TRANSITION);
+    GPIO_selectInterruptEdge(AlarmSignalPort, AlarmSignalPin, GPIO_HIGH_TO_LOW_TRANSITION);
 }
 
 

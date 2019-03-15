@@ -6,7 +6,8 @@
  * ISR to support LowPowerTimer using WDT implementation (msp430Drivers)
  *
  * !!! Two WDT interrupt vectors.
- * This is for interval timer mode
+ * One is the reset vector.
+ * This is for interval timer mode.
  */
 
 
@@ -14,7 +15,7 @@
 __interrupt void WDT_A_ISR(void)
 {
     /*
-     * There is no IFG flag for the WDT?
+     * The IFG flag for the WDT is cleared automatically on return from interrupt.
      */
 
     /*

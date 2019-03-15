@@ -19,6 +19,17 @@ void AllPins::setHighOutput() {
 
     P3OUT = 0xFF;
     P3DIR = 0xFF;
+
+#ifdef __MSP430FR6989__
+    P4OUT = 0xFF;  P4DIR = 0xFF;
+    P5OUT = 0xFF;  P5DIR = 0xFF;
+    P6OUT = 0xFF;  P6DIR = 0xFF;
+    P7OUT = 0xFF;  P7DIR = 0xFF;
+    P8OUT = 0xFF;  P8DIR = 0xFF;
+    P9OUT = 0xFF;  P9DIR = 0xFF;
+    P10OUT = 0xFF; P10DIR = 0xFF;
+    PJOUT = 0xFF;  PJDIR = 0xFF;
+#endif
 }
 
 

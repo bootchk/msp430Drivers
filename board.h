@@ -38,6 +38,13 @@
 #define MYPCB_BOARD_R3
 //#define FULL_PROTO_LAUNCHPAD
 
+// Choose interface to external RTC I2C
+#define I2C_ON_P16_P17
+//#define I2C_ON_P12_P13
+
+// Choose interface to LED and light sensor
+#define LED_ON_P13_P15
+
 
 
 /*
@@ -143,30 +150,36 @@
 #endif
 
 
-
-
-
-// In various revision of my board, was P2.3
-#define AlarmSignalPort GPIO_PORT_P1
-#define AlarmSignalPin  GPIO_PIN1
+#endif  // MYPCB_BOARD_R3
 
 
 
 
+#ifdef LED_ON_P15_P17
 
-
-// P1.7
 #define NSideLEDPort GPIO_PORT_P1
 #define NSideLEDPin  GPIO_PIN7
 
 // P1.1 is green led on launchpad
 
 // P side high to light LED
-// P1.5
 #define PSideLEDPort GPIO_PORT_P1
 #define PSideLEDPin  GPIO_PIN5
+
 #endif
 
+#ifdef LED_ON_P13_P15
+
+#define NSideLEDPort GPIO_PORT_P1
+#define NSideLEDPin  GPIO_PIN3
+
+// P1.1 is green led on launchpad
+
+// P side high to light LED
+#define PSideLEDPort GPIO_PORT_P1
+#define PSideLEDPin  GPIO_PIN5
+
+#endif
 
 
 
@@ -217,7 +230,7 @@
 
 
 
-
+#ifdef I2C_ON_P12_P13
 /*
  * Unused.  For compass using I2C
  */
@@ -231,6 +244,30 @@
 
 #define I2C_SCL_PORT  GPIO_PORT_P1
 #define I2C_SCL_PIN   GPIO_PIN3
+
+// In various revision of my board, was P2.3
+#define AlarmSignalPort GPIO_PORT_P1
+#define AlarmSignalPin  GPIO_PIN1
+
+#endif
+
+
+
+#ifdef I2C_ON_P16_P17
+
+#define I2CInstanceAddress      EUSCI_B0_BASE
+
+#define I2C_SDA_PORT  GPIO_PORT_P1
+#define I2C_SDA_PIN   GPIO_PIN6
+
+#define I2C_SCL_PORT  GPIO_PORT_P1
+#define I2C_SCL_PIN   GPIO_PIN7
+
+
+#define AlarmSignalPort GPIO_PORT_P1
+#define AlarmSignalPin  GPIO_PIN4
+
+#endif
 
 /*
  * 7-bit address

@@ -27,6 +27,7 @@ void testAlarm2()
     PMM_unlockLPM5();
 
     // RTC chip is past its reset delay
+    // TODO suspect since Alarm pins not configured
     assert (Alarm::isRTCReady() );
 
     while (true)
