@@ -25,10 +25,10 @@ void testAlarmLPM45()
 {
     // assert watchdog stopped
 
-    AllPins::setHighOutput();
+    AllPins::setLowOutput();
     // assert all pin configs same, but not necessarily unlocked.
 
-    Bridge::configureToSleepState();        // e.g. I2C bus pins to external RTC
+    Bridge::configureToSleepState();        // e.g. I2C bus pins to external RTC are now GPIO
     Alarm::configureMcuAlarmInterface();    // Alarm pin
     // Pins configured in sleep config, but not necessarily unlocked, and no interrupt is enabled.
 
