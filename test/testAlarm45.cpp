@@ -3,7 +3,7 @@
 #include "../src/pinFunction/allPins.h"
 #include "../src/SoC/SoC.h"
 #include "../src/bridge/bridge.h"
-#include "../src/LED/led.h"
+#include "../src/LED/blinkingLED.h"
 
 #include "../src/assert/myAssert.h"
 
@@ -47,7 +47,7 @@ void testAlarmLPM45()
         // assert bus to RTC ready and RTC still configured
         Alarm::clearBothSidesOfSignal();
 
-        LED::blinkLED2();
+        BlinkingLED::blinkSecond();
     }
     else {
         // Coldstart
@@ -58,7 +58,7 @@ void testAlarmLPM45()
         // Configure bus to RTC and initialize RTC
         Alarm::configureAfterColdReset();
 
-        LED::blink();   // red
+        BlinkingLED::blinkFirst();   // red
     }
 
     // assert bus to RTC configured and RTC is configured

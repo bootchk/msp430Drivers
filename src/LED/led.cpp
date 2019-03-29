@@ -72,17 +72,3 @@ void LED::toggle() {
 
 
 
-// 100k cycles at 1Mhz clock is about 1/10 Sec
-
-
-void LED::blink() {
-    turnOn();
-    __delay_cycles(100000);
-    turnOff();
-}
-
-void LED::blinkLED2() {
-    turnOnLED2();
-    __delay_cycles(100000);
-    turnOffLED2();
-}

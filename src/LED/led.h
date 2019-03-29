@@ -19,10 +19,8 @@ public:
 	 */
 	static void turnOn();
 	static void turnOff();
-    /*
-     * Busy wait blink.
-     */
-    static void blink();
+
+
     static void toggle();
 
     /*
@@ -30,6 +28,4 @@ public:
      */
     static void turnOnLED2();
 	static void turnOffLED2();
-	static void blinkLED2();
-
 };
