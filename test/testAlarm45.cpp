@@ -3,6 +3,7 @@
 #include "../src/pinFunction/allPins.h"
 #include "../src/SoC/SoC.h"
 #include "../src/bridge/bridge.h"
+#include "../src/LED/led.h"
 
 #include "../src/assert/myAssert.h"
 
@@ -27,6 +28,7 @@ void testAlarmLPM45()
 
     AllPins::setLowOutput();
     // assert all pin configs same, but not necessarily unlocked.
+    // assert any pins on LaunchPad that source an LED, the LED will be dark
 
     Bridge::configureToSleepState();        // e.g. I2C bus pins to external RTC are now GPIO
     Alarm::configureMcuAlarmInterface();    // Alarm pin
@@ -44,6 +46,8 @@ void testAlarmLPM45()
         Alarm::configureAfterWake();
         // assert bus to RTC ready and RTC still configured
         Alarm::clearBothSidesOfSignal();
+
+        LED::blinkLED2();
     }
     else {
         // Coldstart
@@ -54,6 +58,7 @@ void testAlarmLPM45()
         // Configure bus to RTC and initialize RTC
         Alarm::configureAfterColdReset();
 
+        LED::blink();   // red
     }
 
     // assert bus to RTC configured and RTC is configured

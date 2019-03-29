@@ -57,14 +57,32 @@ void LED::turnOn(){
 #endif
 }
 
+void LED::turnOnLED2(){
+#ifdef LED_SOURCED
+    GPIO_setOutputHighOnPin(APP_LED2_PORT,    APP_LED2_PIN);
+#else
+    GPIO_setOutputLowOnPin(APP_LED2_PORT,    APP_LED2_PIN);
+#endif
+}
+
 
 void LED::toggle() {
     GPIO_toggleOutputOnPin(APP_LED1_PORT, APP_LED1_PIN);
 }
 
+
+
+// 100k cycles at 1Mhz clock is about 1/10 Sec
+
+
 void LED::blink() {
     turnOn();
-    // 100k cycles is about 1/100 Sec or 10 mSec
     __delay_cycles(100000);
     turnOff();
+}
+
+void LED::blinkLED2() {
+    turnOnLED2();
+    __delay_cycles(100000);
+    turnOffLED2();
 }

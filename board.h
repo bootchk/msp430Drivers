@@ -45,6 +45,9 @@
 // Choose interface to LED and light sensor
 #define LED_ON_P13_P15
 
+// Choose LED config
+#define LED_ON_P10_P97
+
 
 
 /*
@@ -294,13 +297,28 @@
 // TODO for prototype on launchpad, led is sourced
 #define LED_SOURCED
 
-// P1.0, red on launchpad
+#ifdef LED_ON_P10_P97
+
+// red
 #define APP_LED1_PORT     GPIO_PORT_P1
 #define APP_LED1_PIN      GPIO_PIN0
 
-// P1.1 green
+// green
+#define APP_LED2_PORT     GPIO_PORT_P9
+#define APP_LED2_PIN      GPIO_PIN7
+
+#else
+
+// launchpad FR2433
+// red
+#define APP_LED1_PORT     GPIO_PORT_P1
+#define APP_LED1_PIN      GPIO_PIN0
+
+// green
 #define APP_LED2_PORT     GPIO_PORT_P1
 #define APP_LED2_PIN      GPIO_PIN1
+
+#endif
 
 
 

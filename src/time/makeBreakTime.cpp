@@ -29,9 +29,14 @@ void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
 
   unsigned char year;
   unsigned char month, monthLength;
-  unsigned int time;
+  EpochTime time;
   unsigned long days;
 
+  /*
+   * TODO use the div() function
+   * To avoid dependence on compiler optimization, explicitly use div() function
+   * to return both the quotient and remainder.
+   */
   time = (uint32_t)timeIn;
   timeOut.Second = time % 60;
   time /= 60; // now it is minutes
