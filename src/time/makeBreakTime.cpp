@@ -1,6 +1,7 @@
 
 
 #include <inttypes.h>
+#include <stdlib.h>   // ldiv, ldiv_t
 #include "makeBreakTime.h"
 
 
@@ -15,11 +16,31 @@
 static const uint8_t monthDays[]={31,28,31,30,31,30,31,31,30,31,30,31};
 // API starts months from 1, this array starts from 0
 
+/*
+ * !!! Cast to 32-bit type so no loss.
+ * This might be overkill for some operations, but it is not worth optimizing.
+ */
+
 #define SECS_PER_MIN  ((EpochTime)(60UL))
 #define SECS_PER_HOUR ((EpochTime)(3600UL))
 #define SECS_PER_DAY ((EpochTime)(SECS_PER_HOUR * 24UL))
 
 
+/*
+ * Reduce an EpochTime by a unit (say seconds)
+ * returning the remainder and quotient.
+ */
+void divTime(EpochTime& time,   // quotient IN/OUT
+             unsigned char& remainder,  // remainder OUT
+             unsigned int divisor   // IN
+             ) {
+ldiv_t divResult;
+divResult = ldiv(time, divisor);
+
+// Return result
+time = divResult.quot;
+remainder = divResult.rem;
+}
 
 
 void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
@@ -38,12 +59,27 @@ void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
    * to return both the quotient and remainder.
    */
   time = (uint32_t)timeIn;
+
+// whether to use / then %, or div().  Compiler may optimize / then %
+#define BASIC_BREAK_TIME
+#ifdef BASIC_BREAK_TIME
   timeOut.Second = time % 60;
-  time /= 60; // now it is minutes
+  time /= 60;
   timeOut.Minute = time % 60;
-  time /= 60; // now it is hours
+  time /= 60;
   timeOut.Hour = time % 24;
-  time /= 24; // now it is days
+  time /= 24;
+
+#else
+  divTime(time, timeOut.Second, 60);
+  // now time is minutes
+  divTime(time, timeOut.Minute, 60);
+  // now time is hours
+  divTime(time, timeOut.Hour, 24);
+  // now time is days
+#endif
+
+  // Omit calculating day of week
   // timeOut.Wday = ((time + 4) % 7) + 1;  // Sunday is day 1
 
   year = 0;
@@ -89,8 +125,7 @@ EpochTime makeTime(const CalendarTime &tm){
 // note year argument is offset from 1970 (see macros in time.h to convert to other formats)
 // previous version used full four digit year (or digits since 2000),i.e. 2009 was 2009 or 9
 
-  int i;
-  // uint32_t seconds;
+  unsigned int i;
   EpochTime seconds;
 
   // seconds from 1970 till 1 jan 00:00:00 of the given year
