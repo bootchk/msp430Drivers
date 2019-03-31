@@ -3,15 +3,15 @@
 
 #include "../clock/veryLowOscillator.h"
 
+#include <msp430.h> // LPM3 macro
+
+#include "../driverConfig.h"    // choose implementation
+
 #ifdef LOW_POWER_TIMER_USE_RTC
 #include "countdownTimer.h"
 #else
 #include "intervalTimer.h"
 #endif
-
-#include <msp430.h> // LPM3 macro
-
-#include "../driverConfig.h"    // choose implementation
 
 #include "../assert/myAssert.h"
 

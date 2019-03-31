@@ -38,16 +38,29 @@
 #define MYPCB_BOARD_R3
 //#define FULL_PROTO_LAUNCHPAD
 
+
+// Choose Launchpad
+#define USE_MSPFR2433
+
+
+#ifdef USE_MSPFR2433
+
+#define I2C_ON_P12_P13
+#define LED_ON_P10_P11
+#define LED_ON_P13_P15
+
+#else
+
+// FR6989
 // Choose interface to external RTC I2C
 #define I2C_ON_P16_P17
-//#define I2C_ON_P12_P13
-
 // Choose interface to LED and light sensor
 #define LED_ON_P13_P15
 
-// Choose LED config
-#define LED_ON_P10_P97
+// Choose debug LED config
+#define APP_LED_ON_P10_P97
 
+#endif
 
 
 /*
@@ -176,9 +189,6 @@
 #define NSideLEDPort GPIO_PORT_P1
 #define NSideLEDPin  GPIO_PIN3
 
-// P1.1 is green led on launchpad
-
-// P side high to light LED
 #define PSideLEDPort GPIO_PORT_P1
 #define PSideLEDPin  GPIO_PIN5
 
@@ -307,7 +317,9 @@
 #define APP_LED2_PORT     GPIO_PORT_P9
 #define APP_LED2_PIN      GPIO_PIN7
 
-#else
+#endif
+
+#ifdef LED_ON_P10_P11
 
 // launchpad FR2433
 // red

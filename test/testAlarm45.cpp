@@ -14,13 +14,23 @@
 
 
 /*
- * Test: multiple alarms with LPM4.5 in between.
+ * Test: repeat alarms with LPM4.5 in between.
  *
  * Here, we reconfigure Alarm after every sleep.
  *
- * Use EnergyTrace and expect one energy pulse every 10 seconds of sleep.
+ * Use EnergyTrace and expect one energy pulse every 3 seconds.
+ * Sleeps for 3 seconds, wakes, sets alarm, ...
+ *
+ * Expect average power usage of 2uA.
+ *
+ * Optional LED blinking.  ET will tell you whether it is working, LED's are superfluous.
+ * coldstart: red
+ * wake: green
  */
 
+// Options
+//#define BLINK_LED
+#define CHECK_POWER
 
 void testAlarmLPM45()
 {
@@ -47,7 +57,12 @@ void testAlarmLPM45()
         // assert bus to RTC ready and RTC still configured
         Alarm::clearBothSidesOfSignal();
 
+#ifdef BLINK_LED
         BlinkingLED::blinkSecond();
+#endif
+#ifdef CHECK_POWER
+
+#endif
     }
     else {
         // Coldstart
@@ -58,7 +73,9 @@ void testAlarmLPM45()
         // Configure bus to RTC and initialize RTC
         Alarm::configureAfterColdReset();
 
+#ifdef BLINK_LED
         BlinkingLED::blinkFirst();   // red
+#endif
     }
 
     // assert bus to RTC configured and RTC is configured
