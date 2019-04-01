@@ -20,8 +20,7 @@ unsigned int LEDAndLightSensor::measureLight() {
     // Charge capacitance of LED
     toReversedFromOff();
 
-    // Allow time to charge capacitance of LED
-    __delay_cycles(100);
+    // No need for a delay: LED capacitance charges instantly
 
     // Configure p side as input
     toMeasuringFromReversed();
@@ -33,6 +32,8 @@ unsigned int LEDAndLightSensor::measureLight() {
     return result;
     // assert LED state is Off
 }
+
+
 
 
 
@@ -68,14 +69,18 @@ unsigned int LEDAndLightSensor::measureByBleeding() {
     //for ( result = 0; result < DriverConstant::MaxItersInDarkToDischargeLEDCapacitance; result++) {
     for ( result = DriverConstant::MaxItersInDarkToDischargeLEDCapacitance; result > 0; result--) {
 
-        // TEMP hardcoded to test speedier read
-        // If low, break
+        // If LED as input is low, break (i.e. charge is dissipated.)
+#ifdef UNROLL_LIGHT_SENSE_LOOP
+        // hardcoded, no function call
+        // This gives more resolution in the result (higher numbers)
         if (not (P1IN & BIT7)) break;
+#else
 
-        /// value = GPIO_getInputPinValue(NSideLEDPort, NSideLEDPin);
-        ///if (  value == GPIO_INPUT_PIN_LOW )
+        value = GPIO_getInputPinValue(NSideLEDPort, NSideLEDPin);
         /// assert value is 0 or 1
-        ///    break;
+        if (  value == GPIO_INPUT_PIN_LOW )
+            break;
+#endif
     }
     // assert 0 <= result <= MaxItersInDarkToDischargeLEDCapacitance
     // assert result is larger if environment is illuminating LED

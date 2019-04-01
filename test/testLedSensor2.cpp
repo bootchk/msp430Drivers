@@ -4,6 +4,8 @@
 
 #include "../src/LEDAndLightSensor/ledAndLightSensor.h"
 
+#include "../src/assert/myAssert.h"
+
 
 
 /*
@@ -19,6 +21,8 @@ void lightLED() {
      LEDAndLightSensor::toOffFromOn();
 }
 
+
+
 void testLEDSensor2()
 {
     PMM_unlockLPM5();
@@ -29,6 +33,16 @@ void testLEDSensor2()
     // Verify LED will light up
     lightLED();
 
+    // Require this test start in light conditions.
+    // Thus if sensor indicates dark, sensor must be calibrated wrong.
+    myAssert(not LEDAndLightSensor::isNighttimeDark());
+
+
+    /*
+     * Dynamic test:
+     * Leave LED in light, expect no LED blinking.
+     * Darken LED with your hand, expect LED to blink while dark.
+     */
     while (true)
     {
         // One second

@@ -46,8 +46,9 @@
 #ifdef USE_MSPFR2433
 
 #define I2C_ON_P12_P13
-#define LED_ON_P10_P11
-#define LED_ON_P13_P15
+#define APP_LED_ON_P10_P11
+//#define LED_SENSOR_ON_P13_P15
+#define LED_SENSOR_ON_P15_P17
 
 #else
 
@@ -55,7 +56,7 @@
 // Choose interface to external RTC I2C
 #define I2C_ON_P16_P17
 // Choose interface to LED and light sensor
-#define LED_ON_P13_P15
+#define LED_SENSOR_ON_P13_P15
 
 // Choose debug LED config
 #define APP_LED_ON_P10_P97
@@ -171,7 +172,7 @@
 
 
 
-#ifdef LED_ON_P15_P17
+#ifdef LED_SENSOR_ON_P15_P17
 
 #define NSideLEDPort GPIO_PORT_P1
 #define NSideLEDPin  GPIO_PIN7
@@ -184,7 +185,7 @@
 
 #endif
 
-#ifdef LED_ON_P13_P15
+#ifdef LED_SENSOR_ON_P13_P15
 
 #define NSideLEDPort GPIO_PORT_P1
 #define NSideLEDPin  GPIO_PIN3
@@ -307,7 +308,7 @@
 // TODO for prototype on launchpad, led is sourced
 #define LED_SOURCED
 
-#ifdef LED_ON_P10_P97
+#ifdef APP_LED_ON_P10_P97
 
 // red
 #define APP_LED1_PORT     GPIO_PORT_P1
@@ -319,7 +320,7 @@
 
 #endif
 
-#ifdef LED_ON_P10_P11
+#ifdef APP_LED_ON_P10_P11
 
 // launchpad FR2433
 // red

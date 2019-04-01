@@ -31,6 +31,7 @@ static const unsigned int MinItersInLightToDischargeLEDCapacitance = 100;
  * We count up.  This value should be only about ten percent higher than the above value.
  */
 static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
+// FOR TESTING static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 1000;
 
 
 /*
