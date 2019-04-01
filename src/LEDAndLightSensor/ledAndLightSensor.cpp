@@ -47,7 +47,8 @@ bool LEDAndLightSensor::isNighttimeDark() {
      * Discharge is through the LED as solar cell generated current.
      * That current is greater in illumination, and discharges quickly, in fewer cycles of loop.
      */
-    return (sample > DriverConstant::MinItersInLightToDischargeLEDCapacitance );
+    // OLD return (sample >= DriverConstant::MinItersInLightToDischargeLEDCapacitance );
+    return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
 }
 
 
@@ -85,10 +86,15 @@ unsigned int LEDAndLightSensor::measureByBleeding() {
     // assert 0 <= result <= MaxItersInDarkToDischargeLEDCapacitance
     // assert result is larger if environment is illuminating LED
 
-    ///return result;
+    /*
+     * Return the number of iterations.
+     * Since loop index is counting down, subtract
+     */
     return DriverConstant::MaxItersInDarkToDischargeLEDCapacitance - result;
     // assert state still measuring
-    // assert result is small number if environment is illuminating LED as light sensor
+
+    // assert result is small number (<MaxItersInDarkToDischargeLEDCapacitance) if environment is illuminating LED as light sensor
+    // else result == MaxItersInDarkToDischargeLEDCapacitance
 }
 
 

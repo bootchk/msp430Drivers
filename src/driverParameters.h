@@ -8,7 +8,13 @@
 class DriverConstant {
 
 public:
-/*
+#ifdef OLD
+ /*
+  * NEW design:
+  *  Now if loop never break (iterations >= max, then is dark.
+  *  I.E. We don't need two parameters, only one.
+  */
+ /*
  * Count of loop cycles discharging reversed biased LED to sense light.
  *
  * If an external strong light illuminates the LED,
@@ -19,6 +25,7 @@ public:
  * Depends on the LED.
  */
 static const unsigned int MinItersInLightToDischargeLEDCapacitance = 100;
+#endif
 
 /*
  * Maximum loop iterations we will attempt to discharge LED capacitance.
