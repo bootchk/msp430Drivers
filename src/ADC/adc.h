@@ -31,7 +31,7 @@
  * OLD needs revamping, most of this moved to ADCConfigure
  *
  *
- * TODO disable VBG to save power?
+ * FUTURE disable VBG to save power?
  * The ADC will not draw power when not being sampled.
  *
  * To use this requires:

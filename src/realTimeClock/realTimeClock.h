@@ -41,7 +41,7 @@ public:
 
 	/*
 	 * Return time from clock,
-	 * or rest system if clock has failed.
+	 * or reset system if clock has failed.
 	 */
 	static EpochTime timeNowOrReset();
 
@@ -66,6 +66,14 @@ public:
 	// Set alarm to a time
 	static bool setAlarmTime(EpochTime);
 
+
+	/*
+     * Verify alarm is properly set by reading and compare to given time (what was written earlier.)
+     * If it is not set properly, the system may sleep a very long time.
+     * Also verify that now time is not zero????
+     *
+     * The alarm register is not ticking, only the clock.
+     */
 	static bool verifyAlarmTime(const RTCTime*);
 
 	/*

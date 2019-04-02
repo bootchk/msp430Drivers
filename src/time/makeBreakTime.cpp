@@ -54,9 +54,11 @@ void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
   unsigned long days;
 
   /*
-   * TODO use the div() function
+   * FUTURE use the div() function
    * To avoid dependence on compiler optimization, explicitly use div() function
    * to return both the quotient and remainder.
+   * I found experimentally that it does not make much difference.
+   * Besides, a better optimization is to avoid divide altogether by setting alarm on RTCTime.
    */
   time = (uint32_t)timeIn;
 

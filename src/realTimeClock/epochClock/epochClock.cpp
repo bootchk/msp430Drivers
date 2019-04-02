@@ -7,7 +7,7 @@
 
 
 
-EpochTime EpochClock::timeNow() {
+EpochTime EpochClock::timeNowOrReset() {
     // This requirement is valid but implemented lower down.
     // myRequire(RTC::isConfigured);
     return RTC::timeNowOrReset();
@@ -15,8 +15,8 @@ EpochTime EpochClock::timeNow() {
 
 
 
-EpochTime EpochClock::timeDurationFromNow(Duration duration) {
-    return timeDurationFromTime(timeNow(), duration);
+EpochTime EpochClock::timeDurationFromNowOrReset(Duration duration) {
+    return timeDurationFromTime(timeNowOrReset(), duration);
 }
 
 EpochTime EpochClock::timeDurationFromTime(EpochTime time, Duration duration) {
@@ -34,7 +34,7 @@ EpochTime EpochClock::timeDurationFromTime(EpochTime time, Duration duration) {
  */
  void EpochClock::setTimeAlarmableInFuture(EpochTime& time) {
 
-    EpochTime alarmableTime = timeNow() + 2;
+    EpochTime alarmableTime = timeNowOrReset() + 2;
     if (time < alarmableTime )
         time = alarmableTime;
 }

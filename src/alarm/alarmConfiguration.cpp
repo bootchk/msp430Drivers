@@ -39,9 +39,7 @@ bool Alarm::isConfiguredForAlarming() {
  * Note also that design errors could cause this to never return: see isReadable()
  */
 void Alarm::verifyRTCReadable() {
-    // TODO needed?
-    ///Test::delayBriefly();
-    ///__delay_cycles(10000);
+    /// HACK FOR TESTING__delay_cycles(10000);
 
     // assert can talk to RTC
     myAssert(RTC::isReadable());
@@ -99,17 +97,17 @@ void Alarm::configureMcuSide() {
     // Two parts: alarm interrupt pins and bus pin
 
     // Must precede isRTCReady (which reads the alarm pin)
-    // TODO this has already been done by duty cycle framework???
+    // FUTURE this has already been done by duty cycle framework???
     Alarm::configureMcuAlarmInterface();
 
     // Must precede use of bus to configure rtc
     Alarm::configureMcuBusInterface();
 }
 
-// TODO this should be done somewhere else when there are two slaves
+// FUTURE this should be done somewhere else when there are two slaves
 void Alarm::configureMcuBusInterface(){
     /*
-     * TODO hardcoded.
+     * FUTURE hardcoded to false, it should be a parameter.
      * This works for AB0815 SPI, false means RW bit is not high (is low) for a read
      * Also works for AB0805 I2C, which ignores the actual parameter.
      */

@@ -20,12 +20,17 @@
 
 class EpochClock {
 public:
-    static EpochTime timeNow();
+    /*
+     * Return current time.
+     * Resets if external RTC chip fails hard.
+     */
+    static EpochTime timeNowOrReset();
 
     /*
      * Return EpochTime that is Duration seconds in the future from now.
+     * Resets if external RTC fails hard.
      */
-    static EpochTime timeDurationFromNow(Duration);
+    static EpochTime timeDurationFromNowOrReset(Duration);
     /*
      * Return EpochTime that is Duration seconds later than given EpochTime.
      * Neither the given time nor the returned time are guaranteed to be in the future from now.

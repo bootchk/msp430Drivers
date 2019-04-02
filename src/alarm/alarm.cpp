@@ -28,10 +28,11 @@ bool Alarm::clearAlarmOnRTC() {
 	// Tell RTC to end interrupt pulse (signal to high) if not already so
 	bool result;
 
-	// Simple write to a register of RTC
-	// RTC should raise nIRQ signal to high if not already so.
-	// mcu interrupt occurred on rising edge.
-	// TODO delay needed?
+	/*
+	 * Simple write to a register of RTC.
+	 * RTC should raise nIRQ signal to high if not already so.
+	 *  mcu interrupt occurred on rising edge.
+	 */
 	RTC::clearIRQInterrupt();
 
 	// Signal is high

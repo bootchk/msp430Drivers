@@ -13,7 +13,9 @@
 
 #include "../time/timeConverter.h"
 
-// TODO circular includes
+/*
+ * Circular dependency: some RTC methods depend on EpochClock methods which depends on other RTC methods.
+ */
 #include "epochClock/epochClock.h"
 
 
@@ -25,7 +27,7 @@ namespace {
  */
 
 bool timeIsMonotonic(EpochTime nowTime) {
-	// TODO compare to previous read time, must be greater.
+	// FUTURE compare to previous read time, must be greater.
 	return true;
 }
 
@@ -51,6 +53,8 @@ EpochTime RTC::timeNowOrReset() {
 
     /*
      * If RTC has failed, Bridge reads time as all zeroes.
+     * RTC failed: master is clocking but slave RTC is failing to drive data line.
+     * And possibly failing to drive ACK bit.
      */
     if (not TimeConverter::isValidRTCTime(now)) {
         SoftFault::failReadTime();
@@ -70,15 +74,20 @@ EpochTime RTC::timeNowOrReset() {
 bool RTC::setAlarmDuration(Duration duration) {
 	bool result;
 
-	// TODO later, check preconditions for setting alarm
-	// duration is great enough
+	/*
+	 * FUTURE check preconditions for setting alarm:
+	 * duration is great enough so that we get to sleep
+	 * before the alarm goes off.
+	 *
+	 * For now, the minimum duration is one second,
+	 * and assume that sleep follows setAlarm by much less than one second.
+	 */
 
-	// resets if RTC chip fails
 	EpochTime alarmEpochTime;
 
-	alarmEpochTime = EpochClock::timeDurationFromNow(duration);
+	alarmEpochTime = EpochClock::timeDurationFromNowOrReset(duration);
 
-    // Fails if alarm not written to remote device
+    // Fails if alarm not verifiably written to remote RTC device
     result = setAlarmTime(alarmEpochTime);
 
 	return result;
@@ -90,11 +99,12 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
 
     // takes reference to alarmRTCTime
     TimeConverter::convertEpochTimeToRTCTime(alarmEpochTime, alarmRTCTime);
+
     // Takes a pointer, not a reference
     RTCInterface::writeAlarm(&alarmRTCTime);
 
     return true;
-    // TODO ? implementation correct
+    // FUTURE verify alarm written
     ///return verifyAlarmTime(&alarmRTCTime);
 }
 
@@ -103,14 +113,6 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
 
 bool RTC::verifyAlarmTime(const RTCTime* writtenTime) {
     RTCTime readAlarmRTCTime;
-
-    /*
-     * Verify alarm is properly set by reading and compare to what
-     * If it is not set properly, the system may sleep a very long time.
-     * Also verify that now time is not zero????
-     *
-     * Note the alarm register is not ticking.
-     */
 
     RTCInterface::readAlarm(&readAlarmRTCTime);
     return(readAlarmRTCTime == writtenTime);
