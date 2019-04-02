@@ -20,8 +20,13 @@ public:
 
 
     /*
+     * A special function, not generic.
+     * Special for embeddedDutyCycle framework and a particular application.
+     * I.E. knows pins framework and app uses.
+     *
+     * It is redundancy, for use during testing.
+     *
      * May assert and not return.
-     * One interrupt pin.
      */
     static void assertAreConfiguredForSleep();
 };

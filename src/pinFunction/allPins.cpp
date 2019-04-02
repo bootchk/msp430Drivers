@@ -63,7 +63,7 @@ bool AllPins::areGeneralPurpose() {
 }
 
 
-// TODO hardcoded for FR2433, my pin assignments
+// pin assignments hardcoded for FR2433, embeddedDutyCycle framework, SmartBlinker app
 void AllPins::assertAreConfiguredForSleep() {
 
 

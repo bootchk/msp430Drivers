@@ -28,9 +28,16 @@
  * wake: green
  */
 
-// Options
+// Optional actions on every wake
 //#define BLINK_LED
-#define CHECK_POWER
+#define CHECK_LIGHT
+
+
+#ifdef CHECK_LIGHT
+#include "../src/LEDAndLightSensor/ledAndLightSensor.h"
+#endif
+
+
 
 void testAlarmLPM45()
 {
@@ -43,6 +50,10 @@ void testAlarmLPM45()
     Bridge::configureToSleepState();        // e.g. I2C bus pins to external RTC are now GPIO
     Alarm::configureMcuAlarmInterface();    // Alarm pin
     // Pins configured in sleep config, but not necessarily unlocked, and no interrupt is enabled.
+
+#ifdef CHECK_LIGHT
+    LEDAndLightSensor::toOffFromUnconfigured();
+#endif
 
     if ( SoC::isResetWakeFromSleep() ) {
 
@@ -60,8 +71,9 @@ void testAlarmLPM45()
 #ifdef BLINK_LED
         BlinkingLED::blinkSecond();
 #endif
-#ifdef CHECK_POWER
-
+#ifdef CHECK_LIGHT
+        // discard result
+        (void) LEDAndLightSensor::isNighttimeDark();
 #endif
     }
     else {
