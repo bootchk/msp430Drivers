@@ -21,7 +21,8 @@ void VeryLowOscillator::allowOff() {
     // Let VLO stop when RTC stops using it
         CS_enableVLOAutoOff();
 #else
-    // FR6989 ???
-    // TODO
+    //  ??? not necessary
+    // FUTURE FR6989
+    assert(false);
 #endif
 }

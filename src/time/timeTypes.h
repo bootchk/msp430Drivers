@@ -2,6 +2,15 @@
 #pragma once
 
 /*
+ * Notes on time types and math.
+ *
+ * We define Duration as a struct so that EpochTime and Duration cannot be nievely added,
+ * even though both are based on a primitive unsigned long (32 bits.)
+ * Fixes primitive obsession i.e. eliminate convertability,  EpochTime from Duration types.
+ *
+ * Addition: EpochTime + Duration.seconds
+ */
+/*
  * See also AB08xx/rtcTime.h for RTCTime
  */
 
@@ -38,6 +47,9 @@ typedef unsigned long EpochTime;
  * Not enforced by this code.
  *
  * A very large duration added to an epoch time could overflow without throwing exception.
+ *
+ * See notes above about why it is a struct.
+ *
  */
 //typedef unsigned long Duration;
 
