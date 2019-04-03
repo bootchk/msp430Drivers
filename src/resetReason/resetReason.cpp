@@ -50,8 +50,6 @@ bool ResetReason::isResetAWakeFromSleep() {
   bool done = false;
   bool result = false;
 
-  Logger::log(13);
-
   while (! done)
   {
     // not using even_in_range() which is just an optimization, and dissappeared from compiler?
@@ -70,20 +68,29 @@ bool ResetReason::isResetAWakeFromSleep() {
     // Expected
     case SYSRSTIV_BOR:     // power up
     case SYSRSTIV_RSTNMI:  // RST/NMI pin reset e.g. from debug probe
+        break;
+
+    // Unexpected, but comes from an assert() when assert() is configured to reset
+    // We don't log it, since assert() should already have logged
     case SYSRSTIV_DOBOR:   // software initiated
       break;
 
-    // Security. Accessing BSL that is protected. Probably errant
+
+
+
+
+    /*
+     * All the rest are unexpected.
+     */
+    // Security. Accessing BSL that is protected. Probably wild memory access.
     case SYSRSTIV_SECYV:     // Security violation
-       //assert(false);
-       break;
 
      // WDT Time out
      // Not expected since we stop WD
      case SYSRSTIV_WDTTO:
 
     // Software initiated POR
-    // But our software never initiates.
+    // Unexpected since our software never initiates.
     case SYSRSTIV_DOPOR:
 
     // Faults, abnormal e.g. "bus error"
@@ -100,8 +107,10 @@ bool ResetReason::isResetAWakeFromSleep() {
 #endif
 
     default:
-      myAssert(false);
-      break;
+        // Log unexpected reset
+        Logger::log(13);
+        myAssert(false);
+        break;
     }
   }
   return result;
