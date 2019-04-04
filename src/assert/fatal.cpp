@@ -32,13 +32,17 @@
  */
 
 
-
-void Fatal::reboot(unsigned int reason) {
+/*
+ * Parameter is typically the line of an assert that failed.
+ * But could be codes [1,2] for other faults, see below.
+ *
+ */
+void Fatal::reboot(unsigned int line) {
     // LED on briefly, you may fail to see
     //LEDAndLightSensor::toOnFromOff();
     //__delay_cycles(500000);
 
-    Logger::log(reason);
+    Logger::log(line);
 
     SoC::triggerSoftwareReset();
     /*
@@ -61,7 +65,7 @@ void Fatal::fatalAssert(unsigned int line) { Fatal::warbleRedLEDForever(); }
 
 void Fatal::fatalHWFault()                 { reboot(1); }
 void Fatal::fatalSWFault()                 { reboot(2); }
-void Fatal::fatalAssert(unsigned int line) { reboot(3); }
+void Fatal::fatalAssert(unsigned int line) { reboot(line); }
 
 #elif defined(FATAL_DEBUGGING)
 

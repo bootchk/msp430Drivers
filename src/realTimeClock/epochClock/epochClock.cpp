@@ -38,7 +38,3 @@ EpochTime EpochClock::timeDurationFromTime(EpochTime time, Duration duration) {
     if (time < alarmableTime )
         time = alarmableTime;
 }
-
-
-
-

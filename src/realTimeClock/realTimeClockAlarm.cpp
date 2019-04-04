@@ -7,16 +7,19 @@
 
 #include "realTimeClock.h"
 
-//#include "../bridge/bridge.h"
 #include "RTCInterface.h"
 #include "../softFault/softFault.h"
 
 #include "../time/timeConverter.h"
 
+#include "../driverParameters.h"   // MaxPracticalAlarmDuration
+
 /*
  * Circular dependency: some RTC methods depend on EpochClock methods which depends on other RTC methods.
  */
 #include "epochClock/epochClock.h"
+
+
 
 
 #ifdef NOT_USED
@@ -67,23 +70,44 @@ EpochTime RTC::timeNowOrReset() {
 
 
 /*
+ * Correctness:
+ * - minimum duration: duration cannot be so small that we cannot get to sleep before duration elapses
+ * - absolute maximum duration: duration cannot be so large that now + duration > clock max
+ * - practical max duration: duration cannot be greater than a practical limit defined by the application
+ *
+ * Maximum duration:
+ * the epoch clock is 32-bits and would roll over after centuries.
+ * The duration is also 32-bits and could cause alarm to be past the clock max,
+ * but we don't check it, since practical max duration is stronger, and covers this case.
+ *
+ * Practical max duration:
+ * We assume the application specifies a practical max duration.
+ * Most application sleeping too long (say longer than a human lifetime) would be pragmatically useless.
+ * Purpose for checking practical max duration:
+ * - catch software errors in calculating duration.
+ * - enforce absolute maximum duration (see above)
+ *
+ * FUTURE check minimum duration
+ * For now, the minimum duration (enforced by the int type) is one second,
+ * and assume that sleep follows setAlarm by much less than one second.
+ *
  * Implementation is largely converting type (RTCTime) that RTC delivers
  * to type EpochTime (seconds since epoch) so we can use simple math to add Duration
  * then reverse conversion back to the type (RTCTime) that RTC expects.
+ *
+ * Two error return cases:
+ * - practical max duration exceeded
+ * - bus error to external RTC, alarm read does not match alarm written (FUTURE)
+ *
+ * Also resets if RTC now time is zero (external RTC fails to write data bus)
+ * Also asserts if API algebra error (RTC not configured.)
  */
 bool RTC::setAlarmDuration(Duration duration) {
 	bool result;
 
-	/*
-	 * FUTURE check preconditions for setting alarm:
-	 * duration is great enough so that we get to sleep
-	 * before the alarm goes off.
-	 *
-	 * For now, the minimum duration is one second,
-	 * and assume that sleep follows setAlarm by much less than one second.
-	 */
-
 	EpochTime alarmEpochTime;
+
+	if (duration.seconds > DriverConstant::MaxPracticalAlarmDuration) return false;
 
 	alarmEpochTime = EpochClock::timeDurationFromNowOrReset(duration);
 

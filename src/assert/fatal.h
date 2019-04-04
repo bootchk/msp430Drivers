@@ -37,11 +37,14 @@ public:
      * Fatal conditions
      */
     // Discovered in ordinary code
+    // Call comes from programmer written error checking that is never removed from build.
     static void fatalSWFault();
 
     // Discovered by CPU e.g. bus error or vacant memory address
+    // Call comes from the NMI ISR
     static void fatalHWFault();
 
     // Discovered by myAssert()
+    // asserts can be disabled (removed from the build.)
     static void fatalAssert(unsigned int);
 };

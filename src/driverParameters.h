@@ -49,6 +49,14 @@ static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
 //static const unsigned long I2CBusSpeed = 50000;
 //static const unsigned long I2CBusSpeed = 100000;
 static const unsigned long I2CBusSpeed = 400000;
+
+
+/*
+ * maximum duration the application expects to alarm.
+ * In seconds.
+ */
+// TEMP very low for accelerated testing
+static const unsigned long MaxPracticalAlarmDuration = 40;
 };
 
 
