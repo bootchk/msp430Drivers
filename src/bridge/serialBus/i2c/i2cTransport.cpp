@@ -185,6 +185,12 @@ void I2CTransport::initI2CPeripheral()
     // Enable NACK interrupt.  So we can catch bus errors.
     EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_NAK_INTERRUPT);
 
+    // So we can catch slave gone wild.
+    // Enable "clock low" interrupt.
+    EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_CLOCK_LOW_TIMEOUT_INTERRUPT );
+    // Set timeout
+    EUSCI_B_I2C_setTimeout(I2CInstanceAddress, EUSCI_B_I2C_TIMEOUT_28_MS);
+
     /*
      * Note that other interrupts are enabled by stateMachine.
      */

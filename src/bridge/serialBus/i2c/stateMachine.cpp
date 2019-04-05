@@ -113,6 +113,14 @@ void I2CStateMachine::waitUntilPriorTransportComplete() {
 }
 
 
+
+
+
+
+
+
+
+
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
 #pragma vector = USCI_B0_VECTOR
 __interrupt void USCI_B0_ISR(void)
@@ -132,7 +140,13 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
     case USCI_I2C_UCNACKIFG:     // Vector 4: NACK
         // TODO handle gracefully:  return error, and reset driver
         myAssert(false);
-      break;
+        break;
+
+    case USCI_I2C_UCCLTOIFG:
+        // Clock low too long (slave stretching clock incorrectly?)
+        myAssert(false);
+        break;
+
 
     case USCI_I2C_UCSTTIFG:
     case USCI_I2C_UCSTPIFG:
@@ -156,20 +170,21 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
         rx_val = UCB0RXBUF;
         if (byteCounter)
         {
-          bufferPtr[bufferIndex++] = rx_val;
-          byteCounter--;
+            bufferPtr[bufferIndex++] = rx_val;
+            byteCounter--;
         }
 
         if (byteCounter == 1)
         {
-          UCB0CTLW0 |= UCTXSTP;
+            UCB0CTLW0 |= UCTXSTP;
         }
         else if (byteCounter == 0)
         {
-          UCB0IE &= ~UCRXIE;    // disable further RX interrupt
+            UCB0IE &= ~UCRXIE;    // disable further RX interrupt
 
-          state = Idle;
-          __bic_SR_register_on_exit(LPM0_bits);      // Exit LPM0.  Was CPUOFF
+            state = Idle;
+
+            __bic_SR_register_on_exit(LPM0_bits);      // Exit LPM0.  Was CPUOFF
         }
         break;
 

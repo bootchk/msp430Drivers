@@ -45,6 +45,7 @@ static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
  * 50kbps seems to work with internal pullups of 30kohm and jumpers less than an inch.
  *
  * 400kbps is "fast mode".  Requires external pullups
+ * It may seem to work, but often locks up at initialTransition() of the I2C driver
  */
 //static const unsigned long I2CBusSpeed = 50000;
 //static const unsigned long I2CBusSpeed = 100000;
