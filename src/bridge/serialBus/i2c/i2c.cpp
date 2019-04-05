@@ -61,25 +61,13 @@ void I2C::deselectSlave() {
 
 
 
-namespace {
-bool _isEnabled = false;
-}
 
 
+void I2C::enable() {  I2CTransport::enable(); }
+void I2C::disable() { I2CTransport::disable(); }
+bool I2C::isEnabled() { return I2CTransport::isEnabled(); }
 
 
-
-
-void I2C::enable() {
-    _isEnabled = true;
-    I2CTransport::enable();
-}
-void I2C::disable() {
-    _isEnabled= false;
-    I2CTransport::disable();
-}
-// FUTURE make this access the peripheral registers
-bool I2C::isEnabled() { return _isEnabled; }
 
 
 
@@ -89,7 +77,7 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
 
     I2CTransport::configurePins();
 
-    // TODO hardcoded
+    // FUTURE not hardcoded slave address and other parameters
     I2CTransport::initI2CPeripheral();
 }
 
