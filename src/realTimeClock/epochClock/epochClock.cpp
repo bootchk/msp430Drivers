@@ -5,12 +5,36 @@
 #include "../realTimeClock.h"
 
 
+namespace {
+
+/*
+ * Memoized time of this waking period.
+ *
+ * !!! The clock is still ticking.
+ * !!! And this is memoized.
+ * It is NOT the real time of the RTC clock.
+ *
+ * This code is not general, but assumes minimums on alarm durations and wake period duration.
+ * In other words, Lamport's Rule is not used to set the alarm
+ * (Lamport's rule: set alarm, then check that clock has not ticked and alarm is thus in the past.)
+ *
+ * C startup clears this each wake period
+ */
+EpochTime timeNow = 0;
+
+}
 
 
 EpochTime EpochClock::timeNowOrReset() {
-    // This requirement is valid but implemented lower down.
-    // myRequire(RTC::isConfigured);
-    return RTC::timeNowOrReset();
+
+    if (timeNow == 0) {
+        // Have not called RTC::timeNowOrReset() in this waking period
+
+        // This requirement is valid but implemented lower down.
+        // myRequire(RTC::isConfigured);
+        timeNow = RTC::timeNowOrReset();
+    };
+    return timeNow;
 }
 
 

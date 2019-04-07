@@ -131,7 +131,12 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
 #endif
 {
 
-
+  /*
+   * Read the interrupt vector generator (IVG.)
+   * If more than one interrupt, only the highest priority will be read.
+   * Reading clears the corresponding IFG bit.
+   * Note that other operations (such as reading RXBUF) also clear corresponding IFG bit.
+   */
   switch(__even_in_range(UCB0IV, USCI_I2C_UCBIT9IFG))
   {
     case USCI_NONE:          break;         // Vector 0: No interrupts
@@ -151,6 +156,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
     case USCI_I2C_UCSTTIFG:
     case USCI_I2C_UCSTPIFG:
         // Start and stop received.  Since we are master, not expected
+        // Also, USCTPIFG would be set if we were using autostop generation, which we are not
         myAssert(false);
         break;
 

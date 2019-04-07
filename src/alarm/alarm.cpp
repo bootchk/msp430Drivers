@@ -23,9 +23,18 @@ void Alarm::clearBothSidesOfSignal() {
 
 
 
-
+/*
+ * Tell RTC to end interrupt pulse (signal to high) if not already so.
+ * The RTC chip on alarm:
+ * - asserts alarm pin high for a short time.
+ * - sets a flag in the RTC
+ * MCU is configured to interrupt on one edge.
+ * When alarm pin transitions:
+ * - MCU sets IFG
+ * - calls ISR
+ */
 bool Alarm::clearAlarmOnRTC() {
-	// Tell RTC to end interrupt pulse (signal to high) if not already so
+
 	bool result;
 
 	/*

@@ -93,6 +93,13 @@ void I2C::write(const RegisterAddress registerAddress,
 void I2C::read(const RegisterAddress registerAddress,
                           unsigned char * const buffer,
                           const unsigned int count) {
+#ifdef EXTRA_I2C_INIT
+    // TEMP test reconfigure before every read, for the hanging initialTransition issue
+    I2C::disable();
+    I2C::configureMaster(false);
+    I2C::enable();
+#endif
+
     I2CTransport::read(registerAddress, buffer, count);
 }
 

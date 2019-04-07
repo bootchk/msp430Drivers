@@ -72,6 +72,7 @@ EpochTime RTC::timeNowOrReset() {
 /*
  * Correctness:
  * - minimum duration: duration cannot be so small that we cannot get to sleep before duration elapses
+ * - minimum duration: duration cannot be so small that clock ticks beyond alarm while we are setting alarm (Lamport's Rule)
  * - absolute maximum duration: duration cannot be so large that now + duration > clock max
  * - practical max duration: duration cannot be greater than a practical limit defined by the application
  *
@@ -90,6 +91,7 @@ EpochTime RTC::timeNowOrReset() {
  * FUTURE check minimum duration
  * For now, the minimum duration (enforced by the int type) is one second,
  * and assume that sleep follows setAlarm by much less than one second.
+ * !!! But Lamport's Rule could be violated unless minimum durations is two seconds.
  *
  * Implementation is largely converting type (RTCTime) that RTC delivers
  * to type EpochTime (seconds since epoch) so we can use simple math to add Duration

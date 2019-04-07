@@ -54,6 +54,7 @@ void I2CTransport::read(
                         unsigned int count)
 {
     myRequire( isInitialized() );
+    myRequire( isEnabled() );
 
     I2CStateMachine::waitUntilPriorTransportComplete();
     I2CStateMachine::init(registerAddress, buffer, count, false);  // false means a read
@@ -69,6 +70,7 @@ void I2CTransport::write(
         const unsigned int count)
 {
     myRequire( isInitialized() );
+    myRequire( isEnabled() );
 
     I2CStateMachine::waitUntilPriorTransportComplete();
     I2CStateMachine::init(registerAddress, buffer, count, true);    // true means write
@@ -191,13 +193,8 @@ void I2CTransport::initI2CPeripheral()
     // Set timeout
     EUSCI_B_I2C_setTimeout(I2CInstanceAddress, EUSCI_B_I2C_TIMEOUT_28_MS);
 
-    /*
-     * Note that other interrupts are enabled by stateMachine.
-     */
-
-    // Not ensure enabled, caller must do that
-
 #else
+
     // Works.  Code from TI.
     UCB0CTLW0 |= UCSWRST;  // disable
     /*
@@ -210,10 +207,29 @@ void I2CTransport::initI2CPeripheral()
     UCB0I2CSA = slaveAddress;                   // Slave Address
     UCB0IE |= UCNACKIE;     // lkk why enable NACK interrupt?
     UCB0CTLW0 &= ~UCSWRST;                    // Clear SW reset, resume operation
+
 #endif
 
+    /*
+     * Note that other interrupts are enabled by stateMachine.
+     */
+
+    // Not ensure enabled, caller must do that
     _isInitialized = true;
 }
 
-
-bool I2CTransport::isInitialized() { return _isInitialized; }
+#define FULL_INIT_CHECK
+bool I2CTransport::isInitialized() {
+#ifdef FULL_INIT_CHECK
+    return (UCB0I2CSA == RTCBusAddress)
+            //                I2C mode     master     submain clock   always 1
+            and (UCB0CTLW0 == UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC)
+            // no autostop    clock low timeout
+            and (UCB0CTLW1 == UCCLTO_1 )
+            // divisor is two, yielding 500kbps?
+            and (UCB0BRW == 2)
+            ;
+#else
+    return _isInitialized;
+#endif
+}

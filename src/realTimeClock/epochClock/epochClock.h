@@ -21,7 +21,10 @@
 class EpochClock {
 public:
     /*
-     * Return current time.
+     * Return current time of this waking period.
+     * Memoized: repeated calls during this waking period returns the same time.
+     * If the waking period is longer than a second, return time might not be the real time
+     * (might not match time retrieved from RTC.)
      * Resets if external RTC chip fails hard.
      */
     static EpochTime timeNowOrReset();
