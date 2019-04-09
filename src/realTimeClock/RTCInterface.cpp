@@ -9,19 +9,21 @@
 
 
 
+/*
+ * RTCTime is an amalgam.
+ * When written to the alarm registers,
+ * it actually writes the YearOfCentury field into the alarm "Weekday" register.
+ * It will read back correctly.
+ * Since the configured RTC alarm mode is ignoring the "Weekday" register, this works.
+ */
 
 void RTCInterface::writeAlarm(const RTCTime* alarm) {
     Bridge::write(static_cast<unsigned char> (RTCAddress::Alarm),
                  (unsigned char *) alarm,
                  sizeof(RTCTime));
     // assert alarm parameter is unchanged.
-    // assert time was written to RTC
+    // assert alarm was written to RTC
 }
-
-
-
-
-
 
 
 void RTCInterface::readAlarm(RTCTime* alarm) {
@@ -29,6 +31,11 @@ void RTCInterface::readAlarm(RTCTime* alarm) {
                        (unsigned char *) alarm,
                        sizeof(RTCTime));
 }
+
+
+
+
+
 
 
 void RTCInterface::readTime(RTCTime* time) {

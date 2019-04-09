@@ -81,9 +81,10 @@ public:
      * Class is modal on slave address defined in board.h
      * Only 7 bits of slaveAddress are valid.
      *
-     * TODO parameterized on slave address
+     * FUTURE parameterized on slave address
      */
     static void initI2CPeripheral();
+    static void setDataRate250kbps();
     static bool isInitialized();
 
 

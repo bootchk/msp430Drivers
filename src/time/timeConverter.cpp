@@ -55,6 +55,9 @@ void TimeConverter::convertRTCTimeToCalendarTime(const RTCTime& rtcTime, Calenda
 	calendarTime.Hour = bcd2bin(rtcTime.Hour24);
 	calendarTime.Minute = bcd2bin(rtcTime.Minute);
 	calendarTime.Second = bcd2bin(rtcTime.Second);
+	/*
+	 * CalendarTime has no hundredths.
+	 */
 }
 
 
@@ -65,6 +68,11 @@ void TimeConverter::convertCalendarTimeToRTCTime(const CalendarTime& calendarTim
 	rtcTime.Hour24        = bin2bcd(calendarTime.Hour);
 	rtcTime.Minute        = bin2bcd(calendarTime.Minute);
 	rtcTime.Second        = bin2bcd(calendarTime.Second);
+	/*
+	 * !!!! Hundredth is defaulted.
+	 * But both hundredth and YearOfCentury are not used to set alarm (for some RTC chips.)
+	 */
+	rtcTime.Hundredth      = 0;
 }
 
 

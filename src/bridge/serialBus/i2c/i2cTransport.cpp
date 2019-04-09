@@ -181,6 +181,12 @@ void I2CTransport::initI2CPeripheral()
 #ifdef USE_DRIVER_LIB
     EUSCI_B_I2C_initMaster(I2CInstanceAddress,  &params);
 
+    /*
+     * initMaster is flawed re data rate.  See my TI forum posts.
+     * So we set it explicitly.
+     */
+    setDataRate250kbps();
+
     // slave address from board.h
     EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, RTCBusAddress);
 
@@ -218,6 +224,22 @@ void I2CTransport::initI2CPeripheral()
     _isInitialized = true;
 }
 
+
+
+void I2CTransport::setDataRate250kbps() {
+
+    myRequire( not I2CTransport::isEnabled());
+
+    // require SMCLK selected, at 1Mhz
+    // 1Mhz/4 yields 250kbps
+    UCB0BRW = 4;
+}
+
+
+
+
+
+
 #define FULL_INIT_CHECK
 bool I2CTransport::isInitialized() {
 #ifdef FULL_INIT_CHECK
@@ -226,8 +248,8 @@ bool I2CTransport::isInitialized() {
             and (UCB0CTLW0 == UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC)
             // no autostop    clock low timeout
             and (UCB0CTLW1 == UCCLTO_1 )
-            // divisor is two, yielding 500kbps?
-            and (UCB0BRW == 2)
+            // divisor is four, yielding 250kbps
+            and (UCB0BRW == 4)
             ;
 #else
     return _isInitialized;

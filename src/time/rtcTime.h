@@ -3,18 +3,33 @@
 
 
 /*
- * Struct holding part of the time kept by the RTC.
- * Both the time and alarm registers have this format.
+ * Struct holding "part of" sets of registers kept by the RTC.
+ * RTC keeps "time" and "alarm" sets of registers.
+ * Both the time and alarm registers have a similar format.
+ * See the AB08x5 Application Manual.
  *
- * Omit weekday.
+ * This struct is an amalgam; not the true format in the RTC.
+ * This struct is also specialized by configuration of RTC:
+ * - Hours field is 24 hour format
+ * - Alarm is configured "match once a year", which ignores weekday
+ *
+ * "part of" means we omit weekday.
  *
  * Is encoded BCD.
- * Year in range [0, 99]
+ *       range
+ * Minute [0,59]
+ * Hour   [0,23]
+ * Date   [1,31]
+ * Month  [1,12]
+ * Year   [0, 99]
  *
  * Order is important.
  * This is copied from a buffer as a stream of bytes.
  * The order must match the order in the buffer.
  */
+
+// FUTURE omit Hundredth, our EpochTime is in seconds, we don't set alarm on Hundredth
+
 struct RTCTime {
 	unsigned char Hundredth;
 	unsigned char Second;
@@ -23,7 +38,7 @@ struct RTCTime {
 	unsigned char DayOfMonth;
 	unsigned char Month;
 	unsigned char YearOfCentury;
-	// chip also has day of week, we don't use
+	// chip time also has Weekday, i.e. day of week, we don't use
 
 	// C++ does not provide == operator for structs
 	bool operator==(const RTCTime* rhs) const

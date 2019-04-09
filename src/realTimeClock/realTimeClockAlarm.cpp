@@ -126,6 +126,13 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
     // takes reference to alarmRTCTime
     TimeConverter::convertEpochTimeToRTCTime(alarmEpochTime, alarmRTCTime);
 
+    /*
+     * RTCTime has a zero hundredths.
+     * RTCTime has a valid.
+     * writeAlarm() does write hundredths to the alarm, with implications for correctness re shortest duration
+     * writeAlarm() does not write year to the alarm
+     */
+
     // Takes a pointer, not a reference
     RTCInterface::writeAlarm(&alarmRTCTime);
 
