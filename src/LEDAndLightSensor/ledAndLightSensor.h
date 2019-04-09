@@ -30,6 +30,8 @@ private:
 
     static void toOffFromMeasuring();
 
+    static bool isLow();
+
 public:
     /*
      * LED function
@@ -49,6 +51,11 @@ public:
     /*
      * Light sensor function
      */
+    /*
+     * Assuming in light condition,
+     * measureLight and store the result as a calibrated reference.
+     */
+    static void calibrateInLightOrReset();
 
     /*
      * Requires in Off state, and ensures in Off state.
@@ -60,6 +67,8 @@ public:
 
     /*
      * Understands what measurements are nighttime dark.
+     * WAS in relation to a constant.
+     * NOW in relation to calibrated reference value.
      */
     static bool isNighttimeDark();
 };

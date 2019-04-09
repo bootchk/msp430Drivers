@@ -2,12 +2,18 @@
 #include "ledAndLightSensor.h"
 #include "../driverParameters.h"
 
-// DriverLib
-#include <gpio.h>
+#include "../assert/fatal.h"
 
-// App
-#include <board.h>
 
+namespace {
+
+/*
+ * The calibrated count that the light sensor will return if it is dark.
+ */
+#pragma PERSISTENT
+unsigned int referenceLightSensorDarkCount = 0;
+
+}
 
 
 
@@ -31,6 +37,7 @@ unsigned int LEDAndLightSensor::measureLight() {
 
     return result;
     // assert LED state is Off
+    // insure result in [0, MaxItersInDarkToDischargeLEDCapacitance]
 }
 
 
@@ -47,9 +54,26 @@ bool LEDAndLightSensor::isNighttimeDark() {
      * Discharge is through the LED as solar cell generated current.
      * That current is greater in illumination, and discharges quickly, in fewer cycles of loop.
      */
+
+    /*
+     * Compare to a defined constant less than max iterations.
+     */
     // OLD return (sample >= DriverConstant::MinItersInLightToDischargeLEDCapacitance );
-    return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
+    /*
+     * Compare to the max iterations, also a defined constant.
+     */
+    //OLD return (sample >= referenceLightSensorDarkCount );
+
+    /*
+     * NOW: compare to run-time calibrated value
+     */
+    return (sample >= referenceLightSensorDarkCount
+            or sample >= referenceLightSensorDarkCount
+            );
 }
+
+
+
 
 
 /*
@@ -64,7 +88,7 @@ bool LEDAndLightSensor::isNighttimeDark() {
  */
 unsigned int LEDAndLightSensor::measureByBleeding() {
     unsigned int result;
-    unsigned char value;
+
 
     // 30000 is a wildly safe value to use
     //for ( result = 0; result < DriverConstant::MaxItersInDarkToDischargeLEDCapacitance; result++) {
@@ -76,10 +100,7 @@ unsigned int LEDAndLightSensor::measureByBleeding() {
         // This gives more resolution in the result (higher numbers)
         if (not (P1IN & BIT7)) break;
 #else
-
-        value = GPIO_getInputPinValue(NSideLEDPort, NSideLEDPin);
-        /// assert value is 0 or 1
-        if (  value == GPIO_INPUT_PIN_LOW )
+        if (isLow())
             break;
 #endif
     }
@@ -100,73 +121,25 @@ unsigned int LEDAndLightSensor::measureByBleeding() {
 
 
 
+void LEDAndLightSensor::calibrateInLightOrReset() {
+    unsigned int sample;
 
+    sample = measureLight();
 
-/*
- * State transitions.
- * Some are public
- * States are: Off, On, ReverseBiased, Measuring
- */
+    if (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance) {
+        /*
+         * Seems like this was called when it is dark.
+         * It took more iterations to discharge capacitance than should be.
+         */
+        // FUTURE not SW but operating
+        Fatal::fatalSWFault();
+    }
+    else {
+        // Save calibrated reference value
+        referenceLightSensorDarkCount = sample + 50;
+        // TODO magic number 50
+    }
 
-void LEDAndLightSensor::toOffFromUnconfigured() {
-    // Set both sides low before configuring direction out
-    GPIO_setOutputLowOnPin(NSideLEDPort,    NSideLEDPin);
-    GPIO_setOutputLowOnPin(PSideLEDPort,    PSideLEDPin);
-
-    GPIO_setAsOutputPin(NSideLEDPort,    NSideLEDPin);
-    GPIO_setAsOutputPin(PSideLEDPort,    PSideLEDPin);
-    // assert N,P output
-    // assert N,P low
 }
 
-
-void LEDAndLightSensor::toOnFromOff() {
-    // assert N,P are out
-    // assert N,P are low
-    GPIO_setOutputHighOnPin(PSideLEDPort,    PSideLEDPin);
-    // assert N low, P high
-}
-
-
-void LEDAndLightSensor::toOffFromOn() {
-    // assert N,P are out
-    // assert N low, P high
-    GPIO_setOutputLowOnPin(PSideLEDPort,    PSideLEDPin);
-    // assert N,P low
-}
-
-
-void LEDAndLightSensor::toOffFromMeasuring() {
-    // assert measuring:
-    // N is high but dir is input
-    // P low
-    // P output
-    GPIO_setOutputLowOnPin(NSideLEDPort,    NSideLEDPin);
-    GPIO_setAsOutputPin(NSideLEDPort,    NSideLEDPin);
-    // assert N,P low
-    // assert N,P output
-}
-
-
-void LEDAndLightSensor::toReversedFromOff() {
-    // assert N,P output
-    // assert N,P low
-    GPIO_setOutputHighOnPin(NSideLEDPort,    NSideLEDPin);
-    // assert N high, P low (reverse biased)
-}
-
-
-void LEDAndLightSensor::toMeasuringFromReversed() {
-    // assert P,N outputs
-    // assert P low, N high (reversed)
-
-    // !!! Note we don't switch N to low which would start bleeding it
-
-    // More or less equivalent to hardcoded:   P1DIR &= ~BIT7;
-    GPIO_setAsInputPin(NSideLEDPort,    NSideLEDPin);
-
-    // assert P output
-    // assert N input
-    // assert P low (N value is also high, but it is an input)
-}
 

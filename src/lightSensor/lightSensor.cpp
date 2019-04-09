@@ -15,3 +15,8 @@ bool LightSensor::isDark() {
     // return isDarkFromLEDLightSensorUsingADC();
     return LEDAndLightSensor::isNighttimeDark();
 }
+
+
+void LightSensor::calibrateInLightOrReset() {
+    LEDAndLightSensor::calibrateInLightOrReset();
+}

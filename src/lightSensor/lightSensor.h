@@ -8,5 +8,6 @@
 
 class LightSensor {
 public:
+    static void calibrateInLightOrReset();
     static bool isDark();
 };
