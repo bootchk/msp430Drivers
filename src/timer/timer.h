@@ -51,6 +51,7 @@ public:
     static void delayHalfSecond();
     static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();
+    static void delayTwoMilliSeconds();
 
     static void delaySeconds(unsigned int count);
 };
