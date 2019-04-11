@@ -33,6 +33,10 @@ public:
     // Do a software reset and log given reason
     static void reboot(unsigned int reason);
 
+
+    // Attempt to break into the debugger, then infinite loop.
+
+    static void stop(unsigned int);
     /*
      * Fatal conditions
      */

@@ -6,6 +6,9 @@ void fail(unsigned int line);
 
 /*
  * Custom assert macros
+ *
+ * Just as in standard C, "assert()" is a macro.
+ * Here "myAssert()" etc. are macros
  */
 
 /*

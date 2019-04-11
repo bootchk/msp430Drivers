@@ -45,19 +45,25 @@ static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
  * 50kbps seems to work with internal pullups of 30kohm and jumpers less than an inch.
  *
  * 400kbps is "fast mode".  Requires external pullups
- * It may seem to work, but often locks up at initialTransition() of the I2C driver
+ * It may seem to work, but often locks up at initialTransition() of the I2C driver.
+ *
+ * !!! DriverLib function that uses this parameter is not trustworthy, and actual bus speed is set elsewhere.
  */
-//static const unsigned long I2CBusSpeed = 50000;
+//static const unsigned long I2CBusSpeed =  50000;
 //static const unsigned long I2CBusSpeed = 100000;
-static const unsigned long I2CBusSpeed = 400000;
+static const unsigned long I2CBusSpeed = 250000;    // This corresponds to what is set elsewhere
+//static const unsigned long I2CBusSpeed =   400000; // DriverLib will yield unsupported 500kbps if you use this
 
 
 /*
  * maximum duration the application expects to alarm.
  * In seconds.
+ * Code will assert if exceeded in call to setAlarm()
  */
 // TEMP very low for accelerated testing
-static const unsigned long MaxPracticalAlarmDuration = 40;
+// static const unsigned long MaxPracticalAlarmDuration = 40;
+// 24 hours.
+static const unsigned long MaxPracticalAlarmDuration = 86400;
 };
 
 

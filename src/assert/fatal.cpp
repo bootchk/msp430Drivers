@@ -71,13 +71,38 @@ void Fatal::fatalAssert(unsigned int line) { reboot(line); }
 
 // No actual need to log, its here to test logging
 
-// Delegate to C assert
-void Fatal::fatalHWFault()                 { Logger::log(1); assert(false); }
-void Fatal::fatalSWFault()                 { Logger::log(2); assert(false); }
-void Fatal::fatalAssert(unsigned int line) {
-    Logger::log(3);
-    assert(false);
+
+/*
+ * We could call assert, but the definition provided by TI attempts to write() to the host and calls abort().
+ * We don't want to drag in write().
+ */
+void Fatal::stop(unsigned int logCode) {
+
+
+    /*
+     * If we are in the debugger, logging is not necessary.
+     * But if we are not now in debugger, log so we can connect later and read the code.
+     */
+    Logger::log(logCode);
+
+    /*
+     * Break into the debugger (aka BKPT) if it is running, else NOP.
+     * The EEM on MSP430 looks for this opcode.
+     */
+    __op_code(0x4343);
+
+    /*
+     * Infinite loop.
+     * If not in the debugger, lack of blinking should alert you to fact is stopped.
+     * Should also exhaust power and Vcc to alert you something is wrong.
+     */
+    while (true) ;
 }
+
+
+void Fatal::fatalHWFault()                 { stop(1); }
+void Fatal::fatalSWFault()                 { stop(2); }
+void Fatal::fatalAssert(unsigned int line) { stop(3); }
 
 #endif
 
