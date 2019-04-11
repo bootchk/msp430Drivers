@@ -1,6 +1,9 @@
-Code for an external Abracon RTC.
+Code for clock and alarm functions implemented using external Abracon RTC.
 
-Not for the internal "RTC" which is just a counter, and not a "real time clock".
+App uses only types EpochTime and Duration
+Lower levels use RTCTime implemented in external chip. 
+
+Not for the MSP430 internal "RTC" which is just a counter, and not a "real time clock".
 
 
 This diagram is work in progress.
@@ -18,10 +21,10 @@ Architecture:
     __________________________
         |               |
         |           ___________________________
-        |           EpochClock
+     Alarm            EpochClock
         |               |
     ___________________________________
-    RTC
+    RealTimeClock (RTC)
     ___________________________________     ^
         |               |                   |
         |           __________________________
@@ -32,4 +35,9 @@ Architecture:
         |
      Serial
         |
-       etc/
+       	I2C etc
+       	
+       	
+       	
+       	
+       	

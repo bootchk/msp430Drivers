@@ -3,10 +3,10 @@
 
 #include "../realTimeClock/realTimeClock.h"
 
-#include "../pinFunction/alarmPin.h"    // hides GPIO functions
+#include "../../pinFunction/alarmPin.h"    // hides GPIO functions
 
-#include "../assert/myAssert.h"
-#include "../softFault/softFault.h"
+#include "../../assert/myAssert.h"
+#include "../../softFault/softFault.h"
 
 
 

@@ -2,7 +2,7 @@
 
 #include "epochClock.h"
 
-#include "../realTimeClock.h"
+#include "../realTimeClock/realTimeClock.h"
 
 
 namespace {

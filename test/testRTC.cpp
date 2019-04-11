@@ -1,5 +1,5 @@
 
-#include "../src/realTimeClock/realTimeClock.h"
+#include "../src/alarmClock/realTimeClock/realTimeClock.h"
 
 #include "../src/bridge/bridge.h"
 

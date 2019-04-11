@@ -1,7 +1,7 @@
 
 #include <msp430.h>
 
-#include "../../src/alarm/alarm.h"
+#include "../../src/alarmClock/alarm/alarm.h"
 
 // msp430Drivers
 #include <board.h>  // board config

@@ -1,15 +1,13 @@
 
 #include "alarm.h"
 
-#include "../bridge/bridge.h"       //  hides serial io
 #include "../realTimeClock/realTimeClock.h"
 
+#include "../../bridge/bridge.h"       //  hides serial io
+#include "../../pinFunction/alarmPin.h"    // hides GPIO functions
 
-#include "../pinFunction/alarmPin.h"    // hides GPIO functions
-
-
-#include "../assert/myAssert.h"
-#include "../PMM/powerMgtModule.h"  // for assertions only
+#include "../../assert/myAssert.h"
+#include "../../PMM/powerMgtModule.h"  // for assertions only
 
 
 

@@ -1,4 +1,4 @@
-#include "../src/alarm/alarm.h"
+#include "../src/alarmClock/alarm/alarm.h"
 
 // DriverLib
 #include <pmm.h>

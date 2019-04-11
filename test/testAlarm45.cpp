@@ -1,4 +1,4 @@
-#include "../src/alarm/alarm.h"
+#include "../src/alarmClock/alarm/alarm.h"
 
 #include "../src/pinFunction/allPins.h"
 #include "../src/SoC/SoC.h"

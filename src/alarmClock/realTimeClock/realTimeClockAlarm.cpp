@@ -8,16 +8,18 @@
 #include "realTimeClock.h"
 
 #include "RTCInterface.h"
-#include "../softFault/softFault.h"
-
 #include "../time/timeConverter.h"
 
-#include "../driverParameters.h"   // MaxPracticalAlarmDuration
+#include "../../softFault/softFault.h"
+
+
+
+#include "../../driverParameters.h"   // MaxPracticalAlarmDuration
 
 /*
  * Circular dependency: some RTC methods depend on EpochClock methods which depends on other RTC methods.
  */
-#include "epochClock/epochClock.h"
+#include "../epochClock/epochClock.h"
 
 
 
