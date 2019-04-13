@@ -5,12 +5,13 @@
 
 namespace {
 
+#define LOG_COUNT 8
 /*
  * Both the data and index are persistent.
  * Never overwritten except by program load.
  */
 #pragma PERSISTENT
-unsigned int logData[4] = {0,0,0,0};
+unsigned int logData[LOG_COUNT] = {0,0,0,0,0,0,0,0};
 
 #pragma PERSISTENT
 unsigned int logIndex = 0;
@@ -19,7 +20,7 @@ unsigned int logIndex = 0;
 
 
 void Logger::log(unsigned int value) {
-    if ( logIndex < 4) {
+    if ( logIndex < LOG_COUNT) {
         logData[logIndex] = value;
         logIndex++;
     }
