@@ -3,9 +3,10 @@
 
 #include <msp430.h>
 
-#include "../assert/myAssert.h"
+#include "../softFault/softFault.h"
+//#include "../assert/myAssert.h"
 
-#include "../logger/logger.h"
+//#include "../logger/logger.h"
 
 /*
  * Called when the system is newly reset.
@@ -66,7 +67,7 @@ bool ResetReason::isResetAWakeFromSleep() {
       break;
 
     // Expected
-    case SYSRSTIV_BOR:     // power up
+    case SYSRSTIV_BOR:     // power up from near zero volts (below 0.1V)
     case SYSRSTIV_RSTNMI:  // RST/NMI pin reset e.g. from debug probe
         break;
 
@@ -82,6 +83,14 @@ bool ResetReason::isResetAWakeFromSleep() {
     /*
      * All the rest are unexpected.
      */
+
+    // Brownout
+      // TODO since SVSH is off during sleep
+      // will we get this during sleep?
+      // we could also get this while awake, if we brownout and recover from it.
+      // Maybe it should be treated as a normal cold reset.
+    case SYSRSTIV_SVSHIFG:
+
     // Security. Accessing BSL that is protected. Probably wild memory access.
     case SYSRSTIV_SECYV:     // Security violation
 
@@ -108,8 +117,7 @@ bool ResetReason::isResetAWakeFromSleep() {
 
     default:
         // Log unexpected reset
-        Logger::log(13);
-        myAssert(false);
+        SoftFault::failHandleResetReason(resetReason);
         break;
     }
   }

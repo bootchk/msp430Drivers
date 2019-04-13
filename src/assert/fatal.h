@@ -7,6 +7,27 @@
  * Specific to a dev board.
  */
 
+/*
+ * Each log entry is one or two words.
+ * One is always one of these codes.
+ * The other word (may precede the code) is more information.
+ */
+enum class FailCode {
+    HWFault,    // HW bus error e.g. VMA
+
+    Assert,      // assertion false,  Also logs line number.
+
+    // SW detected unrecoverable error
+    SWFaultSetAlarm,
+    SWFaultClearAlarm,
+    SWFaultReadTime,
+    SWFaultDetectLight,
+    SWUnhandledReset,   // Also logs resetReason
+
+    // SW detected, info about dire situation.  Also logs an info code
+    SWInfo
+};
+
 
 class Fatal {
 
@@ -36,13 +57,13 @@ public:
 
     // Attempt to break into the debugger, then infinite loop.
 
-    static void stop(unsigned int);
+    static void stop(FailCode);
     /*
      * Fatal conditions
      */
     // Discovered in ordinary code
     // Call comes from programmer written error checking that is never removed from build.
-    static void fatalSWFault();
+    static void fatalSWFault(FailCode);
 
     // Discovered by CPU e.g. bus error or vacant memory address
     // Call comes from the NMI ISR

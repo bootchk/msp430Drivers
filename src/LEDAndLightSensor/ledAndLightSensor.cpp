@@ -2,7 +2,7 @@
 #include "ledAndLightSensor.h"
 #include "../driverParameters.h"
 
-#include "../assert/fatal.h"
+#include "../softFault/softFault.h"
 
 
 namespace {
@@ -130,9 +130,9 @@ void LEDAndLightSensor::calibrateInLightOrReset() {
         /*
          * Seems like this was called when it is dark.
          * It took more iterations to discharge capacitance than should be.
+         * We can't proceed unless we can detect light.
          */
-        // FUTURE not SW but operating
-        Fatal::fatalSWFault();
+        SoftFault::failDetectLight();
     }
     else {
         // Save calibrated reference value

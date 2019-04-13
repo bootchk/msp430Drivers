@@ -76,14 +76,14 @@ void Fatal::fatalAssert(unsigned int line) { reboot(line); }
  * We could call assert, but the definition provided by TI attempts to write() to the host and calls abort().
  * We don't want to drag in write().
  */
-void Fatal::stop(unsigned int logCode) {
+void Fatal::stop(FailCode logCode) {
 
 
     /*
      * If we are in the debugger, logging is not necessary.
      * But if we are not now in debugger, log so we can connect later and read the code.
      */
-    Logger::log(logCode);
+    Logger::log(static_cast<unsigned int> (logCode));
 
     /*
      * Break into the debugger (aka BKPT) if it is running, else NOP.
@@ -100,9 +100,12 @@ void Fatal::stop(unsigned int logCode) {
 }
 
 
-void Fatal::fatalHWFault()                 { stop(1); }
-void Fatal::fatalSWFault()                 { stop(2); }
-void Fatal::fatalAssert(unsigned int line) { stop(3); }
+void Fatal::fatalHWFault()                 { stop(FailCode::HWFault); }
+void Fatal::fatalSWFault(FailCode code)                 { stop(code); }
+void Fatal::fatalAssert(unsigned int line) {
+    Logger::log(line);
+    stop(FailCode::Assert);
+}
 
 #endif
 
