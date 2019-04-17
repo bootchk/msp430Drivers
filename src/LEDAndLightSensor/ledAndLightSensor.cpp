@@ -13,7 +13,26 @@ namespace {
 #pragma PERSISTENT
 unsigned int referenceLightSensorDarkCount = 0;
 
+
+unsigned int sampleInLightOrReset() {
+    unsigned int sample;
+
+        sample = LEDAndLightSensor::measureLight();
+
+        if (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance) {
+            /*
+             * Seems like this was called when it is dark.
+             * It took more iterations to discharge capacitance than should be.
+             * We can't proceed unless we can detect light.
+             */
+            SoftFault::failDetectLight();
+        }
+        else {
+            return sample;
+        }
 }
+
+}   // namespace
 
 
 
@@ -50,6 +69,8 @@ bool LEDAndLightSensor::isNighttimeDark() {
     sample = measureLight();
 
     /*
+     * Sample is an int <= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
+     *
      * Greater value is dark.
      * Discharge is through the LED as solar cell generated current.
      * That current is greater in illumination, and discharges quickly, in fewer cycles of loop.
@@ -59,16 +80,17 @@ bool LEDAndLightSensor::isNighttimeDark() {
      * Compare to a defined constant less than max iterations.
      */
     // OLD return (sample >= DriverConstant::MinItersInLightToDischargeLEDCapacitance );
+
     /*
      * Compare to the max iterations, also a defined constant.
      */
-    //OLD return (sample >= referenceLightSensorDarkCount );
+    //OLD return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
 
     /*
-     * NOW: compare to run-time calibrated value
+     * NOW: compare to run-time calibrated value OR the max iterations
      */
     return (sample >= referenceLightSensorDarkCount
-            or sample >= referenceLightSensorDarkCount
+            or sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
             );
 }
 
@@ -122,23 +144,20 @@ unsigned int LEDAndLightSensor::measureByBleeding() {
 
 
 void LEDAndLightSensor::calibrateInLightOrReset() {
-    unsigned int sample;
 
-    sample = measureLight();
+    unsigned int sampleSum = 0;
 
-    if (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance) {
-        /*
-         * Seems like this was called when it is dark.
-         * It took more iterations to discharge capacitance than should be.
-         * We can't proceed unless we can detect light.
-         */
-        SoftFault::failDetectLight();
+    // sum two samples
+    for(int i=2; i>0; i--) {
+        unsigned int sample;
+        // May reset, never return
+        sample = sampleInLightOrReset();
+        sampleSum += sample;
     }
-    else {
-        // Save calibrated reference value
-        referenceLightSensorDarkCount = sample + 50;
-        // TODO magic number 50
-    }
+
+    // Calculate average plus factor.
+    // Save calibrated reference value to persistent memory
+    referenceLightSensorDarkCount = sampleSum/2 + DriverConstant::DarkFactorLEDDischargeCount;
 
 }
 

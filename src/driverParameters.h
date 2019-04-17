@@ -42,6 +42,13 @@ static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
 
 
 /*
+ * Factor added to light sample to indicate dark.
+ * Typically, in light discharge count is about 100.
+ * Max iterations is 200.
+ */
+static const unsigned int DarkFactorLEDDischargeCount = 70;
+
+/*
  * 50kbps seems to work with internal pullups of 30kohm and jumpers less than an inch.
  *
  * 400kbps is "fast mode".  Requires external pullups
