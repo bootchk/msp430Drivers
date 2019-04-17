@@ -4,12 +4,21 @@
 #include <msp430.h>
 
 #include "../softFault/softFault.h"
-//#include "../assert/myAssert.h"
 
-//#include "../logger/logger.h"
 
 /*
- * Called when the system is newly reset.
+ * Called when the system is newly reset (coming out of reset.)
+ *
+ * Dispatch on the HW provided reset reason.
+ *
+ * Dispatch into three cases:
+ * 1 wake from LPM4.5 SYSRSTIV_LPM5WU:
+ * 2 other resets
+ * -- cold reset (from Vcc <0.1V) SYSRSTIV_BOR
+ * -- debugger reset (from pin NotReset) SYSRSTIV_RSTNMI
+ * -- SW initiated reset (failed assert) SYSRSTIV_DOBOR
+ * -- Brownout recovery reset
+ *
  * GPIO is locked. and GPIO to say LED's can't be used (unless you unlock and configure.)
  */
 
@@ -61,10 +70,14 @@ bool ResetReason::isResetAWakeFromSleep() {
       done = true;  // stop loop - all reset reasons are cleared
       break;
 
-    // Expected
+
+
+    // Expected, wake from LPM45
     case SYSRSTIV_LPM5WU:
       result = true;
       break;
+
+
 
     // Expected
     case SYSRSTIV_BOR:     // power up from near zero volts (below 0.1V)
@@ -76,20 +89,23 @@ bool ResetReason::isResetAWakeFromSleep() {
     case SYSRSTIV_DOBOR:   // software initiated
       break;
 
-
+     /*
+      * Brownout
+      * We set SVSH off during LPM4.5 sleep, so we were NOT sleeping.
+      * Thus last system state was executing:
+      * - infinite loop for an assert
+      * - normal execution (trying, but failing to conserve power.
+      * Treat it like cold reset: initialize system, without logging.
+      */
+     case SYSRSTIV_SVSHIFG:
+         break;
 
 
 
     /*
      * All the rest are unexpected.
+     * Log them so they can be debugged.
      */
-
-    // Brownout
-      // TODO since SVSH is off during sleep
-      // will we get this during sleep?
-      // we could also get this while awake, if we brownout and recover from it.
-      // Maybe it should be treated as a normal cold reset.
-    case SYSRSTIV_SVSHIFG:
 
     // Security. Accessing BSL that is protected. Probably wild memory access.
     case SYSRSTIV_SECYV:     // Security violation
