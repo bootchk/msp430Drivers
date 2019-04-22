@@ -18,7 +18,7 @@ namespace {
  * In other words, Lamport's Rule is not used to set the alarm
  * (Lamport's rule: set alarm, then check that clock has not ticked and alarm is thus in the past.)
  *
- * C startup clears this each wake period
+ * C startup clears this each wake period, since wake is a reset that does C startup
  */
 EpochTime timeNow = 0;
 

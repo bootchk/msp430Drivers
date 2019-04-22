@@ -14,7 +14,7 @@
  * See also AB08xx/rtcTime.h for RTCTime
  */
 
-typedef struct  {
+struct  CalendarTime {
   unsigned char Second;
   unsigned char Minute;
   unsigned char Hour;
@@ -22,7 +22,7 @@ typedef struct  {
   unsigned char Day;
   unsigned char Month;
   unsigned char Year;   // offset from 1970;
-} CalendarTime;
+} ;
 
 
 // unsigned char Wday;   // day of week, sunday is day 1
@@ -33,6 +33,7 @@ typedef struct  {
  *
  * On most embedded machines, 32 bits, suffers from 2038 problem.
  */
+// FUTURE struct with subtraction operator yielding Duration
 typedef unsigned long EpochTime;
 
 
@@ -53,9 +54,36 @@ typedef unsigned long EpochTime;
  */
 //typedef unsigned long Duration;
 
-typedef struct {
+struct Duration {
     unsigned long seconds;
-} Duration;
+
+    /*
+     * ???
+     */
+    //constexpr Duration() = default;
+
+    /*
+     * default + parameterized constructor
+     */
+    Duration(unsigned long seconds = 0) :
+            seconds(seconds)
+    {
+    }
+
+    /*
+     * subtraction operator. Doesn't modify object, therefore const.
+     *
+     * Operand "a" must be less than operand "this".
+     * Otherwise, overflow on unsigned arithmetic (yielding a very large number)
+     */
+    Duration operator-(const Duration& a) const
+    {
+        if (a.seconds > seconds)
+            return Duration(0);
+        else
+           return Duration(seconds - a.seconds);
+    }
+} ;
 
 /*
  * Snippets trying to fix primitive obsession i.e. eliminate convertability  EpochTime from Duration types.

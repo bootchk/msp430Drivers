@@ -78,6 +78,13 @@ EpochTime RTC::timeNowOrReset() {
  * - absolute maximum duration: duration cannot be so large that now + duration > clock max
  * - practical max duration: duration cannot be greater than a practical limit defined by the application
  *
+ *
+ * Minimum duration is two seconds.
+ * The code real time guarantees we get to sleep in less than one second.
+ * But Lamport's Rule could be violated unless minimum durations is an additional seconds (total of two seconds.)
+ * Implementing Lamport's Rule would read the clock after setting alarm to insure clock is not beyond what we read earlier.
+ * In lieu of implementing Lamport's Rule, we bump the duration to a minimum of two seconds.
+ *
  * Maximum duration:
  * the epoch clock is 32-bits and would roll over after centuries.
  * The duration is also 32-bits and could cause alarm to be past the clock max,
@@ -89,11 +96,6 @@ EpochTime RTC::timeNowOrReset() {
  * Purpose for checking practical max duration:
  * - catch software errors in calculating duration.
  * - enforce absolute maximum duration (see above)
- *
- * FUTURE check minimum duration
- * For now, the minimum duration (enforced by the int type) is one second,
- * and assume that sleep follows setAlarm by much less than one second.
- * !!! But Lamport's Rule could be violated unless minimum durations is two seconds.
  *
  * Implementation is largely converting type (RTCTime) that RTC delivers
  * to type EpochTime (seconds since epoch) so we can use simple math to add Duration
@@ -110,6 +112,9 @@ bool RTC::setAlarmDuration(Duration duration) {
 	bool result;
 
 	EpochTime alarmEpochTime;
+
+	// Quietly enforce a minimum by bumping upwards
+	if (duration.seconds < 2) duration.seconds = 2;
 
 	if (duration.seconds > DriverConstant::MaxPracticalAlarmDuration) return false;
 

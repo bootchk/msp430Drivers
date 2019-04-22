@@ -86,6 +86,11 @@ bool Alarm::isRTCReady() {
  * Must be bulletproof since if alarm is failed to set, may sleep forever.
  */
 bool Alarm::setAlarmDurationSecondsFromNow(Duration duration) {
+
+    /*
+     * Does not require (duration >=0).  It will bump duration to 2 if less than 2.
+     * Does not require duration < DriverConstant::MaxPracticalAlarmDuration), will return false if so.
+     */
 	bool result;
 
 	myAssert(isConfiguredForAlarming());
@@ -93,6 +98,7 @@ bool Alarm::setAlarmDurationSecondsFromNow(Duration duration) {
 	// delegate to RTC
 	result = RTC::setAlarmDuration(duration);
 
+	// We enable interrupt even if alarm was not set, but caller should handle.
 	// Clear interrupt flag and enable at last moment
 	AlarmPin::enableInterrupt();
 
