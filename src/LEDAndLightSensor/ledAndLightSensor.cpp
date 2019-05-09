@@ -50,7 +50,9 @@ unsigned int LEDAndLightSensor::measureLight() {
     // Configure p side as input
     toMeasuringFromReversed();
 
-    result = measureByBleeding();
+    // Choice of implementation
+    // result = measureCapacitanceDischargeIteratively();
+    result = measureCapacitanceDischargeSleeping();
 
     toOffFromMeasuring();
 
@@ -98,50 +100,6 @@ bool LEDAndLightSensor::isNighttimeDark() {
 
 
 
-/*
- * Low power considerations:
- * the loop body takes tens of instructions.
- * The CPU is active during the loop.
- * We want to minimize the max loop iterations to minimize power consumed.
- *
- * We also want to minimize time spent in loop body.
- * That makes the count a larger number.
- * We can make the loop tighter by counting down.
- */
-unsigned int LEDAndLightSensor::measureByBleeding() {
-    unsigned int result;
-
-
-    // 30000 is a wildly safe value to use
-    //for ( result = 0; result < DriverConstant::MaxItersInDarkToDischargeLEDCapacitance; result++) {
-    for ( result = DriverConstant::MaxItersInDarkToDischargeLEDCapacitance; result > 0; result--) {
-
-        // If LED as input is low, break (i.e. charge is dissipated.)
-#ifdef UNROLL_LIGHT_SENSE_LOOP
-        // hardcoded, no function call
-        // This gives more resolution in the result (higher numbers)
-        if (not (P1IN & BIT7)) break;
-#else
-        if (isLow())
-            break;
-#endif
-    }
-    // assert 0 <= result <= MaxItersInDarkToDischargeLEDCapacitance
-    // assert result is larger if environment is illuminating LED
-
-    /*
-     * Return the number of iterations.
-     * Since loop index is counting down, subtract
-     */
-    return DriverConstant::MaxItersInDarkToDischargeLEDCapacitance - result;
-    // assert state still measuring
-
-    // assert result is small number (<MaxItersInDarkToDischargeLEDCapacitance) if environment is illuminating LED as light sensor
-    // else result == MaxItersInDarkToDischargeLEDCapacitance
-}
-
-
-
 
 void LEDAndLightSensor::calibrateInLightOrReset() {
 
@@ -158,7 +116,4 @@ void LEDAndLightSensor::calibrateInLightOrReset() {
     // Calculate average plus factor.
     // Save calibrated reference value to persistent memory
     referenceLightSensorDarkCount = sampleSum/2 + DriverConstant::DarkFactorLEDDischargeCount;
-
 }
-
-

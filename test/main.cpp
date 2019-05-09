@@ -29,10 +29,10 @@ int main(void)
 	//testCompass2();
 	//testAlarm();
     //testAlarm2();
-    testAlarmLPM45();
+    //testAlarmLPM45();
 	//testTimer();
 	//testLEDSensor();
-    //testLEDSensor2();
+    testLEDSensor2();
     //testStepperDriver();
 	//testLogging();
 }

@@ -8,7 +8,7 @@
 #include "../driverConfig.h"    // choose implementation
 
 #ifdef LOW_POWER_TIMER_USE_RTC
-#include "countdownTimer.h"
+#include "../timer/counter.h"
 #else
 #include "intervalTimer.h"
 #endif
@@ -46,9 +46,9 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     VeryLowOscillator::start();
 
     // Init RTC each time
-    CountdownTimer::init(ticks);
+    Counter::init(ticks);
 
-    CountdownTimer::start();
+    Counter::start();
 
     // Enter low power until interrupt for RTC.
     // Does not return until RTC interrupt.
@@ -60,7 +60,7 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     // shutdown resources(
     // Let VLO stop when RTC stops using it
     VeryLowOscillator::allowOff();
-    CountdownTimer::stop();
+    Counter::stop();
 
     // Assert VLO clock is off and RTC counter is off
 }

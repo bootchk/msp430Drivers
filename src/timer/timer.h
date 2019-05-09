@@ -38,16 +38,20 @@ class LowPowerTimer {
 public:
 
     /*
+     * Does not return until duration is elapsed.
+     *
+     * Is LPM3 mostly until returns.
+     *
      * Ensures postcondition clock and module are off, or allowed to go off.
      * E.G. VLO and RTC   or VLO and WDT interval timer
      */
     static void delayTicksOf100uSec(unsigned int);
 
-    static void delaySecond();
 
     // Can be convenience functions that call the above.
     // Depends on implementation
     static void delayFiveSeconds();
+    static void delaySecond();
     static void delayHalfSecond();
     static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();

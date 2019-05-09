@@ -37,9 +37,10 @@ static const unsigned int MinItersInLightToDischargeLEDCapacitance = 100;
  * See the code for sensing light.
  * We count up.  This value should be only about ten percent higher than the above value.
  */
-static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
-// FOR TESTING static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 1000;
-
+//static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
+// FOR TESTING
+static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 20000;
+static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 5000;   // 0.5 seconds
 
 /*
  * Factor added to light sample to indicate dark.

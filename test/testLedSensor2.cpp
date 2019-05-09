@@ -2,6 +2,8 @@
 // DriverLib
 #include <pmm.h>
 
+#include "../src/SoC/SoC.h"
+
 #include "../src/LEDAndLightSensor/ledAndLightSensor.h"
 
 #include "../src/assert/myAssert.h"
@@ -21,10 +23,15 @@ void lightLED() {
      LEDAndLightSensor::toOffFromOn();
 }
 
+unsigned int sample;
 
 
 void testLEDSensor2()
 {
+    // !!!
+    SoC::disableFRAMWriteProtect();
+
+
     PMM_unlockLPM5();
 
     // Configure
@@ -34,7 +41,9 @@ void testLEDSensor2()
     lightLED();
 
     // Require this test start in light conditions.
-    // Thus if sensor indicates dark, sensor must be calibrated wrong.
+    LEDAndLightSensor::calibrateInLightOrReset();
+
+    // If sensor indicates dark, sensor must be calibrated wrong.
     myAssert(not LEDAndLightSensor::isNighttimeDark());
 
 
@@ -47,6 +56,8 @@ void testLEDSensor2()
     {
         // One second
         __delay_cycles(1000000);
+
+        sample = LEDAndLightSensor::measureLight();
 
         // purpose of test
         if (not LEDAndLightSensor::isNighttimeDark() ) {

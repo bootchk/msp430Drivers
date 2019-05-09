@@ -15,6 +15,13 @@
  * Some are public, most are private.
  */
 
+
+
+
+/*
+ * Functions on the P side pin (the measuring side.)
+ */
+
 bool LEDAndLightSensor::isLow() {
     unsigned char value;
 
@@ -22,6 +29,21 @@ bool LEDAndLightSensor::isLow() {
     /// assert value is 0 or 1
    return (  value == GPIO_INPUT_PIN_LOW );
 }
+
+
+void LEDAndLightSensor::enableLowInterrupt() {
+    // require configured input
+    GPIO_selectInterruptEdge(NSideLEDPort, NSideLEDPin, GPIO_HIGH_TO_LOW_TRANSITION);
+    GPIO_enableInterrupt(NSideLEDPort, NSideLEDPin);
+}
+
+void LEDAndLightSensor::disableLowInterrupt() { GPIO_disableInterrupt(NSideLEDPort, NSideLEDPin); }
+
+void LEDAndLightSensor::clearInterrupt() { GPIO_clearInterrupt(NSideLEDPort, NSideLEDPin); }
+
+
+
+
 
 
 /*

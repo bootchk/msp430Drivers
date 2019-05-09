@@ -26,13 +26,19 @@ private:
 
     static void toMeasuringFromReversed();
 
-    static unsigned int measureByBleeding();
+    static unsigned int measureCapacitanceDischargeIteratively();
+    static unsigned int measureCapacitanceDischargeSleeping();
 
     static void toOffFromMeasuring();
 
     static bool isLow();
+    static void enableLowInterrupt();
+    static void disableLowInterrupt();
 
 public:
+    // Public so ISR can clear it
+    static void clearInterrupt();
+
     /*
      * LED function
      */
@@ -69,6 +75,8 @@ public:
      * Understands what measurements are nighttime dark.
      * WAS in relation to a constant.
      * NOW in relation to calibrated reference value.
+     *
+     * Requires prior call to calibrateInLightOrReset
      */
     static bool isNighttimeDark();
 };

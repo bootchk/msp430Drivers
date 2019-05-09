@@ -25,6 +25,14 @@ public:
     static void initForIntervalOfOneSecond();
     static void initForIntervalOfTenMillisecond();
 
+    /*
+     * Returns immediately.
+     */
     static void start();
+
+    /*
+     * Does not guarantee that interrupt has not fired.
+     * Ensures that if not already fired, will not fire.
+     */
     static void stop();
 };
