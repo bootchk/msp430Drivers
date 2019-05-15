@@ -44,7 +44,7 @@ void testLEDSensor2()
     LEDAndLightSensor::calibrateInLightOrReset();
 
     // If sensor indicates dark, sensor must be calibrated wrong.
-    myAssert(not LEDAndLightSensor::isNighttimeDark());
+    myAssert(not LEDAndLightSensor::isNightDark());
 
 
     /*
@@ -60,7 +60,7 @@ void testLEDSensor2()
         sample = LEDAndLightSensor::measureLight();
 
         // purpose of test
-        if (not LEDAndLightSensor::isNighttimeDark() ) {
+        if (not LEDAndLightSensor::isNightDark() ) {
             // lightLED();
         }
     }

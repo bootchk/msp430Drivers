@@ -56,7 +56,7 @@ void testLEDSensor()
 
 
         // purpose of test
-        if (not LEDAndLightSensor::isNighttimeDark() ) {
+        if (not LEDAndLightSensor::isNightDark() ) {
             LEDAndLightSensor::toOnFromOff();
             __delay_cycles(10000);
             LEDAndLightSensor::toOffFromOn();

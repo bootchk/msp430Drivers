@@ -13,6 +13,21 @@
  *    Reversed  LED reversed biased low  pSideLED  ->|-  nSideLED high
  *    Measuring LED                 low  pSideLED  ->|-  nSideLED input
  */
+/*
+ * Choice of implementation: see .cpp
+ * I found that it takes a long time to detect extreme dark
+ * (doesn't take long to detect moderate dark).
+ * The sleeping implementation uses less power.
+ * So if you want to detect extreme dark, and want less power usage, use the sleeping implementation.
+ *
+ * When implementation uses sleeping,
+ * requires ISR for both GPIO and Counter, that simply clear their flags and exit sleep.
+ * These ISR's are NOT in the project (but examples are in /test)
+ * and are usually in a higher project.
+ *
+ * When implementation uses sleeping,
+ * some methods (e.g. measureLight) may not return for seconds, when it is dark!!!!
+ */
 
 
 
@@ -67,16 +82,17 @@ public:
      * Requires in Off state, and ensures in Off state.
      *
      * Return value indicates light level.
-     * Low value means high illumination to LED
+     * Low value means high illumination to LED.
      */
     static unsigned int measureLight();
 
     /*
-     * Understands what measurements are nighttime dark.
+     * Understands what measurements are dark.
      * WAS in relation to a constant.
      * NOW in relation to calibrated reference value.
      *
      * Requires prior call to calibrateInLightOrReset
      */
-    static bool isNighttimeDark();
+    static bool isNightDark();
+    static bool isTwilightDark();
 };

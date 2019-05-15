@@ -73,7 +73,7 @@ void testAlarmLPM45()
 #endif
 #ifdef CHECK_LIGHT
         // discard result
-        (void) LEDAndLightSensor::isNighttimeDark();
+        (void) LEDAndLightSensor::isNightDark();
 #endif
     }
     else {

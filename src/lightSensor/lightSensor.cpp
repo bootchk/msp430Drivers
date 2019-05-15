@@ -13,7 +13,7 @@
  */
 bool LightSensor::isDark() {
     // return isDarkFromLEDLightSensorUsingADC();
-    return LEDAndLightSensor::isNighttimeDark();
+    return LEDAndLightSensor::isNightDark();
 }
 
 

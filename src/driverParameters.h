@@ -39,8 +39,16 @@ static const unsigned int MinItersInLightToDischargeLEDCapacitance = 100;
  */
 //static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 200;
 // FOR TESTING
-static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 20000;
-static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 5000;   // 0.5 seconds
+static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 50000;
+
+// Max duration of measuring light
+//static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 5000;   // 0.5 seconds
+static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 10000;   // 1 seconds
+
+// Experimentally determined ticks for LED capacitance to discharge in 10 lux.
+// Typically about 6k ticks were measured.
+static const unsigned int TicksInNightDarkToDischargeLEDCapacitance = 5000;
+
 
 /*
  * Factor added to light sample to indicate dark.

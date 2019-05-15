@@ -27,9 +27,7 @@ unsigned int sampleInLightOrReset() {
              */
             SoftFault::failDetectLight();
         }
-        else {
-            return sample;
-        }
+        return sample;
 }
 
 }   // namespace
@@ -51,7 +49,7 @@ unsigned int LEDAndLightSensor::measureLight() {
     toMeasuringFromReversed();
 
     // Choice of implementation
-    // result = measureCapacitanceDischargeIteratively();
+    //result = measureCapacitanceDischargeIteratively();
     result = measureCapacitanceDischargeSleeping();
 
     toOffFromMeasuring();
@@ -65,35 +63,41 @@ unsigned int LEDAndLightSensor::measureLight() {
 
 
 
-bool LEDAndLightSensor::isNighttimeDark() {
+
+
+/*
+ * Sample is an int <= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
+ *
+ * Greater value is dark.
+ * Discharge is through the LED as solar cell generated current.
+ * That current is greater in illumination, and discharges quickly, in fewer cycles of loop.
+
+ * Compare to a defined constant less than max iterations.
+ OLD return (sample >= DriverConstant::MinItersInLightToDischargeLEDCapacitance );
+
+ * Compare to the max iterations, also a defined constant.
+ OLD return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
+ */
+
+// Not used anymore?
+// Measuring twilight (100 lux) is different, requires calibrated sensor.
+bool LEDAndLightSensor::isTwilightDark() {
+    unsigned int sample;
+
+    sample = measureLight();
+    // NOW: compare to run-time calibrated value OR the max iterations
+    return (sample >= referenceLightSensorDarkCount
+                or sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
+                );
+}
+
+
+bool LEDAndLightSensor::isNightDark() {
     unsigned int sample;
 
     sample = measureLight();
 
-    /*
-     * Sample is an int <= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
-     *
-     * Greater value is dark.
-     * Discharge is through the LED as solar cell generated current.
-     * That current is greater in illumination, and discharges quickly, in fewer cycles of loop.
-     */
-
-    /*
-     * Compare to a defined constant less than max iterations.
-     */
-    // OLD return (sample >= DriverConstant::MinItersInLightToDischargeLEDCapacitance );
-
-    /*
-     * Compare to the max iterations, also a defined constant.
-     */
-    //OLD return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
-
-    /*
-     * NOW: compare to run-time calibrated value OR the max iterations
-     */
-    return (sample >= referenceLightSensorDarkCount
-            or sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
-            );
+    return (sample >= DriverConstant::TicksInNightDarkToDischargeLEDCapacitance);
 }
 
 
