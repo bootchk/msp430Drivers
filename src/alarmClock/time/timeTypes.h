@@ -85,6 +85,17 @@ struct Duration {
     }
 } ;
 
+
+
+/*
+ * Difference of two EpochTimes.
+ * Signed.
+ * Absolute value is a Duration.
+ *
+ * No enforcement of overflow.
+ */
+typedef signed int Interval;
+
 /*
  * Snippets trying to fix primitive obsession i.e. eliminate convertability  EpochTime from Duration types.
  *
