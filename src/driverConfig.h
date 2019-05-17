@@ -49,3 +49,11 @@
  */
 #define LOW_POWER_TIMER_USE_RTC 1
 //#define LOW_POWER_TIMER_USE_WDT 1
+
+
+
+/*
+ * LEDAndLightSensor implementation
+ */
+//#define LIGHT_SENSE_ITERATIVE
+#define LIGHT_SENSE_SLEEPING

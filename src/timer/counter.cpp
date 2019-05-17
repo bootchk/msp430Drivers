@@ -8,9 +8,15 @@
 
 namespace {
 
-// Indicates overflow interrupt occurred (resetting count register.)
+// Indicates overflow interrupt occurred.  Shared between ISR and this code.
 bool overflowFlag = false;
 
+/*
+ * Remember the parameter stored to modulo register.
+ * Not accessible otherwise since:
+ * - overflow resets the count register.
+ * - DriverLib hides modulo register
+ */
 unsigned int overflowCount;
 
 }

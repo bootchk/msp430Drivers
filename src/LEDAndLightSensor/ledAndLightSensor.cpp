@@ -1,5 +1,6 @@
 
 #include "ledAndLightSensor.h"
+#include "../driverConfig.h"
 #include "../driverParameters.h"
 
 #include "../softFault/softFault.h"
@@ -13,13 +14,28 @@ namespace {
 #pragma PERSISTENT
 unsigned int referenceLightSensorDarkCount = 0;
 
+#ifdef LIGHT_SENSE_SLEEPING
+bool isSampleIndicateLight(unsigned int sample) {
+    return (sample < DriverConstant::TicksInNightDarkToDischargeLEDCapacitance);
+}
+
+bool isSampleIndicateNightDark(unsigned int sample) {
+    return not isSampleIndicateLight(sample);
+}
+#endif
+// TODO ifdef LIGHT_SENSE_ITERATIVE use different parameters
+
+
+
 
 unsigned int sampleInLightOrReset() {
     unsigned int sample;
 
         sample = LEDAndLightSensor::measureLight();
 
-        if (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance) {
+        if ( isSampleIndicateNightDark(sample) ) {
+
+            // OLD sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance) {
             /*
              * Seems like this was called when it is dark.
              * It took more iterations to discharge capacitance than should be.
@@ -49,8 +65,11 @@ unsigned int LEDAndLightSensor::measureLight() {
     toMeasuringFromReversed();
 
     // Choice of implementation
-    //result = measureCapacitanceDischargeIteratively();
+#ifdef LIGHT_SENSE_ITERATIVE
+    result = measureCapacitanceDischargeIteratively();
+#else
     result = measureCapacitanceDischargeSleeping();
+#endif
 
     toOffFromMeasuring();
 
@@ -79,6 +98,7 @@ unsigned int LEDAndLightSensor::measureLight() {
  OLD return (sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance );
  */
 
+#ifdef LIGHT_SENSE_ITERATIVE
 // Not used anymore?
 // Measuring twilight (100 lux) is different, requires calibrated sensor.
 bool LEDAndLightSensor::isTwilightDark() {
@@ -90,20 +110,21 @@ bool LEDAndLightSensor::isTwilightDark() {
                 or sample >= DriverConstant::MaxItersInDarkToDischargeLEDCapacitance
                 );
 }
-
+#endif
 
 bool LEDAndLightSensor::isNightDark() {
     unsigned int sample;
 
     sample = measureLight();
 
-    return (sample >= DriverConstant::TicksInNightDarkToDischargeLEDCapacitance);
+    return isSampleIndicateNightDark(sample);
 }
 
 
 
 
 
+#ifdef LIGHT_SENSE_ITERATIVE
 
 void LEDAndLightSensor::calibrateInLightOrReset() {
 
@@ -121,3 +142,4 @@ void LEDAndLightSensor::calibrateInLightOrReset() {
     // Save calibrated reference value to persistent memory
     referenceLightSensorDarkCount = sampleSum/2 + DriverConstant::DarkFactorLEDDischargeCount;
 }
+#endif

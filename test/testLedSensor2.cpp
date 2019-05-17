@@ -41,7 +41,8 @@ void testLEDSensor2()
     lightLED();
 
     // Require this test start in light conditions.
-    LEDAndLightSensor::calibrateInLightOrReset();
+    // TODO for LIGHT_SENSE_ITERATIVE
+    // LEDAndLightSensor::calibrateInLightOrReset();
 
     // If sensor indicates dark, sensor must be calibrated wrong.
     myAssert(not LEDAndLightSensor::isNightDark());

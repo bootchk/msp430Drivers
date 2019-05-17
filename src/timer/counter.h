@@ -16,6 +16,7 @@ public:
     /*
      * Returns immediately.
      * Enables interrupt.
+     * Will continue to count and interrupt until stop() is called.
      */
     static void start();
 
