@@ -39,4 +39,9 @@ public:
 
     // called by ISR
     static void setOverflowFlag();
+
+    static void enableAndClearInterrupt();
+    // called by ISR
+    static void disableAndClearInterrupt();
+
 };

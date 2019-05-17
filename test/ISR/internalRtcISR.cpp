@@ -1,9 +1,6 @@
 
 #include <msp430.h> // RTC_VECTOR
 
-// Driverlib
-#include <rtc.h>
-
 // msp430Drivers
 #include "../../src/timer/counter.h"
 
@@ -24,7 +21,7 @@ __interrupt void RTC_ISR(void)
      * Any other reason would loop forever.
      * Alternatively, repetitively read RTCIV to clear all flags.
      */
-    RTC_clearInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT_FLAG);
+    Counter::disableAndClearInterrupt();
 
     /*
      * We don't do anything here except exit low power mode.

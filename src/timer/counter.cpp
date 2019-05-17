@@ -45,12 +45,20 @@ void Counter::init(unsigned int durationInTicks)
 
 
 
-void Counter::start() {
-    RTC_clearInterrupt(RTC_BASE,
-            RTC_OVERFLOW_INTERRUPT_FLAG);
+void Counter::enableAndClearInterrupt() {
+    RTC_clearInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT_FLAG);
 
-    RTC_enableInterrupt(RTC_BASE,
-            RTC_OVERFLOW_INTERRUPT);
+    RTC_enableInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT);
+}
+
+void Counter::disableAndClearInterrupt() {
+    RTC_disableInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT);
+    RTC_clearInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT_FLAG);
+}
+
+
+void Counter::start() {
+    enableAndClearInterrupt();
 
     RTC_start(RTC_BASE, RTC_CLOCKSOURCE_VLOCLK);
 

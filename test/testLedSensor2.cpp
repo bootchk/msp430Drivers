@@ -61,8 +61,8 @@ void testLEDSensor2()
         sample = LEDAndLightSensor::measureLight();
 
         // purpose of test
-        if (not LEDAndLightSensor::isNightDark() ) {
-            // lightLED();
+        if (LEDAndLightSensor::isNightDark() ) {
+            lightLED();
         }
     }
 }
