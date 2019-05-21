@@ -59,44 +59,47 @@ void LEDAndLightSensor::toOffFromUnconfigured() {
 
     GPIO_setAsOutputPin(NSideLEDPort,    NSideLEDPin);
     GPIO_setAsOutputPin(PSideLEDPort,    PSideLEDPin);
-    // assert N,P output
-    // assert N,P low
+    // assert N,P low output
 }
 
 
 void LEDAndLightSensor::toOnFromOff() {
-    // assert N,P are out
-    // assert N,P are low
+    // assert off:
+    // N,P low out
     GPIO_setOutputHighOnPin(PSideLEDPort,    PSideLEDPin);
-    // assert N low, P high
+    // assert on
+    // N low out
+    // P high out
 }
 
 
 void LEDAndLightSensor::toOffFromOn() {
-    // assert N,P are out
-    // assert N low, P high
+    // N low out
+    // P high out
     GPIO_setOutputLowOnPin(PSideLEDPort,    PSideLEDPin);
-    // assert N,P low
+    // assert off:
+    // N,P low out
 }
 
 
 void LEDAndLightSensor::toOffFromMeasuring() {
     // assert measuring:
-    // N is high but dir is input
-    // P low
-    // P output
+    // N is unknown(low or high) input
+    // P low output
     GPIO_setOutputLowOnPin(NSideLEDPort,    NSideLEDPin);
     GPIO_setAsOutputPin(NSideLEDPort,    NSideLEDPin);
-    // assert N,P low
-    // assert N,P output
+    // assert off:
+    // N, P low output
 }
 
 
 void LEDAndLightSensor::toReversedFromOff() {
-    // assert N,P output
-    // assert N,P low
+    // N low output
+    // P low output
     GPIO_setOutputHighOnPin(NSideLEDPort,    NSideLEDPin);
-    // assert N high, P low (reverse biased)
+    // assert reverse biased:
+    // N high output
+    // P low output
 }
 
 
@@ -109,7 +112,8 @@ void LEDAndLightSensor::toMeasuringFromReversed() {
     // More or less equivalent to hardcoded:   P1DIR &= ~BIT7;
     GPIO_setAsInputPin(NSideLEDPort,    NSideLEDPin);
 
-    // assert P output
-    // assert N input
-    // assert P low (N value is also high, but it is an input)
+    // assert measuring:
+    // P low output
+    // N probably high, input (out value is also high, but it is now an input)
+    // conceivably N could be low already
 }

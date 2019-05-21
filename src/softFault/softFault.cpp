@@ -29,8 +29,9 @@ void SoftFault::failHandleResetReason(unsigned int resetCode)   {
 void SoftFault::info(unsigned int infoCode)   {
     // infoCode is defined by application
     Logger::log(infoCode);
-    // Not fatal, but log the code that means previous log is info
+    // log the code that means previous log is info
     Logger::log(static_cast<unsigned int> (FailCode::SWInfo) );
+    // Not fatal, continues normal execution
 }
 
 

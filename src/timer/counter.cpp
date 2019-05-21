@@ -1,5 +1,6 @@
 
 #include "counter.h"
+#include "../assert/myAssert.h"
 
 
 // DriverLib
@@ -8,8 +9,8 @@
 
 namespace {
 
-// Indicates overflow interrupt occurred.  Shared between ISR and this code.
-bool overflowFlag = false;
+// Indicates overflow interrupt occurred.  Volatile: shared between ISR and this code.
+volatile bool overflowFlag = false;
 
 /*
  * Remember the parameter stored to modulo register.
@@ -17,7 +18,7 @@ bool overflowFlag = false;
  * - overflow resets the count register.
  * - DriverLib hides modulo register
  */
-unsigned int overflowCount;
+//unsigned int overflowCount;
 
 }
 
@@ -35,12 +36,14 @@ unsigned int overflowCount;
  */
 void Counter::init(unsigned int durationInTicks)
 {
-    overflowCount = durationInTicks;
+    //overflowCount = durationInTicks;
 
     RTC_init(
         RTC_BASE,
         durationInTicks,  // compare reg value at which will trigger interrupt
         RTC_CLOCKPREDIVIDER_1);
+    // assert predivider is set and clock is none and modulo register is set
+    // not assert counter is zero
 }
 
 
@@ -60,6 +63,10 @@ void Counter::disableAndClearInterrupt() {
 void Counter::start() {
     enableAndClearInterrupt();
 
+    /*
+     * This sets the clock source and resets the RTC.
+     * Resetting clears the counter and reloads the modulo register.
+     */
     RTC_start(RTC_BASE, RTC_CLOCKSOURCE_VLOCLK);
 
     overflowFlag = false;
@@ -67,19 +74,44 @@ void Counter::start() {
 
 
 void Counter::stop() {
-    // This DriverLib implementation sets the clock source to 00 which I presume means none, and RTC disabled?
+    // Not require running
+
+    // This DriverLib implementation of stop:
+    // sets the clock source to 00 which I presume means: none and RTC disabled?
+    // does not clear the counter (by setting RTCSR)
     RTC_stop(RTC_BASE);
 
-    // assert IFG already cleared
+    // assert IFG cleared by ISR if overflow occurred.
 
     RTC_disableInterrupt(RTC_BASE,
                 RTC_OVERFLOW_INTERRUPT);
+
+    // Not ensure counter is zero.
+    // RTC IFG is clear since ISR clears it.
 }
 
 
 unsigned int Counter::getCount() {
-    if (overflowFlag)  return overflowCount;
-    else return RTCCNT;
+    unsigned int result;
+
+
+
+    if (overflowFlag) {
+        // Require counter started with non-zero modulo
+        // myAssert( overflowCount > 0);
+        result = RTC_getModulo(RTC_BASE);
+    }
+    else {
+        // modified MSPWare
+        result = RTC_getCounter(RTC_BASE);
+        // RTCCNT;
+        /*
+         * Even if the interrupt we are timing is quick,
+         * the counter starts at 1 ???
+         */
+        myAssert( result > 0 );
+    }
+    return result;
 }
 
 // Called from ISR

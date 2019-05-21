@@ -1,6 +1,7 @@
 #include "ledAndLightSensor.h"
 #include "../driverParameters.h"
 #include "../timer/counter.h"
+#include "../assert/myAssert.h"
 
 #include <msp430.h> // LPM3 macro
 
@@ -38,31 +39,40 @@
 unsigned int LEDAndLightSensor::measureCapacitanceDischargeSleeping() {
     unsigned int result;
 
-    // Enable interrupt on low transition of my pin
+    // Enable interrupt on low transition of charged capacitance pin of LED
+    clearInterrupt();
     enableLowInterrupt();
 
     // Start a counter parallel to other process (capacitor discharging.)
     // Typically, 5000 ticks = 0.5 second, time to discharge Cree566 in 10 lux
     Counter::init(DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance);
     Counter::start();
+    // assert counter is near zero since start() clears it.
 
     // Enter low power until interrupt for pin low OR counter overflow.
     // Does not return until interrupt.
     // Since ISR exits low power, continues after this call.
+    // assert this enables GIE
     _low_power_mode_3();
     __no_operation();
 
     /*
      * One or both processes interrupted.
-     * If counter overflowed, result will be durationInTicks
-     *
-     * Counter is up, will be less than or equal to durationInTicks.
+     * Counter may still be counting and may yet interrupt.
+     * Pin may yet interrupt.
+     */
+
+    /*
+     * If counter overflowed, result will be maxDurationInTicks
      */
     result = Counter::getCount();
+    // Counter is up, will be less than or equal to maxDurationInTicks.
+    myAssert( (result>0) and (result<=DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance));
+
 
     disableLowInterrupt();
-    Counter::stop();
-
+    Counter::stop();    // disables interrupt
+    // assert Counter interrupt disabled
 
     return result;
 }

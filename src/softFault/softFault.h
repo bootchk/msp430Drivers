@@ -23,5 +23,7 @@ public:
     //
     static void failHandleResetReason(unsigned int resetCode);
 
+    // Logs without fail action (possible reset or break into debugger.)
+    // I.E. continues execution
     static void info(unsigned int infoCode);
 };
