@@ -88,13 +88,22 @@ struct Duration {
 
 
 /*
- * Difference of two EpochTimes.
+ * Difference of two EpochTimes, without constraint on order of EpochTimes (can be negative.)
  * Signed.
  * Absolute value is a Duration.
  *
- * No enforcement of overflow.
+ * No enforcement of overflow:
+ * my app deals in small time scale (a few days)
+ * compared to what EpochTime will represent (centuries)
+ *
+ * Since a day is > 86k seconds, this must be a long to hold more than a few days difference.
  */
-typedef signed int Interval;
+typedef signed long Interval;
+
+
+
+
+
 
 /*
  * Snippets trying to fix primitive obsession i.e. eliminate convertability  EpochTime from Duration types.
