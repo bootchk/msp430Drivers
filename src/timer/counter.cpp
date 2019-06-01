@@ -37,10 +37,11 @@ unsigned int overflowCount;
 void Counter::init(unsigned int durationInTicks)
 {
     /*
-     * Cannot be too short (with a fast clock) else not enough time to service interrupt.
-     * Arbitrarily 2.
+     * Can be arbitrarily short, but not zero (which makes no sense.)
+     * If too short and a fast clock, ISR and other code may delay actual service for event,
+     * IOW this is not a good solution for timing short events.
      */
-    myRequire(durationInTicks>2);
+    myRequire(durationInTicks>0);
     // Since unsigned int, durationInTicks < 65k
 
     // Redundant to modulo register
