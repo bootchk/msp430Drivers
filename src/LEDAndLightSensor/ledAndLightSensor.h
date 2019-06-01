@@ -37,8 +37,17 @@ class LEDAndLightSensor {
 
 private:
 
+    /*
+     * Reverse bias.
+     * This will charge capacitance of LED, and N pin will be high.
+     */
     static void toReversedFromOff();
 
+    /*
+     * Change N pin to an input.
+     * It was high, but will immediately start discharging capacitance to low.
+     * There is a race to enable interrupt before sleep.
+     */
     static void toMeasuringFromReversed();
 
     static unsigned int measureCapacitanceDischargeIteratively();
@@ -46,13 +55,24 @@ private:
 
     static void toOffFromMeasuring();
 
-    static bool isLow();
-    static void enableLowInterrupt();
-    static void disableLowInterrupt();
+    static bool isLEDNPinLow();
+
+    /*
+     * Enable interrupt of kind: high-to-low transition.
+     * GPIO interrupts are always edge triggered.
+     */
+    static void enableHighToLowInterruptFromLEDNPin();
+    // Disable any interrupt kind
+    static void disableLEDNPinInterrupt();
 
 public:
-    // Public so ISR can clear it
-    static void clearInterrupt();
+    /*
+     * Public so ISR can clear it.
+     *
+     * Depending on the interrupt edge, this does not guarantee that the flag remains clear.
+     * E.g. when the interrupt edge is "low" and the pin is still low, flag remains set.
+     */
+    static void clearLEDNPinInterruptFlag();
 
     /*
      * LED function

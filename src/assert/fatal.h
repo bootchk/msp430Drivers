@@ -13,6 +13,7 @@
  * The other word (may precede the code) is more information.
  */
 enum class FailCode {
+    // C++ enums start at value 0
     HWFault,    // HW bus error e.g. VMA
 
     Assert,      // assertion false,  Also logs line number.

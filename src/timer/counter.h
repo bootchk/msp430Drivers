@@ -1,12 +1,13 @@
 
 /*
  * Counts up to a given count and then interrupts.
- * May interrupt again since counter keeps going and will wrap.
- * But the duration til the second interrupt is not the same duration as the first interrupt.
+ * May interrupt again since overflow resets counter but keeps ticking.
  *
  * Device "RTC" on older MSP430.   Which is a countdown timer, not a calendar.
  *
  * !!! Shares RTC with Timer (which does blocking delays.)
+ *
+ * You can use the RTC without interrupts, but this does use interrupts.
  */
 
 class Counter {
@@ -25,9 +26,14 @@ public:
      * After overflow, this will return the durationInTicks (called "modulo value" in datasheet)
      * AKA the overflow value.
      *
-     * Between init() and start() should return 0?
+     * Between init() and start() result is undefined.
      *
-     * After start() and before overflow(), should return a value in range [0, durationInTicks]
+     * After start() and before overflow(), returns a value in range [0, durationInTicks].
+     * May return zero:
+     * - if you don't sleep between start() and getCount()
+     * - OR the interrupt which wakes sleep comes before counter can tick (about 100 machine cycles at 1Mhz cpu clock and 10khz counter clock.)
+     *
+     * Any assertion that the count is greater than zero must be enforced by caller.
      */
     static unsigned int getCount();
 
@@ -40,8 +46,8 @@ public:
     // called by ISR
     static void setOverflowFlag();
 
-    static void enableAndClearInterrupt();
+    static void enableAndClearOverflowInterrupt();
     // called by ISR
-    static void disableAndClearInterrupt();
+    static void disableAndClearOverflowInterrupt();
 
 };

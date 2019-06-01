@@ -22,7 +22,7 @@
  * Functions on the P side pin (the measuring side.)
  */
 
-bool LEDAndLightSensor::isLow() {
+bool LEDAndLightSensor::isLEDNPinLow() {
     unsigned char value;
 
     value = GPIO_getInputPinValue(NSideLEDPort, NSideLEDPin);
@@ -31,15 +31,23 @@ bool LEDAndLightSensor::isLow() {
 }
 
 
-void LEDAndLightSensor::enableLowInterrupt() {
+void LEDAndLightSensor::enableHighToLowInterruptFromLEDNPin() {
     // require configured input
+
+    /*
+     * If pin already low, this sets IFG.  See "Interrupt Edge Select Registers"
+     */
     GPIO_selectInterruptEdge(NSideLEDPort, NSideLEDPin, GPIO_HIGH_TO_LOW_TRANSITION);
+
+    /*
+     * Since GIE is not enabled, will not interrupt.
+     */
     GPIO_enableInterrupt(NSideLEDPort, NSideLEDPin);
 }
 
-void LEDAndLightSensor::disableLowInterrupt() { GPIO_disableInterrupt(NSideLEDPort, NSideLEDPin); }
+void LEDAndLightSensor::disableLEDNPinInterrupt() { GPIO_disableInterrupt(NSideLEDPort, NSideLEDPin); }
 
-void LEDAndLightSensor::clearInterrupt() { GPIO_clearInterrupt(NSideLEDPort, NSideLEDPin); }
+void LEDAndLightSensor::clearLEDNPinInterruptFlag() { GPIO_clearInterrupt(NSideLEDPort, NSideLEDPin); }
 
 
 

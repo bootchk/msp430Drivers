@@ -7,18 +7,18 @@
 #include <rtc.h>
 
 
-namespace {
+namespace  {
 
 // Indicates overflow interrupt occurred.  Volatile: shared between ISR and this code.
 volatile bool overflowFlag = false;
 
 /*
  * Remember the parameter stored to modulo register.
- * Not accessible otherwise since:
- * - overflow resets the count register.
- * - DriverLib hides modulo register
+ *
+ * DriverLib hides modulo register but I modified DriverLib to make it accessible.
+ * But
  */
-//unsigned int overflowCount;
+unsigned int overflowCount;
 
 }
 
@@ -36,7 +36,15 @@ volatile bool overflowFlag = false;
  */
 void Counter::init(unsigned int durationInTicks)
 {
-    //overflowCount = durationInTicks;
+    /*
+     * Cannot be too short (with a fast clock) else not enough time to service interrupt.
+     * Arbitrarily 2.
+     */
+    myRequire(durationInTicks>2);
+    // Since unsigned int, durationInTicks < 65k
+
+    // Redundant to modulo register
+    overflowCount = durationInTicks;
 
     RTC_init(
         RTC_BASE,
@@ -48,24 +56,24 @@ void Counter::init(unsigned int durationInTicks)
 
 
 
-void Counter::enableAndClearInterrupt() {
+void Counter::enableAndClearOverflowInterrupt() {
     RTC_clearInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT_FLAG);
 
     RTC_enableInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT);
 }
 
-void Counter::disableAndClearInterrupt() {
+void Counter::disableAndClearOverflowInterrupt() {
     RTC_disableInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT);
     RTC_clearInterrupt(RTC_BASE, RTC_OVERFLOW_INTERRUPT_FLAG);
 }
 
 
 void Counter::start() {
-    enableAndClearInterrupt();
+    enableAndClearOverflowInterrupt();
 
     /*
      * This sets the clock source and resets the RTC.
-     * Resetting clears the counter and reloads the modulo register.
+     * Resetting clears the counter and reloads the shadow reg from modulo register.
      */
     RTC_start(RTC_BASE, RTC_CLOCKSOURCE_VLOCLK);
 
@@ -83,34 +91,36 @@ void Counter::stop() {
 
     // assert IFG cleared by ISR if overflow occurred.
 
-    RTC_disableInterrupt(RTC_BASE,
-                RTC_OVERFLOW_INTERRUPT);
+    disableAndClearOverflowInterrupt();
 
     // Not ensure counter is zero.
-    // RTC IFG is clear since ISR clears it.
+    // RTC IFG is clear
 }
 
 
 unsigned int Counter::getCount() {
     unsigned int result;
 
-
-
     if (overflowFlag) {
+        /*
+         * Overflow occurred.
+         * RTC reset counter to zero and reloaded shadow register.
+         */
         // Require counter started with non-zero modulo
-        // myAssert( overflowCount > 0);
         result = RTC_getModulo(RTC_BASE);
     }
     else {
         // modified MSPWare
-        result = RTC_getCounter(RTC_BASE);
-        // RTCCNT;
+        result = RTC_getCounter(RTC_BASE);    // RTCCNT
         /*
-         * Even if the interrupt we are timing is quick,
-         * the counter starts at 1 ???
+         * If the interrupt we are timing is quick,
+         * the counter may still be zero
          */
-        myAssert( result > 0 );
     }
+
+    // Result is always positive, but may be zero.
+    myAssert( result <= overflowCount );
+
     return result;
 }
 

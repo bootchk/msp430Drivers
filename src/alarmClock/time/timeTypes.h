@@ -98,7 +98,7 @@ struct Duration {
  *
  * Since a day is > 86k seconds, this must be a long to hold more than a few days difference.
  */
-typedef signed long Interval;
+typedef long int Interval;
 
 
 

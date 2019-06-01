@@ -21,7 +21,7 @@ __interrupt void RTC_ISR(void)
      * Any other reason would loop forever.
      * Alternatively, repetitively read RTCIV to clear all flags.
      */
-    Counter::disableAndClearInterrupt();
+    Counter::disableAndClearOverflowInterrupt();
 
     /*
      * We don't do anything here except exit low power mode.

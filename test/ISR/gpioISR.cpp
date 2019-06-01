@@ -22,13 +22,15 @@
 __interrupt void PORT1_ISR(void)
 {
     /*
-     * Clear interrupt flag.
+     * Not really necessary, since _low_power_mode_off_on_exit() will clear GIE
      */
-    LEDAndLightSensor::clearInterrupt();
+    LEDAndLightSensor::clearLEDNPinInterruptFlag();
 
     /*
      * We don't do anything here except exit low power mode.
      * The continuation is after the call to _low_power_mode_x();
      */
     _low_power_mode_off_on_exit();
+
+    // not assert interrupt flag clear: if condition still exists, flag is still set
 }

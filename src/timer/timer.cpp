@@ -75,8 +75,11 @@ void LowPowerTimer::delayTenMilliSeconds()    { LowPowerTimer::delayTicksOf100uS
 void LowPowerTimer::delayTwoMilliSeconds()    { LowPowerTimer::delayTicksOf100uSec(20); }
 
 void LowPowerTimer::delaySeconds(unsigned int count) {
-    // max unsigned int is 64k
-    myAssert(count < 7);
+    /*
+     * Param to delayTicks is unsigned int, max is 64k.
+     * So seconds must be less than 7.
+     */
+    myRequire(count < 7);
     LowPowerTimer::delayTicksOf100uSec(count*10000);
 }
 

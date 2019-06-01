@@ -34,14 +34,25 @@
  *
  * The result is the counter value, up to the max defined by the countdown timer.
  *
- * Requires ISR for both GPIO and Counter, that simply clear their flags and exit sleep.
+ * Requires ISR for both GPIO and Counter.
+ * - GPIO ISR clear IFG bit and exit sleep.
+ * - Counter ISR clear IFG bit, set overflow flag to main, and exit sleep
  */
 unsigned int LEDAndLightSensor::measureCapacitanceDischargeSleeping() {
     unsigned int result;
 
-    // Enable interrupt on low transition of charged capacitance pin of LED
-    clearInterrupt();
-    enableLowInterrupt();
+    /*
+     * Discharge of pin capacitance might already have happened.
+     * So transition from high to low also might have already happened.
+     * We enable interrupt on high-to-low transition.
+     * If transition occurred prior and pin is low, enabling edge will set IFG.
+     * Assert GIE is not enabled, so no interrupt will occur yet.
+     */
+    clearLEDNPinInterruptFlag();
+    enableHighToLowInterruptFromLEDNPin();
+    /*
+     * IFG is set already if pin is already low.
+     */
 
     // Start a counter parallel to other process (capacitor discharging.)
     // Typically, 5000 ticks = 0.5 second, time to discharge Cree566 in 10 lux
@@ -49,30 +60,46 @@ unsigned int LEDAndLightSensor::measureCapacitanceDischargeSleeping() {
     Counter::start();
     // assert counter is near zero since start() clears it.
 
-    // Enter low power until interrupt for pin low OR counter overflow.
-    // Does not return until interrupt.
-    // Since ISR exits low power, continues after this call.
-    // assert this enables GIE
+    /*
+     * Enter low power until interrupt for pin low OR counter overflow.
+     * Does not return until interrupt.
+     * Assert ISR exits low power and clears GIE, and execution continues after this call.
+     *
+     * There is no race to sleep before interrupt.
+     * The interrupt condition (IFG) may already exist:
+     * when this enables GIE, interrupt will occur immediately without an effective sleep.
+     */
     _low_power_mode_3();
     __no_operation();
 
     /*
      * One or both processes interrupted.
-     * Counter may still be counting and may yet interrupt.
-     * Pin may yet interrupt.
+     * Counter may still be counting and may yet set IFG.
+     * Pin may yet set IFG.
+     * But GIE is now clear.
      */
 
     /*
      * If counter overflowed, result will be maxDurationInTicks
      */
     result = Counter::getCount();
+
     // Counter is up, will be less than or equal to maxDurationInTicks.
-    myAssert( (result>0) and (result<=DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance));
+    myAssert(result<=DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance);
 
+    /*
+     * We don't expect count is zero,
+     * but it might happen if the LED is sensitive or light is bright.
+     * Also, the capacitance has already started to discharge before we start the counter.
+     */
 
-    disableLowInterrupt();
+    /*
+     * Disable both interrupt sources.
+     * One should have been already disabled by ISR.
+     * Not really necessary since GIE is clear, but restore system to previous state.
+     */
+    disableLEDNPinInterrupt();
     Counter::stop();    // disables interrupt
-    // assert Counter interrupt disabled
 
     return result;
 }
@@ -103,7 +130,7 @@ unsigned int LEDAndLightSensor::measureCapacitanceDischargeIteratively() {
         // This gives more resolution in the result (higher numbers)
         if (not (P1IN & BIT7)) break;
 #else
-        if (isLow())
+        if (isLEDNPinLow())
             break;
 #endif
     }
