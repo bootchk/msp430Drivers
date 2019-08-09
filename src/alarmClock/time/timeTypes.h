@@ -83,6 +83,11 @@ struct Duration {
         else
            return Duration(seconds - a.seconds);
     }
+
+    bool operator>(const Duration& a) const
+        {
+            return (seconds > a.seconds);
+        }
 } ;
 
 
