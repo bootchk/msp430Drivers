@@ -29,12 +29,11 @@ struct Interval {
     long int plusOrMinusSeconds;
 
 
-
     /*
      * default + parameterized constructor
      */
     // No guard against interpreting very large unsigned as a signed negative number
-    Interval(unsigned long plusOrMinusSeconds = 0) : plusOrMinusSeconds(plusOrMinusSeconds)   { }
+    Interval(signed long initialValue = 0) : plusOrMinusSeconds(initialValue)   { }
     // Interval(int plusOrMinusSeconds = 0) : plusOrMinusSeconds(plusOrMinusSeconds)   { }
 
     /*
@@ -87,12 +86,13 @@ struct Interval {
 #endif
 
 
-
+    // Comparison between Intervals
     bool operator>(const Interval& a) const
     {
          return (plusOrMinusSeconds > a.plusOrMinusSeconds);
     }
 
+    // Comparison to signed int
     bool operator>=(const signed int & a) const
     {
         return (plusOrMinusSeconds >= a);
@@ -100,7 +100,7 @@ struct Interval {
 
     bool operator<(const signed int & a) const
     {
-        return not (plusOrMinusSeconds < a);
+        return (plusOrMinusSeconds < a);
     }
 
 
@@ -113,6 +113,8 @@ struct Interval {
 
         signed long lowerBound = -range;
         if (plusOrMinusSeconds < lowerBound) result = RangeResult::Lesser;
+        else if (plusOrMinusSeconds > range) result = RangeResult::Greater;
+        else result = RangeResult::InRange;
 
         return result;
     }

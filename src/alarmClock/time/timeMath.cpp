@@ -38,7 +38,7 @@ EpochTime TimeMath::projectTimeByPeriodToNearReferenceTime(const EpochTime timeI
                                                         const EpochTime referenceTime,
                                                         const unsigned long int period,
                                                         const unsigned long int halfPeriod,
-                                                        Interval &interval  // OUT
+                                                        Interval &returnedInterval  // OUT
                                                         ) {
     myRequire( referenceTime > timeInPast);
     // actually timeInPast must be > period/2 in past
@@ -46,18 +46,21 @@ EpochTime TimeMath::projectTimeByPeriodToNearReferenceTime(const EpochTime timeI
     Interval intervalToReferenceTime;
     EpochTime workingProjection = timeInPast;
 
-    intervalToReferenceTime =  referenceTime - workingProjection;
+    // Interval starts negative, advances toward zero
+    intervalToReferenceTime =  workingProjection - referenceTime;
+    myAssert(intervalToReferenceTime < 0);
 
     // while interval not in range [-period/2, period/2]
-    while (intervalToReferenceTime.inRange( halfPeriod ) != RangeResult::InRange )
+    while ( intervalToReferenceTime < 0 )
     {
         // project forward by period
         workingProjection += period;
 
         // update interval and test again
-        intervalToReferenceTime =  referenceTime - workingProjection;
+        intervalToReferenceTime =  workingProjection - referenceTime;
     }
 
-    interval = intervalToReferenceTime;
+    myAssert(intervalToReferenceTime.inRange( halfPeriod ) == RangeResult::InRange);
+    returnedInterval = intervalToReferenceTime;
     return workingProjection;
 }
