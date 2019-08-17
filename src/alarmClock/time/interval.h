@@ -107,13 +107,25 @@ struct Interval {
     /*
      * Is in range [-range, range} ?
      */
+    /*
+     * TODO The length of the range is 2*range plus 1 unless one of the operators is <= or >= ?
+     */
     RangeResult inRange(const unsigned long & range) const
     {
         RangeResult result;
 
+        /*
+         * plusOrMinusSeconds is signed while range is unsigned
+         * MUST not compare signed to unsigned, since comparison is unsigned if either operand is unsigned after promotion.
+         * The unsigned long type cannot be promoted to unsigned (some values not representable.)
+         *
+         * TODO optimize by passing unsigned int range (not long) since then it is promotable to signed.
+         */
         signed long lowerBound = -range;
+        signed long upperBound = range;
+
         if (plusOrMinusSeconds < lowerBound) result = RangeResult::Lesser;
-        else if (plusOrMinusSeconds > range) result = RangeResult::Greater;
+        else if (plusOrMinusSeconds > upperBound) result = RangeResult::Greater;
         else result = RangeResult::InRange;
 
         return result;

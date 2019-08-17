@@ -50,8 +50,16 @@ EpochTime TimeMath::projectTimeByPeriodToNearReferenceTime(const EpochTime timeI
     intervalToReferenceTime =  workingProjection - referenceTime;
     myAssert(intervalToReferenceTime < 0);
 
-    // while interval not in range [-period/2, period/2]
-    while ( intervalToReferenceTime < 0 )
+    /*
+     * while interval not in range [-period/2, period/2]
+     *
+     * while ( intervalToReferenceTime < 0 ) is NOT correct: it can overshoot.
+     *
+     * while ( not (intervalToReferenceTime.inRange( halfPeriod ) == RangeResult::InRange) ) is NOT robust,
+     * can be infinite loop if parameters period and halfPeriod are incorrect.
+     * More robust to loop until InRange or Greater.
+     */
+    while ( intervalToReferenceTime.inRange( halfPeriod ) == RangeResult::Lesser )
     {
         // project forward by period
         workingProjection += period;
@@ -60,7 +68,9 @@ EpochTime TimeMath::projectTimeByPeriodToNearReferenceTime(const EpochTime timeI
         intervalToReferenceTime =  workingProjection - referenceTime;
     }
 
+    // Check overshoot when given incorrect parameters
     myAssert(intervalToReferenceTime.inRange( halfPeriod ) == RangeResult::InRange);
+
     returnedInterval = intervalToReferenceTime;
     return workingProjection;
 }
