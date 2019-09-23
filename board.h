@@ -22,6 +22,7 @@
 
 
 
+
 /*
  * Describes hardware design i.e. connections between pins of mcu and rtc chips
  *
@@ -34,33 +35,45 @@
 
 
 
-// Choose configuration
-#define MYPCB_BOARD_R3
-//#define FULL_PROTO_LAUNCHPAD
+// Choose exactly one configuration of board.
+// Board may be a breadboard of Launchpad's target and sub-boards
+//#define MYPCB_BOARD_R5
+#define FULL_PROTO_LAUNCHPAD
+//#define BLINKERBQ_BOARD
 
 
-// Choose Launchpad
-#define USE_MSPFR2433
+// Choose exactly one debugger probe (Launchpad)
+// Only required when the board uses target board of launchpad
+#define USE_EXP430FR2433
+//#define USE_EXP430FRFR698
+
+#include "ledAndLightSensorConfig.h"
 
 
-#ifdef USE_MSPFR2433
+
+
+#ifdef USE_EXP430FR2433
 
 #define I2C_ON_P12_P13
 #define APP_LED_ON_P10_P11
-//#define LED_SENSOR_ON_P13_P15
-#define LED_SENSOR_ON_P15_P17
 
-#else
+
+#elif defined(USE_EXP430FRFR698)
 
 // FR6989
 // Choose interface to external RTC I2C
 #define I2C_ON_P16_P17
+
+// TODO move this to ledAndLightSensorConfig.h
 // Choose interface to LED and light sensor
 #define LED_SENSOR_ON_P13_P15
 
 // Choose debug LED config
 #define APP_LED_ON_P10_P97
 
+
+#else
+#error "Launchpad model not defined."
 #endif
 
 
@@ -123,15 +136,6 @@
 #define RTCSelectPort GPIO_PORT_P3
 #define RTCSelectPin  GPIO_PIN2
 
-
-#define NSideLEDPort GPIO_PORT_P1
-#define NSideLEDPin  GPIO_PIN0
-
-// P1.1 is green led on launchpad
-
-// P side high to light LED
-#define PSideLEDPort GPIO_PORT_P1
-#define PSideLEDPin  GPIO_PIN1
 #endif
 
 
@@ -172,31 +176,6 @@
 
 
 
-#ifdef LED_SENSOR_ON_P15_P17
-
-#define NSideLEDPort GPIO_PORT_P1
-#define NSideLEDPin  GPIO_PIN7
-
-// P1.1 is green led on launchpad
-
-// P side high to light LED
-#define PSideLEDPort GPIO_PORT_P1
-#define PSideLEDPin  GPIO_PIN5
-
-#endif
-
-#ifdef LED_SENSOR_ON_P13_P15
-
-#define NSideLEDPort GPIO_PORT_P1
-#define NSideLEDPin  GPIO_PIN3
-
-#define PSideLEDPort GPIO_PORT_P1
-#define PSideLEDPin  GPIO_PIN5
-
-#endif
-
-
-
 // !!! slight difference from PCB: alarm pin not 3.0, chip select not 2.2
 #ifdef FULL_PROTO_LAUNCHPAD
 
@@ -228,16 +207,6 @@
 #define RTCSelectPort GPIO_PORT_P1
 #define RTCSelectPin  GPIO_PIN2
 
-
-
-#define NSideLEDPort GPIO_PORT_P1
-#define NSideLEDPin  GPIO_PIN7
-
-// P1.1 is green led on launchpad
-
-// P side high to light LED
-#define PSideLEDPort GPIO_PORT_P1
-#define PSideLEDPin  GPIO_PIN5
 
 #endif
 
