@@ -57,7 +57,7 @@ void AllPins::setLowOutput() {
 
 
 bool AllPins::areGeneralPurpose() {
-    return (P1SEL0 == 0) and (P1SEL1 == 0)
+    return      (P1SEL0 == 0) and (P1SEL1 == 0)
             and (P2SEL0 == 0) and (P2SEL1 == 0)
             and (P3SEL0 == 0) and (P3SEL1 == 0);
 }
@@ -71,11 +71,10 @@ void AllPins::assertAreConfiguredForSleep() {
     // Compiler complains about this equivalent: ???? (P1DIR == ~AlarmSignalPin);
     myAssert(P1DIR == 0xFD);
 
-    myAssert(
-        // all port1 pins (especially I2C bus pins) are high
-        // except P1.5 and P1.7 (LED legs left low)
-        // TODO make them left high for OFF state
-        (P1OUT == 0x5F));
+    // all port1 pins (especially I2C bus pins) are high.
+    // except when app uses P1.5 and P1.7 (LED legs outputs, value low)
+    // (P1OUT == 0x5F));
+    myAssert( P1OUT == 0xFF );
 
     /*
      * other ports output.
@@ -85,8 +84,6 @@ void AllPins::assertAreConfiguredForSleep() {
      */
     myAssert(
         (P2DIR == 0xFF) and
-
-        // port 3 only 3 pins
-        (P3DIR == 0x7)
+        (P3DIR == 0x7)  // port 3 only 3 pins
     );
 }
