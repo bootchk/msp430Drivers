@@ -81,6 +81,8 @@ void I2CStateMachine::initialTransition() {
 
     // Subsequent transitions are taken in the ISR
     // The ISR does not exit LPM0 until the I2C transaction is complete (or fails??)
+
+    // The next action will be UCTXIFG flag and interrupt when ready for TXBUF to be filled with a byte of register address on slave.
 }
 
 
@@ -101,17 +103,6 @@ void I2CStateMachine::init(const uint8_t registerAddress,
     bufferPtr = buffer;
     bufferIndex = 0;
 }
-
-
-
-
-void I2CStateMachine::waitUntilPriorTransportComplete() {
-    /*
-     * The prior transaction set the STOP bit, and the peripheral will clear the bit after issuing STOP on wire.
-     */
-    while (UCB0CTLW0 & UCTXSTP)  ;
-}
-
 
 
 
@@ -170,22 +161,36 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
         myAssert(false);
         break;
 
-    case USCI_I2C_UCRXIFG0:                 // Vector 22: RXIFG0
+
+    // receiving.  Flag set and interrupt when device has received a byte into device buffer.
+    case USCI_I2C_UCRXIFG0:
+        myAssert(state == ReceivingData);
+
         uint8_t rx_val;
-        // Read UCB0RXBUF to clear RXIFG
+        // Read device buffer UCB0RXBUF, side effect is clear RXIFG
         rx_val = UCB0RXBUF;
+
+        // A byte was received and byteCounter should be positive.
+        // In case we ever get this interrupt in the wrong state,
+        // checking byteCounter positive prevents us from overflowing buffer.
         if (byteCounter)
         {
+            // Copy from device buffer to app buffer
             bufferPtr[bufferIndex++] = rx_val;
             byteCounter--;
         }
 
         if (byteCounter == 1)
         {
-            UCB0CTLW0 |= UCTXSTP;
+            // Last byte yet to be received.
+            // Tell device to send stop at end of next received byte.
+            // If there was only one byte to receive, we already set UTXSTP (see "Sending Restart")
+            UCB0CTLW0 |= UCTXSTP;  // lhs is register, rhs is bit value
+            // RXIE still set, next action is another RXIFG interrupt
         }
         else if (byteCounter == 0)
         {
+            // Stop condition set earlier
             UCB0IE &= ~UCRXIE;    // disable further RX interrupt
 
             state = Idle;
@@ -207,7 +212,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
 
               // Queue up command (i.e. register address) to send
               // Side effect is clear TXIFG
-              // Next TXIFG when command has been sent
+              // Next action is TXIFG set and interrupt when command has been sent
               UCB0TXBUF = command;
 
               if (not transactionIsSend)
@@ -215,8 +220,10 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
               else
                   state = TransmittingData; // Continue to transmision with the data in Transmit Buffer
               break;
+              // exit ISR without leaving LPM
 
           case SendingRestart:
+              // Slave address and register address were sent, send restart and then receive data from slave
               UCB0IE |= UCRXIE;              // Enable RX interrupt
               UCB0IE &= ~UCTXIE;             // Disable TX interrupt
               UCB0CTLW0 &= ~UCTR;            // Switch to receiver
@@ -224,10 +231,12 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
               UCB0CTLW0 |= UCTXSTT;          // Send repeated start
               if (byteCounter == 1)
               {
-                  //Must send stop since this is the N-1 byte
+                  // To avoid delay for bus stall, must send stop since this is the N-1 byte.
+                  // This means send stop at conclusion of next byte received.
                   while((UCB0CTLW0 & UCTXSTT));
                   UCB0CTLW0 |= UCTXSTP;      // Send stop condition
               }
+              // Next action will be RXIFG flag and interrupt
               break;
 
           case TransmittingData:
@@ -239,7 +248,10 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
               else
               {
                   //Done with packet and therefore done with transport
-                  UCB0CTLW0 |= UCTXSTP;     // Send stop condition
+
+                  UCB0CTLW0 |= UCTXSTP;     // Send stop condition.
+                  // Next transaction must not start until TXSTP is clear!!!  See waitUntilPriorTransportComplete()
+
                   state = Idle;
                   UCB0IE &= ~UCTXIE;                       // disable TX interrupt
                   __bic_SR_register_on_exit(LPM0_bits);      // Exit LPM0

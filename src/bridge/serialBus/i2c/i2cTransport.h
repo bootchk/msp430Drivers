@@ -67,7 +67,7 @@ class I2CTransport {
 
 public:
     /*
-     * !!! Using internal pullups.
+     * !!! Compile time configured to use external OR internal pullups.
      */
     static void configurePins();
     static void unconfigurePins();
@@ -85,7 +85,18 @@ public:
      */
     static void initI2CPeripheral();
     static void setDataRate250kbps();
+    /*
+     * Is peripheral initialized as I2C master
+     * Does not include bit rate or interrupts.
+     */
+    static bool isInitI2CMaster();
+    /*
+     * Is I2C master, slave address set, bit rate set and other stuff
+     */
     static bool isInitialized();
+
+    static bool isInitToAddressSlave(unsigned int slaveAddress);
+
 
 
     static void enable();
@@ -102,4 +113,6 @@ public:
     static void read( const RegisterAddress registerAddress,
                       unsigned char * const bufferIn,
                       const unsigned int count);
+
+
 };

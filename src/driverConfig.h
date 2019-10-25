@@ -40,7 +40,7 @@
 /*
  * Whether I2C bus has external pullups
  */
-//#define I2C_HAS_EXTERNAL_PULLUPS
+#define I2C_HAS_EXTERNAL_PULLUPS
 
 
 

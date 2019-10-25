@@ -15,6 +15,8 @@ void testLEDSensor();
 void testLEDSensor2();
 void testStepperDriver();
 void testLogging();
+void testI2C();
+void testI2CTransport();
 
 
 
@@ -32,7 +34,9 @@ int main(void)
     //testAlarmLPM45();
 	//testTimer();
 	//testLEDSensor();
-    testLEDSensor2();
+    //testLEDSensor2();
     //testStepperDriver();
 	//testLogging();
+	//testI2C();
+	testI2CTransport();
 }

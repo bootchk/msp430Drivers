@@ -6,6 +6,8 @@
 #include "i2c.h"
 
 #include "i2cTransport.h"
+#include "i2cPeripheral.h"
+
 
 #include "../../../assert/myAssert.h"
 
@@ -79,6 +81,8 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
 
     // FUTURE not hardcoded slave address and other parameters
     I2CTransport::initI2CPeripheral();
+
+    I2CPeripheral::clearInterruptFlags();
 }
 
 

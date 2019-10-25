@@ -15,10 +15,17 @@
 #include <eusci_b_i2c.h>
 
 #include "i2cTransport.h"
+#include "i2cPeripheral.h"
 #include "../../../pinFunction/i2cPins.h"
 
-// Implementation is by a stateMachine (which implements link layer)
+// Alternative implementations for link layer:  my stateMachine, or DriverLib
+#define USE_DRIVERLIB_FOR_LINK
+
+#ifdef USE_DRIVERLIB_FOR_LINK
+#include "i2cDriverLibLink.h"
+#else
 #include "stateMachine.h"
+#endif
 
 #include "../../../driverParameters.h"  // I2C bus speed
 
@@ -30,10 +37,6 @@
 
 
 
-
-namespace {
-bool _isInitialized = false;
-}
 
 
 
@@ -47,7 +50,6 @@ bool I2CTransport::isEnabled() { return not (UCB0CTLW0 & UCSWRST); }
 
 
 
-
 void I2CTransport::read(
                         const RegisterAddress registerAddress,
                         unsigned char * const buffer,
@@ -56,9 +58,22 @@ void I2CTransport::read(
     myRequire( isInitialized() );
     myRequire( isEnabled() );
 
-    I2CStateMachine::waitUntilPriorTransportComplete();
+    // I found that STPIFG and BIT9IFG are set.  This assertion is not valid
+    // myRequire( I2CPeripheral::isNoInterruptFlag() );
+
+    I2CPeripheral::waitUntilPriorTransportComplete();
+
+    // TODO may hang
+    I2CPeripheral::waitUntilBusReady();
+
+    I2CPeripheral::clearInterruptFlags();
+
+#ifdef USE_DRIVERLIB_FOR_LINK
+    I2CDriverLibLink::read(registerAddress, buffer, count);
+#else
     I2CStateMachine::init(registerAddress, buffer, count, false);  // false means a read
     I2CStateMachine::initialTransition();
+#endif
 
     // assert buffer is filled by device
 }
@@ -72,9 +87,14 @@ void I2CTransport::write(
     myRequire( isInitialized() );
     myRequire( isEnabled() );
 
-    I2CStateMachine::waitUntilPriorTransportComplete();
+    I2CPeripheral::waitUntilPriorTransportComplete();
+
+#ifdef USE_DRIVERLIB_FOR_LINK
+    // TODO I2CDriverLibLink::write(registerAddress, buffer, count);
+#else
     I2CStateMachine::init(registerAddress, buffer, count, true);    // true means write
     I2CStateMachine::initialTransition();
+#endif
 }
 
 
@@ -111,11 +131,14 @@ void I2CTransport::configurePins()
 #endif
 }
 
+
+
 void I2CTransport::unconfigurePins()
 {
     I2CPins::unconfigure();
-    _isInitialized = false;
 }
+
+
 
 bool I2CTransport::isUnconfigurePins() {
     // TODO hardcoded
@@ -190,6 +213,7 @@ void I2CTransport::initI2CPeripheral()
     // slave address from board.h
     EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, RTCBusAddress);
 
+#ifdef MISCELLANEOUS_I2C_INIT
     // Enable NACK interrupt.  So we can catch bus errors.
     EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_NAK_INTERRUPT);
 
@@ -198,6 +222,7 @@ void I2CTransport::initI2CPeripheral()
     EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_CLOCK_LOW_TIMEOUT_INTERRUPT );
     // Set timeout
     EUSCI_B_I2C_setTimeout(I2CInstanceAddress, EUSCI_B_I2C_TIMEOUT_28_MS);
+#endif
 
 #else
 
@@ -221,7 +246,6 @@ void I2CTransport::initI2CPeripheral()
      */
 
     // Not ensure enabled, caller must do that
-    _isInitialized = true;
 }
 
 
@@ -240,18 +264,35 @@ void I2CTransport::setDataRate250kbps() {
 
 
 
-#define FULL_INIT_CHECK
+
+bool I2CTransport::isInitI2CMaster() {
+    //                   I2C mode     master   submain clock   always 1
+    return (UCB0CTLW0 == UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC);
+}
+
+bool I2CTransport::isInitToAddressSlave(unsigned int slaveAddress) {
+    return (UCB0I2CSA == RTCBusAddress);
+}
+
 bool I2CTransport::isInitialized() {
 #ifdef FULL_INIT_CHECK
-    return (UCB0I2CSA == RTCBusAddress)
-            //                I2C mode     master     submain clock   always 1
-            and (UCB0CTLW0 == UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC)
+    return
+            isInitI2CMaster()
+            and isInitToAddressSlave(RTCBusAddress)
             // no autostop    clock low timeout
             and (UCB0CTLW1 == UCCLTO_1 )
             // divisor is four, yielding 250kbps
             and (UCB0BRW == 4)
             ;
 #else
-    return _isInitialized;
+    return
+            isInitI2CMaster()
+            and isInitToAddressSlave(RTCBusAddress);
 #endif
 }
+
+
+
+
+
+

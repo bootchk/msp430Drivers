@@ -177,8 +177,8 @@
 
 
 // !!! slight difference from PCB: alarm pin not 3.0, chip select not 2.2
-#ifdef FULL_PROTO_LAUNCHPAD
 
+#ifdef SERIAL_IS_SPI
 #define SPIInstanceAddress      EUSCI_A1_BASE
 
 // msp430fr2433 and Launchpad MSP-EXP430FR2433, using instance UCA1:
@@ -194,7 +194,8 @@
 #define SPI_CLK_PORT  GPIO_PORT_P2
 #define SPI_CLK_PIN   GPIO_PIN4
 
-#ifdef USE_SPI
+
+#ifdef SPI_ALARM_PIN_1_3
 // P1.3
 #define AlarmSignalPort GPIO_PORT_P1
 #define AlarmSignalPin  GPIO_PIN3
@@ -338,6 +339,7 @@
 /*
  * Abracon says 7-bit address is 0b1101001 (0x69)
  * But they say "0xD2/3", which includes the R/W bit which is transmitted AFTER the seven bit address
+ * 0xD2 is 1101 0010 which shifted right one bit is 0110 1001 which is 0x69, the same thing
  */
 #define AB0805BusAddress 0x69
 

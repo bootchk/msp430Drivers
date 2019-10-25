@@ -44,6 +44,7 @@ public:
 
 
 	static unsigned char transfer(ReadOrWrite,  unsigned char);
+
 	static void write(const RegisterAddress registerAddress,
 	                      unsigned char * const buffer,
 	                      const unsigned int count);

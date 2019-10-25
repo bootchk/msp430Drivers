@@ -37,11 +37,5 @@ public:
      * Meanwhile, mcu sleeps in LPM while waiting for transitions from eUSCI_B device.
      */
     static void initialTransition();
-
-    /*
-     * Spin (busy wait) until any STOP has been transmitted for prior transaction.
-     * Avoid a race.
-     */
-    static void waitUntilPriorTransportComplete();
 };
 
