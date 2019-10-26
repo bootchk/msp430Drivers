@@ -52,7 +52,7 @@ void testI2CTransport()
 
 //#define TEMP
 
-    left it not working to use I2CTransport::init
+//  not working to use I2CTransport::init
 #ifdef TEMP    // Init peripheral
     I2CTransport::initI2CPeripheral();
     // pins not configured
@@ -91,11 +91,12 @@ void testI2CTransport()
         LED::toggle();
 #endif
 
-        // Test reading the time
-        // TODO I2CDirect::readTime();
-
         // Test reading ID
         I2CTransport::read(0x28, buf, 1);
+        myAssert(buf[0] == 0x8);    // ID of RTC chip
 
+        // Test reading the time
+        I2CTransport::read(0x0, buf, 8);
+        // buf should be a time, buf[0] is hundredths, buf[1] is seconds, etc.
     }
 }

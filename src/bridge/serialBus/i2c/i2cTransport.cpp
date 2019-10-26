@@ -90,7 +90,7 @@ void I2CTransport::write(
     I2CPeripheral::waitUntilPriorTransportComplete();
 
 #ifdef USE_DRIVERLIB_FOR_LINK
-    // TODO I2CDriverLibLink::write(registerAddress, buffer, count);
+    I2CDriverLibLink::write(registerAddress, buffer, count);
 #else
     I2CStateMachine::init(registerAddress, buffer, count, true);    // true means write
     I2CStateMachine::initialTransition();
