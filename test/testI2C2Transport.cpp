@@ -50,17 +50,21 @@ void testI2CTransport()
     delayHalfSecond3();
     delayHalfSecond3();
 
-//#define TEMP
+#define TEMP
 
 //  not working to use I2CTransport::init
 #ifdef TEMP    // Init peripheral
-    I2CTransport::initI2CPeripheral();
+    I2CTransport::initI2CPeripheral(0x69);
+    // slave set
     // pins not configured
     // not enabled
 
-    I2CTransport::configurePins();
+    I2CTransport::setDataRate125kbps();
+
+    I2CTransport::configurePinsWithExternalPullups();
 
     I2CTransport::enable();
+
 #else
     I2CDirect::init();
     // Pins are configured
@@ -73,6 +77,8 @@ void testI2CTransport()
     // the current check isInitialized is foobar
 #endif
 
+myAssert(I2CTransport::isConfiguredPinsForModule());
+// TODO assert data rate, slave, enabled, external pullups
 
 #define USE_LED
 
@@ -82,6 +88,7 @@ void testI2CTransport()
 
 
     unsigned char buf[8];
+    unsigned const char alarmBuf[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 
     while (true)
     {
@@ -98,5 +105,14 @@ void testI2CTransport()
         // Test reading the time
         I2CTransport::read(0x0, buf, 8);
         // buf should be a time, buf[0] is hundredths, buf[1] is seconds, etc.
+
+        // Test writing alarm
+        I2CTransport::write(0x8, alarmBuf, 8);
+
+        // Test by reading alarm just written
+        I2CTransport::read(0x8, buf, 8);
+        for (int i = 0; i<8; i++) {
+                myAssert(buf[i] == alarmBuf[i]);
+        }
     }
 }

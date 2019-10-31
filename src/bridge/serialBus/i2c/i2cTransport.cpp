@@ -50,6 +50,10 @@ bool I2CTransport::isEnabled() { return not (UCB0CTLW0 & UCSWRST); }
 
 
 
+
+
+
+
 void I2CTransport::read(
                         const RegisterAddress registerAddress,
                         unsigned char * const buffer,
@@ -81,7 +85,7 @@ void I2CTransport::read(
 
 void I2CTransport::write(
         const RegisterAddress registerAddress,
-        unsigned char * const buffer, // buffer data is const but stateMachine wants a buffer that is changeable
+        unsigned const char * const buffer, // buffer data is const but stateMachine wants a buffer that is changeable
         const unsigned int count)
 {
     myRequire( isInitialized() );
@@ -98,20 +102,25 @@ void I2CTransport::write(
 }
 
 
-
-
-
-
-void I2CTransport::configurePins()
+unsigned char I2CTransport::read(const RegisterAddress registerAddress)
 {
+    I2CPeripheral::waitUntilPriorTransportComplete();
+    return I2CDriverLibLink::read(registerAddress);
+}
 
-#ifdef USE_DRIVER_LIB
 
-#ifdef I2C_HAS_EXTERNAL_PULLUPS
+
+
+
+
+
+void I2CTransport::configurePinsWithExternalPullups() {
     I2CPins::configureWithExternalPullup();
-#else
+}
+
+void I2CTransport::configurePinsWithInternalPullups() {
+#ifdef USE_DRIVER_LIB
     I2CPins::configureWithInternalPullup();
-#endif
 
 #else
     // Works.  Code from TI.
@@ -148,6 +157,13 @@ bool I2CTransport::isUnconfigurePins() {
              ((P1DIR & (BIT2 | BIT3)) == (BIT2 | BIT3)) and  // both out
              ((P1OUT & (BIT2 | BIT3)) == (BIT2 | BIT3))  // both high
              );
+}
+
+bool I2CTransport::isConfiguredPinsForModule() {
+    return (
+             ((P1SEL1 & (BIT2 | BIT3)) == 0 ) // are PSEL1 bits clear
+             and ((P1SEL0 & (BIT2 | BIT3)) == (BIT2 | BIT3) )  // are PSEL0 bits set
+            );
 }
 
 
@@ -196,9 +212,10 @@ EUSCI_B_I2C_initMasterParam params = {
 
 
 #define USE_DRIVER_LIB
-void I2CTransport::initI2CPeripheral()
+void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
 {
     myRequire(not isEnabled());
+
 
 
 #ifdef USE_DRIVER_LIB
@@ -211,7 +228,7 @@ void I2CTransport::initI2CPeripheral()
     setDataRate250kbps();
 
     // slave address from board.h
-    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, RTCBusAddress);
+    EUSCI_B_I2C_setSlaveAddress(I2CInstanceAddress, slaveAddress);
 
 #ifdef MISCELLANEOUS_I2C_INIT
     // Enable NACK interrupt.  So we can catch bus errors.
@@ -257,6 +274,15 @@ void I2CTransport::setDataRate250kbps() {
     // require SMCLK selected, at 1Mhz
     // 1Mhz/4 yields 250kbps
     UCB0BRW = 4;
+}
+
+void I2CTransport::setDataRate125kbps() {
+
+    myRequire( not I2CTransport::isEnabled());
+
+    // require SMCLK selected, at 1Mhz
+    // 1Mhz/8 yields 125kbps
+    UCB0BRW = 8;
 }
 
 

@@ -90,7 +90,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="test/ISR/externalRtcISR.cpp|MSP430FR5xx_6xx|lnk_msp430fr6989.cmd|cruft/bridgeSPI.cpp|cruft/i2c.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/bridge/bridge.cpp|src/bridge/bridgeMove.cpp|test/ISR/externalRtcISR.cpp|MSP430FR5xx_6xx|lnk_msp430fr6989.cmd|cruft/bridgeSPI.cpp|cruft/i2c.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -29,7 +29,7 @@ void testAlarm()
     PMM_unlockLPM5();
 
     // TODO broken
-    // WAS Alarm::configureForAlarming();
+    Alarm::configureForAlarming();
 
     // assert ready for setAlarm()
     // assert serial bus (Bridge) ready, was configured

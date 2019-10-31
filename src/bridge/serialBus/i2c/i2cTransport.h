@@ -66,28 +66,33 @@ class I2CTransport {
 
 
 public:
-    /*
-     * !!! Compile time configured to use external OR internal pullups.
-     */
-    static void configurePins();
+    static void configurePinsWithExternalPullups();
+    static void configurePinsWithInternalPullups();
+    // Are pins configured for module function?  Says nothing about pullups.
+    static bool isConfiguredPinsForModule();
+
     static void unconfigurePins();
     static bool isUnconfigurePins();
 
     /*
      * Prepare for use with a particular slave.
-     * Also must configure pins.
      * There is no unconfigure, but unconfigurePins uninitializes.
      *
-     * Class is modal on slave address defined in board.h
      * Only 7 bits of slaveAddress are valid.
      *
-     * FUTURE parameterized on slave address
+     * Does set data rate.
+     *
+     * Does not configure pins, or enable.
      */
-    static void initI2CPeripheral();
+    static void initI2CPeripheral(unsigned int slaveAddress);
+
     static void setDataRate250kbps();
+    static void setDataRate125kbps();
+
+
     /*
      * Is peripheral initialized as I2C master
-     * Does not include bit rate or interrupts.
+     * Does not check bit rate or interrupts.
      */
     static bool isInitI2CMaster();
     /*
@@ -106,7 +111,7 @@ public:
 
     // Write data to register.
     static void write( const RegisterAddress registerAddress,
-                       unsigned char * const dataOut,
+                       unsigned const char * const dataOut,
                        const unsigned int count);
 
     // Read from register into buffer
@@ -114,5 +119,10 @@ public:
                       unsigned char * const bufferIn,
                       const unsigned int count);
 
-
+    /*
+     * Overloaded, single byte operations.
+     */
+    static void write( const RegisterAddress registerAddress,
+                       const char value);
+    static unsigned char read( const RegisterAddress registerAddress);
 };

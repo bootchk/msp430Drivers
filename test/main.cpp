@@ -27,7 +27,7 @@ int main(void)
 	
 	//testStepper();
 	//testCompass();
-	//testRTC();
+	testRTC();
 	//testCompass2();
 	//testAlarm();
     //testAlarm2();
@@ -38,5 +38,5 @@ int main(void)
     //testStepperDriver();
 	//testLogging();
 	//testI2C();
-	testI2CTransport();
+	//testI2CTransport();
 }

@@ -77,10 +77,10 @@ void I2C::configureMaster(bool isRWBitHighForRead) {
     // require disabled to config
     myRequire( not isEnabled() );
 
-    I2CTransport::configurePins();
+    I2CTransport::configurePinsWithInternalPullups();
 
-    // FUTURE not hardcoded slave address and other parameters
-    I2CTransport::initI2CPeripheral();
+    // TODO slave address parameter
+    I2CTransport::initI2CPeripheral(0x69);
 
     I2CPeripheral::clearInterruptFlags();
 }
