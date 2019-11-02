@@ -50,6 +50,16 @@
 #include "ledAndLightSensorConfig.h"
 
 
+/*
+ * Whether I2C bus has external pullups
+ */
+#ifdef FULL_PROTO_LAUNCHPAD
+#define I2C_HAS_EXTERNAL_PULLUPS
+#elif defined(MYPCB_BOARD_R5)
+#define I2C_HAS_INTERNAL_PULLUPS
+#else
+#error "board.h does not define I2C pullups"
+#endif
 
 
 #ifdef USE_EXP430FR2433

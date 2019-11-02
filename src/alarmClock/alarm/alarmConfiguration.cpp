@@ -71,7 +71,12 @@ void Alarm::configureAfterColdReset() {
     Alarm::configureRTC();
 
     _isConfiguredForAlarming = true;
-    // Ensure MCU bus interface and RTC chip are configured for alarming
+    /*
+     * Ensure configured:
+     * - MCU alarm pin
+     * - MCU bus interface
+     * - RTC chip
+     */
 }
 
 
@@ -136,7 +141,8 @@ bool Alarm::isConfiguredMcuAlarmInterface() {
 
 
 void Alarm::configureRTC() {
-    // require RTC bus interface configured
+    // require bus interface to the external RTC configured
+
     /*
      * Require alarm is behind the counter.
      * Otherwise, by chance it could soon match,
@@ -144,13 +150,26 @@ void Alarm::configureRTC() {
      */
 
     // Order of configuration not important.
+
+    /*
+     * Miscellaneous configuration choices not critical to alarm function
+     */
+    // This just affects time math implementation
     RTC::configure24HourMode();
 
+    // This is not critical to functionality, it just saves power at slight expense of accuracy
     RTC::configureRCCalibratedOscillatorMode();
+
+    /*
+     * Configuration of alarming function.
+     */
 
     RTC::configureAlarmInterruptToFoutnIRQPin();
 
-    // Tell RTC chip to trigger interrupt on alarm register match
-    RTC::enableAlarm();
+    // Tell RTC chip to trigger interrupt on alarm register match once per year (match Hund,S,M,H,D,M)
+    RTC::configureAlarmMatchPerYear();
+
+    // FUTURE more comprehensive, test the entire chain of configurations re the alarm
+    // myEnsure(RTC::isAlarmInterruptEnabled());
 }
 

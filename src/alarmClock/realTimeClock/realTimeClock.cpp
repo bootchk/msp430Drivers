@@ -5,6 +5,8 @@
 
 #include "../../bridge/bridge.h"
 
+#include "../../assert/myAssert.h"
+
 
 
 
@@ -14,6 +16,11 @@
  * - RTC is connected via SPI
  * - which register and bit, semantics of same
  */
+
+
+
+
+
 void RTC::clearIRQInterrupt() {
 	/*
 	 * Since we are only using one interrupt from RTC,
@@ -33,8 +40,20 @@ void RTC::clearIRQInterrupt() {
 	              0);
 }
 
+bool RTC::isAlarmFlagClear(){
+    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Status));
+    // BIT2 is clear
+    return ((value & 0b0100) == 0);
+}
+
+
 
 void RTC::configureRCCalibratedOscillatorMode() {
+    // TEMP
+    // TODO
+    // This is optional, and is failing to verify writes.
+    return;
+
 	// Set two separate registers
 	RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod();
 	RTC::enableAutocalibrationFilter();
@@ -77,9 +96,13 @@ void RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod() {
 
 	unlockOscControlRegister();
 
+	/*
+	 * ??? Fails to verify often, thus we do not verify (writeByteWriteOnly() instead of writeByte())
+	 */
+
 	// OSEL on => BIT7;
 	// ACAL == 10 (17 minute autocalibration period) => BIT6
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::OscillatorControl),
+	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::OscillatorControl),
 	              (unsigned char) 0b11000000 ); // (BIT7 | BIT6) );
 }
 
@@ -102,13 +125,31 @@ void RTC::enableAutocalibrationFilter() {
 void RTC::enablePulseInterruptForAlarm() {
 	/*
 	 * Bit 2:  AIE: enable alarm interrupt
-	 * Bit 5,6: IM: == 11 1/4 second pulse width, requires least power
+	 * Bit 5,6: IM: == 11 :  1/4 second pulse width, requires least power
 	 */
 	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
 	              0b01100100 );
 
-	// Polarity of interrupt is not configurable, is high-to-low
+	// Polarity of interrupt is not configurable on RTC, occurs on high-to-low edge
+
+	myEnsure(RTC::isAlarmInterruptEnabled());
 }
+
+/*
+ * Only bit 2, not the other bits that configure the pulse
+ */
+bool RTC::isAlarmInterruptEnabled(){
+    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::InterruptMask));
+    return (value & 0b100);
+}
+
+bool RTC::isAlarmInterruptConfiguredPulse(){
+    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::InterruptMask));
+    return (value & 0b01100000);
+}
+
+
+
 
 void RTC::connectFoutnIRQPinToAlarmSignal() {
 	/*
@@ -120,28 +161,51 @@ void RTC::connectFoutnIRQPinToAlarmSignal() {
 	              0b11 );
 }
 
-void RTC::enableAlarm() {
+bool RTC::isAlarmConfiguredToFoutnIRQPin(){
+    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control2));
+    return (value & 0b11);
+}
+
+
+void RTC::configureAlarmMatchPerYear() {
     /*
      * Reset state of TimerControl is all zeros.
      *
-     * Bits [4:2]==1 => alarm once per year
-     * Bits [4:2]==0 => alarm disabled
+     * Bits [4:2]==1 => match once per year
+     * Bits [4:2]==0 => match disabled
      */
     Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
 }
 
+bool RTC::isAlarmConfiguredMatchPerYear(){
+    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::TimerControl));
+    return (value & 0b11100);
+}
 
 
 
+
+/*
+ * Unlocking.
+ * !!! Writes to ConfigurationKey cannot be verified, since it resets to zero upon any write.
+ * It is really a lock: writing the key unlocks other registers.
+ * The write doesn't change the value in the register (it always reads zero.)
+ */
 void RTC::unlockMiscRegisters() {
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::ConfigurationKey), (unsigned char) Key::UnlockMiscRegisters );
+	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
+	                           (unsigned char) Key::UnlockMiscRegisters );
 }
 
 
 void RTC::unlockOscControlRegister() {
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
-	              (unsigned char) Key::UnlockOscillatorControl );
+	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
+	                           (unsigned char) Key::UnlockOscillatorControl );
 }
+
+
+
+
+
 
 bool RTC::isReadable() {
     /*
@@ -178,4 +242,17 @@ bool RTC::isReadable() {
 bool RTC::readOUTBit() {
     unsigned char control1 = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control1));
     return (control1 & 0b1000);
+}
+
+
+/*
+ * Whole chain of configuration re alarm.
+ */
+bool RTC::isAlarmConfigured() {
+    return (isAlarmInterruptEnabled()
+            and isAlarmInterruptConfiguredPulse()
+            and isAlarmConfiguredToFoutnIRQPin()
+            and isAlarmFlagClear()
+            );
+
 }

@@ -13,8 +13,17 @@
 
 #include "../assert/myAssert.h"
 
+// Configuration of I2C pullups
+// File is external to library
+#include <board.h>
 
 
+
+
+
+/*
+ * Read/write
+ */
 void Bridge::write(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
@@ -31,6 +40,32 @@ void Bridge::read(const RegisterAddress registerAddress,
 }
 
 
+void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
+    //myRequire(isConfigured());
+
+    I2CTransport::write(registerAddress, value);
+
+#ifdef VERIFY_BRIDGE_SINGLE_WRITES
+    // reread to ensure slave has same value written (no glitch noise on wires)
+    unsigned char finalValue = I2CTransport::read(registerAddress);
+    myAssert(finalValue == value);
+#endif
+}
+
+
+void Bridge::writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value) {
+    I2CTransport::write(registerAddress, value);
+    // !!! Does not read back what was written
+}
+
+
+unsigned char Bridge::readByte(RegisterAddress registerAddress) {
+
+    //myRequire(isConfigured());
+    return I2CTransport::read(registerAddress);
+}
+
+
 
 
 
@@ -40,10 +75,6 @@ void Bridge::configureToSleepState() {
     I2CTransport::disable();
     I2CTransport::unconfigurePins();
 }
-
-
-
-
 
 
 
@@ -57,7 +88,13 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 
     I2CTransport::setDataRate125kbps();
 
+#ifdef    I2C_HAS_EXTERNAL_PULLUPS
     I2CTransport::configurePinsWithExternalPullups();
+#elif defined(I2C_HAS_INTERNAL_PULLUPS)
+    I2CTransport::configurePinsWithInternalPullups();
+#else
+#error "I2C pullups unspecified in board.h"
+#endif
 
     I2CTransport::enable();
 }
@@ -74,6 +111,7 @@ void Bridge::unconfigureMcuSide() {
 
 
 /*
+ * Convenience functions.
  * See I2C Device library, Github for comparable code.
  */
 void Bridge::setBits(RegisterAddress registerAddress, unsigned char mask) {
@@ -100,21 +138,4 @@ void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
 
 
 
-void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
-    //myRequire(isConfigured());
 
-    I2CTransport::write(registerAddress, value);
-
-#ifdef VERIFY_BRIDGE_WRITES
-    // reread to ensure slave has same value written (no glitch noise on wires)
-    unsigned char finalValue = Bridge::readByte(registerAddress);
-    myAssert(finalValue == value);
-#endif
-}
-
-
-unsigned char Bridge::readByte(RegisterAddress registerAddress) {
-
-    //myRequire(isConfigured());
-    return I2CTransport::read(registerAddress);
-}

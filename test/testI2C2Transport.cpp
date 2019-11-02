@@ -5,8 +5,8 @@
 #include "../src/assert/myAssert.h"
 #include "../src/LED/led.h"
 
-// Use the simplified interface to I2C
-#include "../src/bridge/serialBus/i2c/i2cDirect.h"
+// Use the direct interface to I2C
+//#include "../src/bridge/serialBus/i2c/i2cDirect.h"
 
 // Not direct
 #include "../src/bridge/serialBus/i2c/i2cTransport.h"
@@ -50,10 +50,11 @@ void testI2CTransport()
     delayHalfSecond3();
     delayHalfSecond3();
 
-#define TEMP
+#define INIT_USING_TRANSPORT
 
-//  not working to use I2CTransport::init
-#ifdef TEMP    // Init peripheral
+
+#ifdef INIT_USING_TRANSPORT
+    // Init peripheral
     I2CTransport::initI2CPeripheral(0x69);
     // slave set
     // pins not configured
@@ -61,11 +62,16 @@ void testI2CTransport()
 
     I2CTransport::setDataRate125kbps();
 
-    I2CTransport::configurePinsWithExternalPullups();
+    // Choice
+    // I2CTransport::configurePinsWithExternalPullups();
+    I2CTransport::configurePinsWithInternalPullups();
 
     I2CTransport::enable();
 
 #else
+    // init using direct
+    // ??? only for external pullups???
+
     I2CDirect::init();
     // Pins are configured
     // peripheral enabled

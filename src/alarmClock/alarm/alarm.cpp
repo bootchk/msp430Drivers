@@ -74,8 +74,11 @@ bool Alarm::isClearOnMCUSide() {
 
 bool Alarm::isRTCReady() {
 	// requires pin configured as input
-
 	return AlarmPin::isHigh();
+}
+
+bool Alarm::isRTCReadable() {
+    return RTC::isReadable();
 }
 
 

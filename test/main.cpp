@@ -27,16 +27,20 @@ int main(void)
 	
 	//testStepper();
 	//testCompass();
-	testRTC();
 	//testCompass2();
-	//testAlarm();
-    //testAlarm2();
-    //testAlarmLPM45();
+
 	//testTimer();
 	//testLEDSensor();
     //testLEDSensor2();
     //testStepperDriver();
 	//testLogging();
-	//testI2C();
+
+	// These tests are usually run in this order, from low level implementation to high
+
 	//testI2CTransport();
+	//testI2C();
+	//testRTC();
+	testAlarm();
+	//testAlarm2();
+	//testAlarmLPM45();
 }

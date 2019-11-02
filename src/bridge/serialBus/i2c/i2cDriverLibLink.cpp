@@ -181,12 +181,18 @@ unsigned char I2CDriverLibLink::read(unsigned int registerAddress) {
     // Transmit one byte of register address
     writeOneByte(registerAddress);
     while (not isStopComplete()) ;
+    // Receive one byte of data from that register address
     aByte = readOneByte();
     while (not isStopComplete()) ;
     return aByte;
 }
 
 
+/*
+ * Writing one byte of data must be a single transaction (slave address, register address, data)
+ * Otherwise the device can't distinguish a single write to set its address register from a single write of data.
+ */
 void I2CDriverLibLink::write(unsigned int registerAddress, unsigned const char value) {
-
+    // Pass address of parameter on stack
+    write(registerAddress, &value, 1);
 }

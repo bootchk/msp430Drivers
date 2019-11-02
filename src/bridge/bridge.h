@@ -111,6 +111,11 @@ public:
 	static unsigned char readByte(RegisterAddress registerAddress);
 	static void writeByte(RegisterAddress registerAddress, unsigned char value);
 
+	/*
+	 * Write a byte to an address that is not readable (or always reads 0.)
+	 */
+	static void writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value);
+
 
 
 

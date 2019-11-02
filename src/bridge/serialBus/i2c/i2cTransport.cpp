@@ -102,10 +102,21 @@ void I2CTransport::write(
 }
 
 
+
+
+/*
+ * Single byte transport
+ */
 unsigned char I2CTransport::read(const RegisterAddress registerAddress)
 {
     I2CPeripheral::waitUntilPriorTransportComplete();
     return I2CDriverLibLink::read(registerAddress);
+}
+
+void I2CTransport::write(const RegisterAddress registerAddress, const unsigned char value)
+{
+    I2CPeripheral::waitUntilPriorTransportComplete();
+    I2CDriverLibLink::write(registerAddress, value);
 }
 
 

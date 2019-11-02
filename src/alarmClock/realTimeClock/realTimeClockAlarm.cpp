@@ -16,6 +16,8 @@
 
 #include "../../driverParameters.h"   // MaxPracticalAlarmDuration
 
+#include "../../assert/myAssert.h"
+
 /*
  * Circular dependency: some RTC methods depend on EpochClock methods which depends on other RTC methods.
  */
@@ -135,17 +137,20 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
 
     /*
      * RTCTime has a zero hundredths.
-     * RTCTime has a valid.
+     * RTCTime has a valid year.
      * writeAlarm() does write hundredths to the alarm, with implications for correctness re shortest duration
-     * writeAlarm() does not write year to the alarm
+     * The RTC does not have a register for year, but does have a weekday (1-7) register
+     * writeAlarm() does write year to the alarm but to the weekday register!!!
      */
 
     // Takes a pointer, not a reference
     RTCInterface::writeAlarm(&alarmRTCTime);
 
+    // Expensive assertion
+    myEnsure(verifyAlarmTime(&alarmRTCTime));
+
+    // Always true. FUTURE return false if alarm cannot be verified.
     return true;
-    // FUTURE verify alarm written
-    ///return verifyAlarmTime(&alarmRTCTime);
 }
 
 

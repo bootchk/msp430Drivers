@@ -123,6 +123,6 @@ public:
      * Overloaded, single byte operations.
      */
     static void write( const RegisterAddress registerAddress,
-                       const char value);
+                       const unsigned char value);
     static unsigned char read( const RegisterAddress registerAddress);
 };

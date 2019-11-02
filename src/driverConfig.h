@@ -30,17 +30,18 @@
 #define SERIAL_IS_I2C
 //#define SERIAL_IS_SPI
 
-
 /*
- * Whether to verify by reading back everything that was written across Bridge.
+ * Whether I2C has external pullups is property in board.h
  */
-//#define VERIFY_BRIDGE_WRITES
 
 
 /*
- * Whether I2C bus has external pullups
+ * Whether to verify single byte writes by reading back and comparing to what was written.
  */
-#define I2C_HAS_EXTERNAL_PULLUPS
+#define VERIFY_BRIDGE_SINGLE_WRITES
+
+
+
 
 
 

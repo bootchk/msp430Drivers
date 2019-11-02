@@ -26,6 +26,12 @@ void AlarmPin::enableInterrupt() {
     GPIO_enableInterrupt(AlarmSignalPort, AlarmSignalPin);
 }
 
+// FUTURE hardcoded
+bool AlarmPin::isEnabledInterrupt() {
+    // P1.1
+    return (P1IE & BIT1);
+}
+
 
 
 /*

@@ -82,10 +82,21 @@ public:
 	 * Alternatively, the match can partial on the alarm, and generate AIRQ repeatedly e.g. once per second.
 	 * AIRQ signal might be configured to generate an interrupt.
 	 *
-	 * For now, we leave alarm enabled and configure it once per year.
-	 * I.E. it only goes off once per setAlarm().
+	 * For now, we configure it once at program start (cold reset.)
+	 * We don't use this to disable alarm.
+	 *
+	 * The alarm only goes off once per setAlarm().
 	 */
-	static void enableAlarm();
+	static void configureAlarmMatchPerYear();
+
+	/*
+	 * Are all aspects of alarm configured on RTC side?
+	 */
+	// FUTURE
+	static bool isAlarmConfigured();
+
+	// Is alarm interrupt enabled on RTC chip
+	static bool isAlarmInterruptEnabled();
 
 	/*
 	 * Configuration methods.
@@ -110,7 +121,7 @@ public:
 	static void configureRCCalibratedOscillatorMode();
 
 	/*
-	 * Configure RTC so only alarm interrupts are on pin.
+	 * Configure mux in RTC so only alarm interrupts are on pin.
 	 */
 	static void configureAlarmInterruptToFoutnIRQPin();
 
@@ -119,9 +130,23 @@ public:
 private:
 	static void selectOscModeRCCalibratedWithAutocalibrationPeriod();
 	static void enableAutocalibrationFilter();
+
+	/*
+	 * Configure alarm for match once per year
+	 * AND enable alarm interrupt
+	 */
 	static void enablePulseInterruptForAlarm();
 	static void connectFoutnIRQPinToAlarmSignal();
 
 	static void unlockMiscRegisters();
 	static void unlockOscControlRegister();
+
+
+	/*
+	* Used to check configuration.
+	*/
+	static bool isAlarmInterruptConfiguredPulse();
+	static bool isAlarmConfiguredMatchPerYear();
+	static bool isAlarmConfiguredToFoutnIRQPin();
+	static bool isAlarmFlagClear();
 };

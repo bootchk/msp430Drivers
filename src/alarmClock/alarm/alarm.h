@@ -167,6 +167,8 @@ class Alarm {
 	 */
 	static void verifyRTCReadable();
 
+
+
 public:
     /*
      * Is logical state of signal high?
@@ -183,6 +185,13 @@ public:
      *
      */
     static bool isRTCReady();
+
+
+    /*
+     * Test whether configuration seems correct.
+     * Used for testing.
+     */
+    static bool isRTCReadable();
 
 
 
@@ -228,7 +237,7 @@ public:
      * Prepare for setAlarm()
      * May reset on failure.
      *
-     * May lose time on RTC.
+     * May lose or reset the time on RTC.
      *
      * Configures bus pins.
      * Does not configure alarm pin, already configured.
@@ -236,7 +245,7 @@ public:
     static void configureAfterColdReset();
 
     /*
-     * Is interface and RTC configured?
+     * Was there a prior call to configureXXX() in this waking period?
      * Does not access interface or RTC, only a state variable.
      * The state variable is not persistent.
      * It is set by:
@@ -251,17 +260,18 @@ public:
     /*
      * After a wake from LPM4.5 by alarm, configure MCU serial bus pins interface to RTC.
      * Does not reconfigure the RTC (it should still be powered.)
+     * Does not change time on the RTC.
      * Does not configure the alarm pin (it is still an input, configured to interrupt on rising edge.)
      *
-     * May reset on failure.
+     * May reset MCU on failure.
      */
     static void configureAfterWake();
 
     /*
      * Change bus interface to a low power condition.
-     * When called, exists a set of in and out GPIO for serial bus.
+     * When called, exists a set of in and out GPIO for serial bus peripheral (module).
      * Ensure all all are low power (inputs not floating.)
-     * Since RTC is expected to be alive and driving input pins, this might not do anything.
+     * Since the peripheral (module) to the RTC is driving input pins (or open drain pins), this might not do anything.
      */
     static void unconfigureMcuBusInterface();
 
