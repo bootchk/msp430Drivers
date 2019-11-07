@@ -7,6 +7,10 @@ void testStepper();
 void testCompass();
 void testCompass2();
 void testRTC();
+void testRTC2();
+void testRTCAlarmPoll();
+void testRTCAlarmPoll2();
+void testRTCTimeMonotonic();
 void testAlarm();
 void testAlarm2();
 void testAlarmLPM45();
@@ -40,7 +44,11 @@ int main(void)
 	//testI2CTransport();
 	//testI2C();
 	//testRTC();
-	testAlarm();
+	//testRTC2();
+	//testRTCAlarmPoll();
+	testRTCAlarmPoll2();
+	//testRTCTimeMonotonic();
+	// testAlarm();
 	//testAlarm2();
 	//testAlarmLPM45();
 }

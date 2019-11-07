@@ -92,7 +92,7 @@ void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
   timeOut.Year = year; // year is offset from 1970
 
   days -= LEAP_YEAR(year) ? 366 : 365;
-  time  -= days; // now it is days in this year, starting at 0
+  time  -= days; // now time is days in this year, starting at 0
 
   days=0;
   month=0;
@@ -114,8 +114,10 @@ void breakTime(const EpochTime& timeIn, CalendarTime &timeOut){
         break;
     }
   }
+  // not month is months in this year, starting at 0
   timeOut.Month = month + 1;  // jan is month 1
-  timeOut.Day = time + 1;     // day of month
+  // now time is days in this month, starting at 0
+  timeOut.Day = time + 1;     // day of month, first day is 1
 }
 
 

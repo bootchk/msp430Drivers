@@ -5,11 +5,8 @@
 #include "../src/assert/myAssert.h"
 #include "../src/LED/led.h"
 
-// Use the simplified interface to I2C
-#include "../src/bridge/serialBus/i2c/i2cDirect.h"
-
-// Not direct
-#include "../src/bridge/serialBus/i2c/i2cTransport.h"
+// Use transport layer interface to I2C
+#include "../src/bridge/serialBus/i2c/transport/i2cTransport.h"
 
 //#include "../src/pinFunction/i2cPins.h"
 
@@ -51,8 +48,15 @@ void testI2C()
     delayHalfSecond2();
 
     // Init peripheral
-    I2CDirect::init();
-    I2CDirect::setSlaveAddress(0x69);
+    I2CTransport::initI2CPeripheral(0x69);
+    I2CTransport::configurePinsWithExternalPullups();
+    I2CTransport::enable();
+
+
+    // TODO consolidate
+    myAssert(I2CTransport::isInitialized);
+    myAssert(I2CTransport::isConfiguredPinsForModule());
+    myAssert(I2CTransport::isEnabled());
 
 
     // We configured pins in init()
@@ -77,10 +81,16 @@ void testI2C()
 #endif
 
         // Test reading the time
-        I2CDirect::readTime();
+        static unsigned char buf[7];
+
+        I2CTransport::read(0x0, buf, 7);
+        //I2CDirect::readTime();
 
         // Test reading ID
-        unsigned int ID = I2CDirect::readID();
+        myAssert(RTC::isReadable());
+        // equivalent to unsigned int ID = I2CDirect::readID();
+
+        // TODO test writing something
 
     }
 }

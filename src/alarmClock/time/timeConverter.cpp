@@ -49,7 +49,13 @@ return 0;
  */
 
 void TimeConverter::convertRTCTimeToCalendarTime(const RTCTime& rtcTime, CalendarTime& calendarTime) {
-	calendarTime.Year = bcd2bin(rtcTime.YearOfCentury); // Not used: CalendarYrToTm(); // /*+ (buf.weekdays.GP * 100)*/) + 2000;
+    // Not used: CalendarYrToTm(); // /*+ (buf.weekdays.GP * 100)*/) + 2000;
+
+    // FUTURE mask off the GP bits in the time registers of the RTC.
+    /*
+     * We are not using the GP bits, so they should not be set, but for safety, mask them off anyway.
+     */
+	calendarTime.Year = bcd2bin(rtcTime.YearOfCentury);
 	calendarTime.Month = bcd2bin(rtcTime.Month);
 	calendarTime.Day = bcd2bin(rtcTime.DayOfMonth);
 	calendarTime.Hour = bcd2bin(rtcTime.Hour24);
@@ -80,13 +86,12 @@ void TimeConverter::convertCalendarTimeToRTCTime(const CalendarTime& calendarTim
 
 
 EpochTime TimeConverter::convertCalendarTimeToEpochTime(const CalendarTime& calendarTime ) {
-	// Equivalent to Unix mktime()
+	// Roughly equivalent to Unix mktime()
 	return makeTime( calendarTime) ;
 }
 
 
 void TimeConverter::convertEpochTimeToCalendarTime( const EpochTime& epochTime, CalendarTime& calendarTime) {
-	// Equivalent to Unix localtime()
 	breakTime( epochTime, calendarTime ) ;
 }
 

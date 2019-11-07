@@ -9,7 +9,7 @@
 //#include "../src/bridge/serialBus/i2c/i2cDirect.h"
 
 // Not direct
-#include "../src/bridge/serialBus/i2c/i2cTransport.h"
+#include "../src/bridge/serialBus/i2c/transport/i2cTransport.h"
 
 //#include "../src/pinFunction/i2cPins.h"
 

@@ -18,26 +18,32 @@
  */
 
 
+/*
+ The chain from alarm on RTC to interrupt on MCU:
+ - RTC alarm match is enabled
+ - RTC alarm register matching time registers sets Status.ALM bit
+ - RTC ALM controls the AIRQ signal
+ - RTC AIRQ signal is configured to pulse down the pin Fout/nIRQ.
+ - MCU GPIO pin for alarm is configured to interrupt on rising edge
+ - MCU alarm pin interrupt flag is set
+ - ISR called (since interrupt enabled)
+ */
 
 
 
-void RTC::clearIRQInterrupt() {
+void RTC::clearAlarmFlag() {
 	/*
 	 * Since we are only using one interrupt from RTC,
 	 * it is safe to clear them all by writing a zero to the flag byte.
 	 * Per AB08x5 User Manual section 5.12.9
 	 *
 	 * Register name is Status
-	 * Bit name is ALM, but we clear all bits.
-	 *
-	 * The chain is:
-	 * alarm register matching time registers sets Status.ALM bit
-	 * ALM controls the AIRQ signal
-	 * AIRQ signal is configured to pin Fout/nIRQ.
+	 * Bit name is ALM, but we clear all bits
 	 */
 
 	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Status),
 	              0);
+	myEnsure(isAlarmFlagClear());
 }
 
 bool RTC::isAlarmFlagClear(){
@@ -169,17 +175,30 @@ bool RTC::isAlarmConfiguredToFoutnIRQPin(){
 
 void RTC::configureAlarmMatchPerYear() {
     /*
-     * Reset state of TimerControl is all zeros.
+     * Reset state of TimerControl is 0b100011 ???.
      *
      * Bits [4:2]==1 => match once per year
      * Bits [4:2]==0 => match disabled
      */
     Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
+    myEnsure(isAlarmFlaggingConfigured());
 }
 
+void RTC::disableAlarm() {
+    Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0 );
+}
+
+
+
 bool RTC::isAlarmConfiguredMatchPerYear(){
+    bool result;
+
     unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::TimerControl));
-    return (value & 0b11100);
+    // TODO why was 11100 ???
+    result = (value & 0b100);
+    // TEMP
+    myAssert(result);
+    return result;
 }
 
 
@@ -241,18 +260,30 @@ bool RTC::isReadable() {
 
 bool RTC::readOUTBit() {
     unsigned char control1 = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control1));
-    return (control1 & 0b1000);
+    return (control1 & 0b10000);    // BIT4
 }
 
 
 /*
  * Whole chain of configuration re alarm.
+ *
+ * Starts with ALM bits set so that match sets a flag.
+ * Followed by configuration so that flag setting causes interrupt pulse on a pin.
+ *
+ * These do NOT check that alarm registers have a value that is in the future.
  */
-bool RTC::isAlarmConfigured() {
-    return (isAlarmInterruptEnabled()
+bool RTC::isAlarmInterruptConfigured() {
+    return (isAlarmFlaggingConfigured()
+            and isAlarmInterruptEnabled()
             and isAlarmInterruptConfiguredPulse()
             and isAlarmConfiguredToFoutnIRQPin()
             and isAlarmFlagClear()
             );
 
+}
+
+
+bool RTC::isAlarmFlaggingConfigured() {
+    // FUTURE also must be 24 hour mode or alarm match might not work
+    return isAlarmConfiguredMatchPerYear();
 }

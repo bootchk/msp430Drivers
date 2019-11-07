@@ -25,6 +25,9 @@
  */
 
 
+static const Duration duration = {10};
+
+
 void testAlarm()
 {
     //CentralSystem::configureAfterReset();
@@ -57,7 +60,6 @@ void testAlarm()
 
     while (true)
     {
-        static const Duration duration = {10};
         bool didSet = Alarm::setAlarmDurationSecondsFromNow(duration);
         myAssert(didSet);
 
@@ -68,7 +70,7 @@ void testAlarm()
         myAssert(AlarmPin::isEnabledInterrupt());
 
         // alarm completely configured on RTC side
-        myAssert(RTC::isAlarmConfigured());
+        myAssert(RTC::isAlarmInterruptConfigured());
 
 
 

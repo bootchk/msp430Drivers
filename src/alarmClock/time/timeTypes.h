@@ -4,15 +4,38 @@
 /*
  * Notes on time types and math.
  *
+ *
+ * Duration and EpochTime Math
+ *
  * We define Duration as a struct so that EpochTime and Duration cannot be nievely added,
  * even though both are based on a primitive unsigned long (32 bits.)
  * Fixes primitive obsession i.e. eliminate convertability,  EpochTime from Duration types.
  *
  * Addition: EpochTime + Duration.seconds
+ *
+ *
+ *
+ * RTCTime, CalendarTime, EpochTime, AlarmTime
+ *
+ * See AB08xx/rtcTime.h for RTCTime
+ *
+ * We don't implement AlarmTime struct, it is entirely in RTC hardware, there are hacks when writing it from RTCTime
+ *
+ * CalendarTime is roughly equivalent to Unix type "tm"
+ * EpochTime is roughly equivalent to Unix type "time_t", seconds from an epoch 1970-01-01 00:00:00 +0000 UTC
+ *
+ *
+ *           |  RTCTime |   CalendarTime | AlarmTime
+ * ---------------------------------------------------
+ * encoding      BCD    |   binary       |   BCD
+ *
+ * Hundredths    yes        no               yes
+ *
+ * Weekday        no        no               yes
+ *
+ * Month [1,12]   yes       yes              yes    * Unix tm type is [0,11]
  */
-/*
- * See also AB08xx/rtcTime.h for RTCTime
- */
+
 
 struct  CalendarTime {
   unsigned char Second;

@@ -135,14 +135,6 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
     // takes reference to alarmRTCTime
     TimeConverter::convertEpochTimeToRTCTime(alarmEpochTime, alarmRTCTime);
 
-    /*
-     * RTCTime has a zero hundredths.
-     * RTCTime has a valid year.
-     * writeAlarm() does write hundredths to the alarm, with implications for correctness re shortest duration
-     * The RTC does not have a register for year, but does have a weekday (1-7) register
-     * writeAlarm() does write year to the alarm but to the weekday register!!!
-     */
-
     // Takes a pointer, not a reference
     RTCInterface::writeAlarm(&alarmRTCTime);
 
@@ -160,6 +152,7 @@ bool RTC::verifyAlarmTime(const RTCTime* writtenTime) {
     RTCTime readAlarmRTCTime;
 
     RTCInterface::readAlarm(&readAlarmRTCTime);
+    // equality operator is defined for type RTCTime, passing const RTCTime* on rhs
     return(readAlarmRTCTime == writtenTime);
 }
 

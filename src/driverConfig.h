@@ -38,7 +38,7 @@
 /*
  * Whether to verify single byte writes by reading back and comparing to what was written.
  */
-#define VERIFY_BRIDGE_SINGLE_WRITES
+//#define VERIFY_BRIDGE_SINGLE_WRITES
 
 
 

@@ -5,7 +5,9 @@
 
 #include "i2c.h"
 
-#include "i2cTransport.h"
+// Uses a layer that hides
+#include "transport/i2cTransport.h"
+
 #include "i2cPeripheral.h"
 
 

@@ -16,7 +16,7 @@
 #include <inttypes.h>
 
 #include "stateMachine.h"
-#include "i2cTransport.h"
+
 
 #include "../../../assert/myAssert.h"
 
@@ -51,7 +51,8 @@ uint8_t command;
  * Same buffer used for send and receive transactions (I2C is half duplex.)
  * You must use the contents before starting another transaction.
  */
-uint8_t * bufferPtr;
+uint8_t * readBufferPtr;
+const uint8_t* writeBufferPtr;
 
 uint8_t byteCounter;    // count of bytes remaining to transact
 uint8_t bufferIndex;
@@ -88,19 +89,33 @@ void I2CStateMachine::initialTransition() {
 
 
 
-void I2CStateMachine::init(const uint8_t registerAddress,
+void I2CStateMachine::initForRead(const uint8_t registerAddress,
                uint8_t * const buffer,
-               uint8_t count,
-               bool isTransactionSend ) {
+               uint8_t count
+               ) {
 
-    // Require driver enabled
-    myAssert(I2CTransport::isEnabled());
+    // This just sets initial state, and has no requires
 
     state = SendingStart;
     command = registerAddress;
     byteCounter = count;
-    transactionIsSend = isTransactionSend;
-    bufferPtr = buffer;
+    transactionIsSend = false;
+    readBufferPtr = buffer; // <<<<<
+    bufferIndex = 0;
+}
+
+void I2CStateMachine::initForWrite(const uint8_t registerAddress,
+               const uint8_t * const buffer,
+               uint8_t count
+               ) {
+
+    // This just sets initial state, and has no requires
+
+    state = SendingStart;
+    command = registerAddress;
+    byteCounter = count;
+    transactionIsSend = true;
+    writeBufferPtr = buffer; // <<<<<
     bufferIndex = 0;
 }
 
@@ -176,7 +191,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
         if (byteCounter)
         {
             // Copy from device buffer to app buffer
-            bufferPtr[bufferIndex++] = rx_val;
+            readBufferPtr[bufferIndex++] = rx_val;
             byteCounter--;
         }
 
@@ -242,7 +257,7 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
           case TransmittingData:
               if (byteCounter)
               {
-                  UCB0TXBUF = bufferPtr[bufferIndex++];  // side effect is clear TXIFG
+                  UCB0TXBUF = writeBufferPtr[bufferIndex++];  // side effect is clear TXIFG
                   byteCounter--;
               }
               else

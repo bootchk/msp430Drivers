@@ -9,7 +9,7 @@
 #include "bridge.h"
 
 // implementation
-#include "serialBus/i2c/i2cTransport.h"
+#include "serialBus/i2c/transport/i2cTransport.h"
 
 #include "../assert/myAssert.h"
 

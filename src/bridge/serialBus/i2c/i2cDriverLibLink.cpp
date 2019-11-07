@@ -18,12 +18,13 @@
 void I2CDriverLibLink::writeOneByte( unsigned char dataByte) {
     EUSCI_B_I2C_setMode(I2CInstanceAddress, EUSCI_B_I2C_TRANSMIT_MODE);
     EUSCI_B_I2C_masterSendSingleByte(I2CInstanceAddress, dataByte);
+    // !!! assert STOP was sent but may not be complete
 }
 
 unsigned char I2CDriverLibLink::readOneByte() {
     EUSCI_B_I2C_setMode(I2CInstanceAddress, EUSCI_B_I2C_RECEIVE_MODE);
     return EUSCI_B_I2C_masterReceiveSingleByte(I2CInstanceAddress);
-    // !!! assert STOP may not be complete
+    // !!! assert STOP was sent but may not be complete
 }
 
 /*
@@ -107,6 +108,9 @@ bool I2CDriverLibLink::isStopComplete() {
 
 /*
  * Public, transport layer API
+ *
+ * Each is a separate transaction meaning STOP was sent and completed.
+ * Caller does not need to wait for STOP complete.
  */
 
 void I2CDriverLibLink::read(unsigned int registerAddress, unsigned char * buffer, unsigned int count) {
@@ -195,4 +199,5 @@ unsigned char I2CDriverLibLink::read(unsigned int registerAddress) {
 void I2CDriverLibLink::write(unsigned int registerAddress, unsigned const char value) {
     // Pass address of parameter on stack
     write(registerAddress, &value, 1);
+    // Since write() waits for stop complete, assert stop is complete
 }

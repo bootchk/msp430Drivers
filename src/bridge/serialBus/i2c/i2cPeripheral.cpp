@@ -28,15 +28,19 @@ bool I2CPeripheral::isBusBusy() {
     // return (UCB0STATW & UCBBUSY);
 }
 
+
+// FUTURE may hang is some I2C peripheral is continually sending START condition????
+// But that is a hardware condition that we can't fix in software???
 void I2CPeripheral::waitUntilBusReady() {
-    // TODO should send STP while waiting
     while ( I2CPeripheral::isBusBusy()) {
-        // bus is busy (start was seen), but we should be the only master.
+       // bus is busy (start was seen), but we should be the only master.
        // send stop to tell other masters and reset the busy flag.
        UCB0CTLW0 |= UCTXSTP;
+       // Wait until the stop was sent
+       waitUntilPriorTransportComplete();
+       // stop interrupt flag is set.  Clear it.
+       clearInterruptFlags();
     }
-    // If we sent stop, then stop flag is set.  Clear it.
-    clearInterruptFlags();
 }
 
 

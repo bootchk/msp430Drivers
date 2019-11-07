@@ -26,6 +26,20 @@ public:
      */
     static void readTime(RTCTime*);
 
+    /*
+     * Write to the alarm registers (that we are using) of the RTC.
+     * We configure the alarm to use only Hundredths,S,M,H,D,M
+     *
+     * The written RTCTime has a zero hundredths.
+     * writeAlarm() does write hundredths to the alarm, with implications for correctness re shortest duration
+     *
+     * * RTCTime has a valid year.
+     * The RTC does not have an alarm register for year, but does have a weekday (1-7) register
+     * writeAlarm() does write year to the alarm but to the weekday register!!!
+     * Since the match is not configured to use the weekday register, this is OK.
+     */
     static void writeAlarm(const RTCTime*);
+
+
     static void readAlarm(RTCTime*);
 };

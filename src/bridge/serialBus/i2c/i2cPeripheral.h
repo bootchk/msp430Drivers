@@ -42,7 +42,8 @@ public:
 
      /*
       * Spin until not isBusBusy().
-      * TODO should send stop if busBusy
+      * May send stop if bus is busy
+      * Other side effects.
       */
      static void waitUntilBusReady();
 

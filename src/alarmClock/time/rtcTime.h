@@ -34,9 +34,9 @@ struct RTCTime {
 	unsigned char Hundredth;
 	unsigned char Second;
 	unsigned char Minute;
-	unsigned char Hour24;	// 24 hour mode,range [0, 23]
-	unsigned char DayOfMonth;
-	unsigned char Month;
+	unsigned char Hour24;	     // 24 hour mode, [0, 23]
+	unsigned char DayOfMonth;    // [1, 31]
+	unsigned char Month;         // [1, 12]
 	unsigned char YearOfCentury;
 	// chip time also has Weekday, i.e. day of week, we don't use
 

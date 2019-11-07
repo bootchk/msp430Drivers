@@ -1,5 +1,5 @@
 
-
+#include <inttypes.h>
 
 /*
  * State machine for eUSCI_B using I2C.
@@ -21,11 +21,16 @@
 class I2CStateMachine {
 public:
     // TODO document the parameters
-    static void init(
-            uint8_t registerAddress,
-             uint8_t * const buffer,
-             const uint8_t count,
-             const bool isSend);
+    static void initForRead(
+             uint8_t registerAddress,
+             uint8_t * const buffer,  // buffer is writeable
+             const uint8_t count
+             );
+    static void initForWrite(
+                uint8_t registerAddress,
+                const uint8_t * const buffer,
+                const uint8_t count
+                );
 
     /*
      * The initial transition is to send [START, slave address]

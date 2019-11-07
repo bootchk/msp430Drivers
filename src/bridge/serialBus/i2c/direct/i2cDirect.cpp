@@ -12,7 +12,7 @@
 #include <eusci_b_i2c.h>
 
 // For configuration with internal pullup
-#include "../../../pinFunction/i2cPins.h"
+#include "../../../../pinFunction/i2cPins.h"
 
 void I2CDirect::readTime() {
     readFromAddress( 0x00 );   // Time is 8 bytes at address 0x0)
@@ -25,23 +25,150 @@ unsigned int I2CDirect::readID() {
 
 
 
+
+
+// wait for bus ready.  Insure not other master is holding bus by pulling down SDA while SCL high (start condition detected.)
+void waitForBusReady() {
+
+    // TEMP
+    return;
+
+   unsigned int flags;
+
+   flags = UCB0STATW;
+   while (UCB0STATW & UCBBUSY) {
+        // Stop, to force other masters off bus
+        UCB0CTLW0 |= UCTXSTP;
+
+        // wait for stop complete
+        while (UCB0CTLW0 & UCTXSTP)  ;
+        // clear IFG by writing generator
+        UCB0IV = 1;
+   }
+}
+
+
+
+
+/*
+ * This is a combined transaction: START, write, RESTART, read, STOP
+ */
+void
+I2CDirect::readFromAddress(unsigned int registerAddress,
+                unsigned char * const buffer,
+                unsigned int count)
+{
+unsigned int countDown = count;
+unsigned int bufferIndex = 0;
+
+waitForBusReady();
+
+UCB0CTLW0 |= UCTR;
+UCB0CTLW0 |= UCTXSTT;
+
+waitForStart();
+
+// write register address (in RTC address space)
+UCB0TXBUF = registerAddress;
+
+// wait for driver to shift TXBUF to its internal buffer
+while (!(UCB0IFG & UCTXIFG0)) ;
+
+// restart for rx
+UCB0CTLW0 &= ~UCTR;
+UCB0CTLW0 |= UCTXSTT;
+
+// Read first count-1 bytes
+while (countDown > 1 ) {
+    // wait for byte to be read
+    while (!(UCB0IFG & UCRXIFG0)) ;
+    countDown--;
+
+    // copy byte from device buffer, side effect clear RXIFG
+    buffer[bufferIndex] = UCB0RXBUF;
+    bufferIndex++;
+}
+// assert counDown == 1
+
+// stop after last byte
+UCB0CTLW0 |= UCTXSTP;
+
+while (!(UCB0IFG & UCRXIFG0)) ;
+buffer[bufferIndex] = UCB0RXBUF;
+
+// wait for stop complete
+while (UCB0CTLW0 & UCTXSTP)  ;
+}
+
+
+
+
+
+void
+I2CDirect::writeToAddress(unsigned int registerAddress, const unsigned char * const buffer, unsigned int count)
+{
+    unsigned int countDown = count;
+    unsigned int bufferIndex = 0;
+
+    // start for tx
+    UCB0CTLW0 |= UCTR;
+    UCB0CTLW0 |= UCTXSTT;
+
+    while (!(UCB0IFG & UCTXIFG0)) ;
+
+    // write register address (in RTC address space)
+    UCB0TXBUF = registerAddress;
+
+
+    while (count > 0 ) {
+        // Wait for previous byte (register address or previous data byte)
+        while (!(UCB0IFG & UCTXIFG0)) ;
+
+        // write value to addressed register in slave
+        UCB0TXBUF = buffer[bufferIndex];
+        bufferIndex ++;
+        countDown--;
+    }
+    // assert count == 0
+
+    // stop
+    UCB0CTLW0 |= UCTXSTP;
+
+    // wait for stop complete
+     while (UCB0CTLW0 & UCTXSTP)  ;
+}
+
+
+void
+I2CDirect::writeToAddress(unsigned int registerAddress, unsigned char value) {
+    // Address of value on stack
+    readFromAddress(registerAddress, &value, 1);
+}
+
+
+/*
+ * Single byte of data.
+ * Uses multiple byte read, provides buffer.
+ */
+unsigned char
+I2CDirect::readFromAddress(unsigned int registerAddress) {
+    unsigned char dataByte;
+    readFromAddress(registerAddress, &dataByte, 1);
+    return dataByte;
+}
+
+
+
+
+
+#ifdef OLD
 // requires init() and pins configured
 unsigned int  I2CDirect::readFromAddress(unsigned int registerAddress) {
     unsigned int byte1, byte2, byte3;
     unsigned int flags;
 
 
-        // wait for bus ready.  Insure not other master is holding bus by pulling down SDA while SCL high (start condition detected.)
-
-        flags = UCB0STATW;
-        while (UCB0STATW & UCBBUSY) {
-            // Stop, to force other masters off bus
-            UCB0CTLW0 |= UCTXSTP;
-        }
-        flags = UCB0IFG;
-        // clear IFG by writing generator
-        UCB0IV = 1;
-        flags = UCB0IFG;
+        waitForBusReady();
 
 
         // start for tx
@@ -103,6 +230,14 @@ unsigned int  I2CDirect::readFromAddress(unsigned int registerAddress) {
         // insure buffer was read and ready for next transaction
         return byte1;
 }
+
+#endif
+
+
+
+
+
+
 
 void I2CDirect::setSlaveAddress(unsigned int slaveAddress) {
     // right justified 7-bit address

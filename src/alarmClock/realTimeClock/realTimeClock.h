@@ -27,16 +27,17 @@ public:
 
 
 	/*
-	 * Clear interrupt flag that generated alarm interrupt.
+	 * Clear flag that generated alarm interrupt.
 	 * The flag must be cleared before another alarm can be set.
-	 * Since the interrupt is downward pulse (1/64 second)  from rtc,
+	 * Since RTC generates interrupt signal that is downward pulse (1/64 second),
 	 * and interrupt on the mcu is rising edge,
-	 * Fout/nIRQ should already be high.
+	 * if this is called after the interrupt on MCU side,
+	 * RTC should already have retuned high the Fout/nIRQ signal.
 	 *
 	 * No error return.
 	 * Caller must check that Fout/nIRQ is high.
 	 */
-	static void clearIRQInterrupt();
+	static void clearAlarmFlag();
 
 
 	/*
@@ -50,7 +51,7 @@ public:
 	 * Return true if alarm is set.
 	 * Return false if:
 	 * - duration too short
-	 * - SPI bus error (what was written did not compare to what was read)
+	 * - bus error (what was written did not compare to what was read)
 	 *
 	 * !!! Does not:
 	 * - enable the alarm
@@ -58,7 +59,8 @@ public:
 	 *
 	 * The clock is still ticking.
 	 * There can be a race to set a short alarm.
-	 * This code has no special consideration for the race.
+	 * To handle the race, this code requires duration >= 2 and assume the alarm can be set in less than one second.
+	 * This code does not use Lamport's rule.
 	 */
 	// Set alarm duration from now
 	static bool setAlarmDuration(Duration);
@@ -88,12 +90,17 @@ public:
 	 * The alarm only goes off once per setAlarm().
 	 */
 	static void configureAlarmMatchPerYear();
+	// Set matching to no matching.
+	static void disableAlarm();
 
 	/*
 	 * Are all aspects of alarm configured on RTC side?
 	 */
-	// FUTURE
-	static bool isAlarmConfigured();
+	// Is configured to interrupt on alarm
+	static bool isAlarmInterruptConfigured();
+
+	// Is configured to set flag on alarm
+	static bool isAlarmFlaggingConfigured();
 
 	// Is alarm interrupt enabled on RTC chip
 	static bool isAlarmInterruptEnabled();
@@ -127,6 +134,8 @@ public:
 
 	static bool readOUTBit();
 
+	static bool isAlarmFlagClear();
+
 private:
 	static void selectOscModeRCCalibratedWithAutocalibrationPeriod();
 	static void enableAutocalibrationFilter();
@@ -148,5 +157,5 @@ private:
 	static bool isAlarmInterruptConfiguredPulse();
 	static bool isAlarmConfiguredMatchPerYear();
 	static bool isAlarmConfiguredToFoutnIRQPin();
-	static bool isAlarmFlagClear();
+
 };

@@ -29,4 +29,9 @@ public:
      */
     static unsigned char read(unsigned int registerAddress);
     static void write(unsigned int registerAddress, unsigned const char value);
+
+    /*
+     * Config
+     */
+    static void initI2CPeripheral(unsigned int slaveAddress);
 };
