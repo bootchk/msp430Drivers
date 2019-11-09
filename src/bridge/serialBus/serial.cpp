@@ -8,7 +8,7 @@
 
 #ifdef SERIAL_IS_I2C
 #define SERIAL_DEVICE_CLASS I2C
-#include "i2c/i2c.h"
+#include "../../i2c/i2c.h"
 #endif
 
 #ifdef SERIAL_IS_SPI

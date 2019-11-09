@@ -5,14 +5,14 @@
 
 #include "i2cTransport.h"
 
-#include "../../../../assert/myAssert.h"
+#include "../../assert/myAssert.h"
 
 
 
 
 
 #ifdef USE_DRIVERLIB_FOR_LINK
-#include "../i2cDriverLibLink.h"
+#include "../driverLibLink/i2cDriverLibLink.h"
 #include "../i2cPeripheral.h"
 #elif defined(USE_DIRECT_FOR_LINK)
 #include "../direct/i2cDirect.h"

@@ -1,12 +1,12 @@
 
-#include "../../../bridge.h"  // type RegisterAddress
+#include "../../bridge/bridge.h"  // type RegisterAddress
 
 
 
 // Alternative implementations for link layer
-//#define USE_DRIVERLIB_FOR_LINK
+#define USE_DRIVERLIB_FOR_LINK
 //#define USE_DIRECT_FOR_LINK
-#define USE_STATE_MACHINE_FOR_LINK
+//#define USE_STATE_MACHINE_FOR_LINK
 
 /*
  * I2C transport

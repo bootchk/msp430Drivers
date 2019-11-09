@@ -20,17 +20,17 @@
 #include "i2cTransport.h"
 
 #include "../i2cPeripheral.h"
-#include "../../../../pinFunction/i2cPins.h"
+#include "../../pinFunction/i2cPins.h"
 
 
 
-#include "../../../../driverParameters.h"  // I2C bus speed
+#include "../../driverParameters.h"  // I2C bus speed
 
-#include "../../../../assert/myAssert.h"
+#include "../../assert/myAssert.h"
 
 
 #ifdef USE_DRIVERLIB_FOR_LINK
-#include "../i2cDriverLibLink.h"
+#include "../driverLibLink/i2cDriverLibLink.h"
 #elif defined(USE_DIRECT_FOR_LINK)
 #include "../direct/i2cDirect.h"
 #elif defined(USE_STATE_MACHINE_FOR_LINK)

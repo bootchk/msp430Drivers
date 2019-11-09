@@ -12,7 +12,7 @@
 #include <eusci_b_i2c.h>
 
 // For configuration with internal pullup
-#include "../../../../pinFunction/i2cPins.h"
+#include "../../pinFunction/i2cPins.h"
 
 void I2CDirect::readTime() {
     readFromAddress( 0x00 );   // Time is 8 bytes at address 0x0)

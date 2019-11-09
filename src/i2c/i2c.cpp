@@ -11,7 +11,7 @@
 #include "i2cPeripheral.h"
 
 
-#include "../../../assert/myAssert.h"
+#include "../assert/myAssert.h"
 
 
 

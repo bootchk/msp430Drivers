@@ -9,7 +9,7 @@
 // Driverlib
 #include <eusci_b_i2c.h>
 
-#include "../../../driverParameters.h"  // I2C bus speed
+#include "../../driverParameters.h"  // I2C bus speed
 #include "board.h"  // instanceAddress
 
 

@@ -18,7 +18,7 @@
 #include "stateMachine.h"
 
 
-#include "../../../assert/myAssert.h"
+#include "../assert/myAssert.h"
 
 
 /*

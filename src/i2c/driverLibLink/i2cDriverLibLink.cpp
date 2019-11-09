@@ -6,7 +6,7 @@
 
 #include "board.h"  // I2CInstanceAddress
 
-#include "../../../assert/myAssert.h"
+#include "../../assert/myAssert.h"
 
 
 

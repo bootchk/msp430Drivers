@@ -7,8 +7,9 @@
  * See specifications at Serial.
  */
 
-#include "../serial.h"  // ReadOrWrite
+#include "../bridge/serialBus/serial.h"  // ReadOrWrite
 
+#include "../bridge/bridge.h"   // RegisterAddress
 
 
 class I2C {
@@ -43,7 +44,7 @@ public:
 
 
 
-	static unsigned char transfer(ReadOrWrite,  unsigned char);
+
 
 	static void write(const RegisterAddress registerAddress,
 	                      unsigned char * const buffer,
@@ -59,6 +60,12 @@ public:
 
 	static void selectSlave(unsigned int);
 	static void deselectSlave();
+
+
+	/*
+	 * Generic, used for SPI???
+	 */
+	static unsigned char transfer(ReadOrWrite,  unsigned char);
 
 	static RegisterAddress mangleRegisterAddress(ReadOrWrite readOrWrite, RegisterAddress address );
 };
