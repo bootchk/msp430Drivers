@@ -10,19 +10,24 @@
 
 
 
+#define TRANSACTION_TIMEOUT 200
 
 /*
  * Private, link operations
  */
 
-void I2CDriverLibLink::writeOneByte( unsigned char dataByte) {
+bool I2CDriverLibLink::writeOneByte( unsigned char dataByte) {
+    bool result;
+
     EUSCI_B_I2C_setMode(I2CInstanceAddress, EUSCI_B_I2C_TRANSMIT_MODE);
-    EUSCI_B_I2C_masterSendSingleByte(I2CInstanceAddress, dataByte);
+    result = EUSCI_B_I2C_masterSendSingleByteWithTimeout(I2CInstanceAddress, dataByte, TRANSACTION_TIMEOUT);
     // !!! assert STOP was sent but may not be complete
+    return result;
 }
 
 unsigned char I2CDriverLibLink::readOneByte() {
     EUSCI_B_I2C_setMode(I2CInstanceAddress, EUSCI_B_I2C_RECEIVE_MODE);
+    // ??? Why not EUSCI_B_I2C_masterReceiveSingleByteWithTimeout
     return EUSCI_B_I2C_masterReceiveSingleByte(I2CInstanceAddress);
     // !!! assert STOP was sent but may not be complete
 }
@@ -30,7 +35,7 @@ unsigned char I2CDriverLibLink::readOneByte() {
 /*
  * Why does DriverLib not have "with timeout" functions for all of this, but some of the functions?
  */
-void I2CDriverLibLink::readMultipleBytes(unsigned char * buffer, unsigned int count) {
+bool I2CDriverLibLink::readMultipleBytes(unsigned char * buffer, unsigned int count) {
     // !!! Not handling a single byte
     myRequire(count>1);
 
@@ -54,6 +59,9 @@ void I2CDriverLibLink::readMultipleBytes(unsigned char * buffer, unsigned int co
     buffer[bufferIndex] = EUSCI_B_I2C_masterReceiveMultiByteFinish(I2CInstanceAddress);
     // assert STOP was sent
     // !!! assert STOP is complete (see DriverLib code)
+
+    // Hack
+    return true;
 }
 
 
@@ -61,17 +69,20 @@ void I2CDriverLibLink::readMultipleBytes(unsigned char * buffer, unsigned int co
 /*
  * At the link layer, just one long transmit, but with first byte distinguished: registerAddress, and following bytes data.
  */
-void I2CDriverLibLink::writeMultipleBytes(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count) {
+bool I2CDriverLibLink::writeMultipleBytes(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count) {
     // !!! Must write a byte of data, else should use writeSingleByte()
     myRequire(count>0);
 
     // bufferIndex counts up
     unsigned int bufferIndex = 0 ;
 
+    bool result;
+
     EUSCI_B_I2C_setMode(I2CInstanceAddress, EUSCI_B_I2C_TRANSMIT_MODE);
 
-    EUSCI_B_I2C_masterSendMultiByteStart(I2CInstanceAddress, registerAddress);
+    result = EUSCI_B_I2C_masterSendMultiByteStartWithTimeout(I2CInstanceAddress, registerAddress, TRANSACTION_TIMEOUT);
     // assert START condition and registerAddress sent
+    if (!result) return result;
 
     // Continue, sending all data less last byte
     while (bufferIndex != (count - 1) ) {
@@ -79,15 +90,17 @@ void I2CDriverLibLink::writeMultipleBytes(unsigned int registerAddress, unsigned
          * !!! EUSCI_B_I2C_masterReceiveMultiByteNext just fetches RXBUF, but doesn't care whether RXBUF is full
          * EUSCI_B_I2C_masterReceiveSingle polls for RXIFG, returns RXBUF, which also clears RXIFG
          */
-        EUSCI_B_I2C_masterSendMultiByteNext(I2CInstanceAddress, buffer[bufferIndex]);
+        result = EUSCI_B_I2C_masterSendMultiByteNextWithTimeout(I2CInstanceAddress, buffer[bufferIndex], TRANSACTION_TIMEOUT);
+        if (!result) return result;
         bufferIndex++;
     }
     // assert bufferIndex == count-1
 
     // Send last byte and STOP condition
-    EUSCI_B_I2C_masterSendMultiByteFinish(I2CInstanceAddress, buffer[bufferIndex]);
+    result = EUSCI_B_I2C_masterSendMultiByteFinishWithTimeout(I2CInstanceAddress, buffer[bufferIndex], TRANSACTION_TIMEOUT);
     // assert STOP was sent
     // !!! NOT assert STOP is complete (see DriverLib code)
+    return result;
 }
 
 

@@ -4,7 +4,7 @@
 
 
 #include "i2cTransport.h"
-#include "../i2cPeripheral.h"
+
 #include "../../../../assert/myAssert.h"
 
 
@@ -13,6 +13,7 @@
 
 #ifdef USE_DRIVERLIB_FOR_LINK
 #include "../i2cDriverLibLink.h"
+#include "../i2cPeripheral.h"
 #elif defined(USE_DIRECT_FOR_LINK)
 #include "../direct/i2cDirect.h"
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -25,7 +26,7 @@
 
 
 
-void I2CTransport::read(
+bool I2CTransport::read(
                         const RegisterAddress registerAddress,
                         unsigned char * const buffer,
                         unsigned int count)
@@ -36,16 +37,17 @@ void I2CTransport::read(
     // I found that STPIFG and BIT9IFG are set.  This assertion is not valid
     // myRequire( I2CPeripheral::isNoInterruptFlag() );
 
-    I2CPeripheral::waitUntilPriorTransportComplete();
+    // TODO some implementation do not ensure this???  I2CPeripheral::waitUntilPriorTransportComplete();
 
-    I2CPeripheral::waitUntilBusReady();
+    // This apparently is flawed.
+    //I2CPeripheral::waitUntilBusReady();
 
-    I2CPeripheral::clearInterruptFlags();
+    // TODO some implementation do not ensure this???  I2CPeripheral::clearInterruptFlags();
 
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::read(registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
-    // TODO
+    return I2CDirect::readFromAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
     I2CStateMachine::initForRead(registerAddress, buffer, count);
     I2CStateMachine::initialTransition();
@@ -55,7 +57,7 @@ void I2CTransport::read(
 }
 
 
-void I2CTransport::write(
+bool I2CTransport::write(
         const RegisterAddress registerAddress,
         unsigned const char * const buffer, // buffer data is const but stateMachine wants a buffer that is changeable
         const unsigned int count)
@@ -63,12 +65,12 @@ void I2CTransport::write(
     myRequire( isInitialized() );
     myRequire( isEnabled() );
 
-    I2CPeripheral::waitUntilPriorTransportComplete();
+    // TODO some implementation do not ensure this???  I2CPeripheral::waitUntilPriorTransportComplete();
 
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::write(registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
-    // TODO
+    return I2CDirect::writeToAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
     I2CStateMachine::initForWrite(registerAddress, buffer, count);
     I2CStateMachine::initialTransition();

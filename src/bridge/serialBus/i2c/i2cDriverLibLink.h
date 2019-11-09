@@ -12,11 +12,11 @@
 class I2CDriverLibLink {
 private:
     // Link operations
-    static void writeOneByte( unsigned char);
-    static void writeMultipleBytes( unsigned int registerAddress, const unsigned char * const buffer, unsigned int count);
+    static bool writeOneByte( unsigned char);
+    static bool writeMultipleBytes( unsigned int registerAddress, const unsigned char * const buffer, unsigned int count);
 
     static unsigned char readOneByte();
-    static void readMultipleBytes( unsigned char * buffer, unsigned int count);
+    static bool readMultipleBytes( unsigned char * buffer, unsigned int count);
 
     static bool isStopComplete();
 

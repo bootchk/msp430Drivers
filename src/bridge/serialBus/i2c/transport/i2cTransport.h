@@ -4,9 +4,9 @@
 
 
 // Alternative implementations for link layer
-#define USE_DRIVERLIB_FOR_LINK
+//#define USE_DRIVERLIB_FOR_LINK
 //#define USE_DIRECT_FOR_LINK
-//#define USE_STATE_MACHINE_FOR_LINK
+#define USE_STATE_MACHINE_FOR_LINK
 
 /*
  * I2C transport
@@ -115,12 +115,12 @@ public:
 
 
     // Write data to register.
-    static void write( const RegisterAddress registerAddress,
+    static bool write( const RegisterAddress registerAddress,
                        unsigned const char * const dataOut,
                        const unsigned int count);
 
     // Read from register into buffer
-    static void read( const RegisterAddress registerAddress,
+    static bool read( const RegisterAddress registerAddress,
                       unsigned char * const bufferIn,
                       const unsigned int count);
 

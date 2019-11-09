@@ -19,6 +19,8 @@
 // DriverLib
 #include <pmm.h>
 
+static unsigned int errorCount = 0;
+
 
 void delayHalfSecond3() {
     __delay_cycles(500000); // half second
@@ -57,16 +59,17 @@ void testI2CTransport()
     // Init peripheral
     I2CTransport::initI2CPeripheral(0x69);
     // slave set
-    // pins not configured
-    // not enabled
+    // pins configured
+    // data rate set
+    // enabled
 
-    I2CTransport::setDataRate125kbps();
+    //I2CTransport::setDataRate125kbps();
 
     // Choice
-    // I2CTransport::configurePinsWithExternalPullups();
-    I2CTransport::configurePinsWithInternalPullups();
+    I2CTransport::configurePinsWithExternalPullups();
+    //I2CTransport::configurePinsWithInternalPullups();
 
-    I2CTransport::enable();
+    //I2CTransport::enable();
 
 #else
     // init using direct
@@ -105,20 +108,28 @@ myAssert(I2CTransport::isConfiguredPinsForModule());
 #endif
 
         // Test reading ID
-        I2CTransport::read(0x28, buf, 1);
-        myAssert(buf[0] == 0x8);    // ID of RTC chip
+        if (I2CTransport::read(0x28, buf, 1)) {
+            myAssert(buf[0] == 0x8);    // ID of RTC chip
+        }
+        else {
+            errorCount++;
+        }
 
         // Test reading the time
-        I2CTransport::read(0x0, buf, 8);
+        if (not I2CTransport::read(0x0, buf, 8) ) errorCount++;
         // buf should be a time, buf[0] is hundredths, buf[1] is seconds, etc.
 
         // Test writing alarm
-        I2CTransport::write(0x8, alarmBuf, 8);
+        if ( not I2CTransport::write(0x8, alarmBuf, 8) ) errorCount++;
 
         // Test by reading alarm just written
-        I2CTransport::read(0x8, buf, 8);
-        for (int i = 0; i<8; i++) {
+        if ( I2CTransport::read(0x8, buf, 8) ) {
+            for (int i = 0; i<8; i++) {
                 myAssert(buf[i] == alarmBuf[i]);
+            }
+        }
+        else {
+            errorCount++;
         }
     }
 }

@@ -8,8 +8,20 @@
 class I2CDirect {
 private:
     // wait for start and slave address sent
-    // returns false if slave NACK (no slave recognizes slave address)
+    // returns false if timeout, usually slave NACK (no slave recognizes slave address)
     static bool waitForStart();
+
+    // Wait for TXBUF to be emptied
+    // returns false if timeout, usually slave NACK
+    static bool waitForReadyToTXNext();
+
+    // Send STOP before transaction is successfully complete
+    // Returns false if STOP condition not sent
+    static bool abortI2C();
+
+    static bool waitForStopComplete();
+
+    static bool waitForReadByteReady();
 
 public:
 
@@ -25,8 +37,8 @@ public:
     static unsigned char readFromAddress(unsigned int registerAddress);
     static void writeToAddress(unsigned int registerAddress, const unsigned char value);
 
-    static void readFromAddress(unsigned int registerAddress, unsigned char * const buffer, unsigned int count);
-    static void writeToAddress(unsigned int registerAddress, const unsigned char * const buffer, unsigned int count);
+    static bool readFromAddress(unsigned int registerAddress, unsigned char * const buffer, unsigned int count);
+    static bool writeToAddress(unsigned int registerAddress, const unsigned char * const buffer, unsigned int count);
 
     /*
      * Configure peripheral AND pins
@@ -36,7 +48,7 @@ public:
     /*
      * Ordinarily not called by public.
      */
-    static void configurePins();
+    static void configurePinsWithExternalPullups();
     static void configurePinsWithInternalPullups();
 
     /*

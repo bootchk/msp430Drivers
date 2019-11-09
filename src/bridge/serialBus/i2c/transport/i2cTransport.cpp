@@ -110,6 +110,7 @@ void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
 
 #elif defined(USE_DIRECT_FOR_LINK)
     I2CDirect::initI2CPeripheral(slaveAddress);
+    // assert data rate is set, and peripheral enabled
 #else
     // Note that other interrupts are enabled by stateMachine.
 

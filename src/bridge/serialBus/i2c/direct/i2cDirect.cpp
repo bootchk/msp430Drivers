@@ -27,6 +27,7 @@ unsigned int I2CDirect::readID() {
 
 
 
+#ifdef TEMP
 // wait for bus ready.  Insure not other master is holding bus by pulling down SDA while SCL high (start condition detected.)
 void waitForBusReady() {
 
@@ -46,14 +47,14 @@ void waitForBusReady() {
         UCB0IV = 1;
    }
 }
-
+#endif
 
 
 
 /*
  * This is a combined transaction: START, write, RESTART, read, STOP
  */
-void
+bool
 I2CDirect::readFromAddress(unsigned int registerAddress,
                 unsigned char * const buffer,
                 unsigned int count)
@@ -61,27 +62,43 @@ I2CDirect::readFromAddress(unsigned int registerAddress,
 unsigned int countDown = count;
 unsigned int bufferIndex = 0;
 
-waitForBusReady();
+// This is suspect
+//waitForBusReady();
+
+
+// TEST
+setSlaveAddress(0x69);
 
 UCB0CTLW0 |= UCTR;
 UCB0CTLW0 |= UCTXSTT;
 
-waitForStart();
+if (not waitForStart() ) {
+    abortI2C();
+    return false;
+}
 
 // write register address (in RTC address space)
+// side effect: clear TXIFG
 UCB0TXBUF = registerAddress;
 
-// wait for driver to shift TXBUF to its internal buffer
-while (!(UCB0IFG & UCTXIFG0)) ;
+if ( not waitForReadyToTXNext()) {
+    (void) abortI2C();
+    return false;
+}
 
 // restart for rx
 UCB0CTLW0 &= ~UCTR;
 UCB0CTLW0 |= UCTXSTT;
 
+// TODO wait for restart complete???
+
 // Read first count-1 bytes
 while (countDown > 1 ) {
-    // wait for byte to be read
-    while (!(UCB0IFG & UCRXIFG0)) ;
+    if (not waitForReadByteReady()) {
+        (void) abortI2C();
+        return false;
+    }
+
     countDown--;
 
     // copy byte from device buffer, side effect clear RXIFG
@@ -93,49 +110,63 @@ while (countDown > 1 ) {
 // stop after last byte
 UCB0CTLW0 |= UCTXSTP;
 
-while (!(UCB0IFG & UCRXIFG0)) ;
+if (not waitForReadByteReady()) {
+    (void) abortI2C();
+    return false;
+}
 buffer[bufferIndex] = UCB0RXBUF;
 
-// wait for stop complete
-while (UCB0CTLW0 & UCTXSTP)  ;
+// return true if stop completes
+return waitForStopComplete();
 }
 
 
 
 
 
-void
+bool
 I2CDirect::writeToAddress(unsigned int registerAddress, const unsigned char * const buffer, unsigned int count)
 {
     unsigned int countDown = count;
     unsigned int bufferIndex = 0;
 
+
+    // TEST
+    setSlaveAddress(0x69);
+
     // start for tx
     UCB0CTLW0 |= UCTR;
     UCB0CTLW0 |= UCTXSTT;
 
-    while (!(UCB0IFG & UCTXIFG0)) ;
+    if (not waitForStart() ) {
+        abortI2C();
+        return false;
+    }
 
     // write register address (in RTC address space)
     UCB0TXBUF = registerAddress;
 
-
+    // write data
     while (count > 0 ) {
-        // Wait for previous byte (register address or previous data byte)
-        while (!(UCB0IFG & UCTXIFG0)) ;
+        if ( not waitForReadyToTXNext()) {
+            (void) abortI2C();
+            return false;
+        }
 
         // write value to addressed register in slave
+        // side effect: clear TXIFG
         UCB0TXBUF = buffer[bufferIndex];
         bufferIndex ++;
         countDown--;
     }
     // assert count == 0
 
+    // Note we don't make the optimization of setting TXSTP bit as early as possible
     // stop
     UCB0CTLW0 |= UCTXSTP;
 
-    // wait for stop complete
-     while (UCB0CTLW0 & UCTXSTP)  ;
+    // return true if stop completes
+    return waitForStopComplete();
 }
 
 
@@ -245,47 +276,8 @@ void I2CDirect::setSlaveAddress(unsigned int slaveAddress) {
 }
 
 
-void I2CDirect::init(void)
-{
-    // disable
-    UCB0CTLW0 |= UCSWRST;
-
-    //  I2C mode, master mode, clock is SMCLK, UCSYNC (required for I2C)
-    UCB0CTLW0 |= UCMODE_3 | UCMST | UCSSEL__SMCLK | UCSYNC;
-
-    // bit rate divisor
-    //UCB0BRW = 4;   // 250kHz at 1Mhz SMCLK
-    UCB0BRW = 8;   // 125kHz at 1Mhz SMCLK
-
-    // TI recommends configuring GPIO pins before enabling module
-
-    // Configure directly, but with external pullups
-    configurePins();
-
-    // OR
-    //I2CPins::configureWithInternalPullup();
 
 
-    // enable
-    UCB0CTLW0 &= ~UCSWRST;
-
-    // insure device configured and enabled
-    // does not configure pins
-}
 
 
-void I2CDirect::configurePins() {
-    // P1.2 UCB0 SDA data
-    // P1.3 UCB0 SCL clock
 
-    // Assume that DIR is irrelevant
-
-    // Assume external pulllups
-
-    // TODO configure internal pullups
-
-
-    // Primary module function selected:  0x01 SEL1 == 0, SEL0 == 1
-    P1SEL0 |= BIT2 | BIT3;
-    P1SEL1 &= ~(BIT2 | BIT3);
-}
