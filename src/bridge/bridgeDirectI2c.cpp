@@ -40,10 +40,10 @@ void Bridge::read(const RegisterAddress registerAddress,
 }
 
 
-void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
+bool Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
     //myRequire(isConfigured());
 
-    I2CTransport::write(registerAddress, value);
+    return I2CTransport::write(registerAddress, value);
 
 #ifdef VERIFY_BRIDGE_SINGLE_WRITES
     // reread to ensure slave has same value written (no glitch noise on wires)
@@ -53,16 +53,15 @@ void Bridge::writeByte(RegisterAddress registerAddress, unsigned char value) {
 }
 
 
-void Bridge::writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value) {
-    I2CTransport::write(registerAddress, value);
+bool Bridge::writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value) {
+    return I2CTransport::write(registerAddress, value);
     // !!! Does not read back what was written
 }
 
 
-unsigned char Bridge::readByte(RegisterAddress registerAddress) {
-
+bool Bridge::readByte(RegisterAddress registerAddress, unsigned char* value) {
     //myRequire(isConfigured());
-    return I2CTransport::read(registerAddress);
+    return I2CTransport::read(registerAddress, value);
 }
 
 
@@ -114,14 +113,16 @@ void Bridge::unconfigureMcuSide() {
  * Convenience functions.
  * See I2C Device library, Github for comparable code.
  */
-void Bridge::setBits(RegisterAddress registerAddress, unsigned char mask) {
+bool Bridge::setBits(RegisterAddress registerAddress, unsigned char mask) {
 
-    unsigned char initialValue = Bridge::readByte(registerAddress);
-
-    Bridge::writeByte(registerAddress, mask | initialValue );
+    unsigned char initialValue;
+    if ( Bridge::readByte(registerAddress, &initialValue)) {
+        return Bridge::writeByte(registerAddress, mask | initialValue );
+    }
+    else return false;
 }
 
-void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
+bool Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
 
     /*
      * initial value          11
@@ -129,9 +130,11 @@ void Bridge::clearBits(RegisterAddress registerAddress, unsigned char mask) {
      * ~mask                  10
      * initial value & ~mask  10
      */
-    unsigned char initialValue = Bridge::readByte(registerAddress);
-
-    Bridge::writeByte(registerAddress, initialValue & ~mask );
+    unsigned char initialValue;
+    if ( Bridge::readByte(registerAddress, &initialValue) ) {
+        return Bridge::writeByte(registerAddress, initialValue & ~mask );
+    }
+    else return false;
 }
 
 

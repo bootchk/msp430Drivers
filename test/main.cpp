@@ -41,9 +41,9 @@ int main(void)
 
 	// These tests are usually run in this order, from low level implementation to high
 
-	testI2CTransport();
+	//testI2CTransport();
 	//testI2C();
-	//testRTC();
+	testRTC();
 	//testRTC2();
 	//testRTCAlarmPoll();
 	//testRTCAlarmPoll2();

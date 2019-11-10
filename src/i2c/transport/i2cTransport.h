@@ -126,9 +126,8 @@ public:
                       const unsigned int count);
 
     /*
-     * Overloaded, single byte operations.
+     * single byte operations.
      */
-    static void write( const RegisterAddress registerAddress,
-                       const unsigned char value);
-    static unsigned char read( const RegisterAddress registerAddress);
+    static bool write( const RegisterAddress registerAddress,  const unsigned char value);
+    static bool read( const RegisterAddress registerAddress, unsigned char* value);
 };

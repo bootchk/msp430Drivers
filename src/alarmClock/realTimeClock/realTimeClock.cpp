@@ -47,9 +47,15 @@ void RTC::clearAlarmFlag() {
 }
 
 bool RTC::isAlarmFlagClear(){
-    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Status));
-    // BIT2 is clear
-    return ((value & 0b0100) == 0);
+
+    unsigned char value;
+    if (not Bridge::readByte(static_cast<unsigned char>(RTCAddress::Status), &value) ) {
+        return false;
+    }
+    else {
+        // BIT2 is clear
+       return ((value & 0b0100) == 0);
+    }
 }
 
 
@@ -133,7 +139,8 @@ void RTC::enablePulseInterruptForAlarm() {
 	 * Bit 2:  AIE: enable alarm interrupt
 	 * Bit 5,6: IM: == 11 :  1/4 second pulse width, requires least power
 	 */
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
+	// TODO
+    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
 	              0b01100100 );
 
 	// Polarity of interrupt is not configurable on RTC, occurs on high-to-low edge
@@ -145,13 +152,11 @@ void RTC::enablePulseInterruptForAlarm() {
  * Only bit 2, not the other bits that configure the pulse
  */
 bool RTC::isAlarmInterruptEnabled(){
-    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::InterruptMask));
-    return (value & 0b100);
+    return isRegisterHaveBitsSet(RTCAddress::InterruptMask, 0b100 );
 }
 
 bool RTC::isAlarmInterruptConfiguredPulse(){
-    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::InterruptMask));
-    return (value & 0b01100000);
+    return isRegisterHaveBitsSet(RTCAddress::InterruptMask, 0b01100000 );
 }
 
 
@@ -163,14 +168,32 @@ void RTC::connectFoutnIRQPinToAlarmSignal() {
 	 * Here, we connect only the rtc's internal nAIRQ signal (from alarm)
 	 * bits 0,1: OUT1S: == 11, pin is signal nAIRQ if AIE is set, else OUT
 	 */
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),
+	// TODO
+    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),
 	              0b11 );
 }
 
-bool RTC::isAlarmConfiguredToFoutnIRQPin(){
-    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control2));
-    return (value & 0b11);
+bool RTC::isRegisterHaveBitsSet(RTCAddress registerAddress, unsigned char bitMask) {
+    unsigned char actualValue;
+   if ( not Bridge::readByte(static_cast<unsigned char>(registerAddress), &actualValue) ) {
+        return false;
+   }
+   else {
+        return (bitMask & actualValue);
+   }
 }
+bool RTC::isRegisterHaveValue(RTCAddress registerAddress, unsigned char desiredValue) {
+    unsigned char actualValue;
+   if ( not Bridge::readByte(static_cast<unsigned char>(registerAddress), &actualValue) ) {
+        return false;
+   }
+   else {
+        return (desiredValue == actualValue);
+   }
+}
+
+
+bool RTC::isAlarmConfiguredToFoutnIRQPin(){ return isRegisterHaveBitsSet(RTCAddress::Control2, 0b11); }
 
 
 void RTC::configureAlarmMatchPerYear() {
@@ -180,7 +203,7 @@ void RTC::configureAlarmMatchPerYear() {
      * Bits [4:2]==1 => match once per year
      * Bits [4:2]==0 => match disabled
      */
-    Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
+    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
     myEnsure(isAlarmFlaggingConfigured());
 }
 
@@ -190,16 +213,9 @@ void RTC::disableAlarm() {
 
 
 
-bool RTC::isAlarmConfiguredMatchPerYear(){
-    bool result;
+bool RTC::isAlarmConfiguredMatchPerYear(){ return isRegisterHaveBitsSet(RTCAddress::TimerControl, 0b100); }
+// TODO why was 11100 ???
 
-    unsigned char value = Bridge::readByte(static_cast<unsigned char>(RTCAddress::TimerControl));
-    // TODO why was 11100 ???
-    result = (value & 0b100);
-    // TEMP
-    myAssert(result);
-    return result;
-}
 
 
 
@@ -251,16 +267,12 @@ bool RTC::isReadable() {
      * This costs a bus transfer.
      * It is optional: if omitted, later RTC operations should fail anyway.
      */
-    unsigned char ID;
-
-    ID = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Identifier));
-    return (ID == 0x08);
+    return isRegisterHaveValue(RTCAddress::Identifier, 0x08);
 }
 
 
-bool RTC::readOUTBit() {
-    unsigned char control1 = Bridge::readByte(static_cast<unsigned char>(RTCAddress::Control1));
-    return (control1 & 0b10000);    // BIT4
+bool RTC::isOUTBitSet() {
+    return isRegisterHaveBitsSet(RTCAddress::Control1, 0b10000);    // BIT4
 }
 
 

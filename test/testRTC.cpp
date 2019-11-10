@@ -13,7 +13,7 @@
 #include <pmm.h>
 
 
-void delayHalfSecond() {
+static void delayHalfSecond() {
     __delay_cycles(500000); // half second
 }
 

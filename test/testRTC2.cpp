@@ -52,7 +52,7 @@ void testRTC2()
         myAssert(foo);
 
         // OUT bit should be set
-        myAssert(RTC::readOUTBit());
+        myAssert(RTC::isOUTBitSet());
      }
 
 

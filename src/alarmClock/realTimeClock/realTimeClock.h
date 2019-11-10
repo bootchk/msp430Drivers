@@ -2,7 +2,8 @@
 // include types for time
 #include "../time/rtcTime.h"  // RTCTime
 #include "../time/timeTypes.h"  // EpochTime, Duration
-
+#include "AB08xxRegisters.h"  // RTCAddress
+//#include "../../bridge/bridge.h" // RegisterAddress
 
 /*
  * Abstracts RTC methods.
@@ -132,11 +133,12 @@ public:
 	 */
 	static void configureAlarmInterruptToFoutnIRQPin();
 
-	static bool readOUTBit();
+	static bool isOUTBitSet();
 
 	static bool isAlarmFlagClear();
 
 private:
+
 	static void selectOscModeRCCalibratedWithAutocalibrationPeriod();
 	static void enableAutocalibrationFilter();
 
@@ -154,6 +156,11 @@ private:
 	/*
 	* Used to check configuration.
 	*/
+	// Returns false if register cannot be read or can be read but does not have value
+	static bool isRegisterHaveValue(RTCAddress, unsigned char value);
+	// Returns false if register cannot be read or can be read but bits not set
+	static bool isRegisterHaveBitsSet(RTCAddress, unsigned char maskValue);
+
 	static bool isAlarmInterruptConfiguredPulse();
 	static bool isAlarmConfiguredMatchPerYear();
 	static bool isAlarmConfiguredToFoutnIRQPin();

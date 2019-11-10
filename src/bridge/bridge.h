@@ -108,13 +108,13 @@ public:
 	 * This is not appropriate when a read will clear a register
 	 * (But there are no such registers on this RTC chip.)
 	 */
-	static unsigned char readByte(RegisterAddress registerAddress);
-	static void writeByte(RegisterAddress registerAddress, unsigned char value);
+	static bool readByte(RegisterAddress registerAddress, unsigned char* value);
+	static bool writeByte(RegisterAddress registerAddress, unsigned char value);
 
 	/*
 	 * Write a byte to an address that is not readable (or always reads 0.)
 	 */
-	static void writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value);
+	static bool writeByteWriteOnly(RegisterAddress registerAddress, unsigned char value);
 
 
 
@@ -131,8 +131,8 @@ public:
 	 *
 	 * Not general purpose: more generally, you would pass a mask and a value for the masked bits.
 	 */
-	static void setBits(RegisterAddress registerAddress, unsigned char mask);
+	static bool setBits(RegisterAddress registerAddress, unsigned char mask);
 
-	static void clearBits(RegisterAddress registerAddress, unsigned char mask);
+	static bool clearBits(RegisterAddress registerAddress, unsigned char mask);
 
 };

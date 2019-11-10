@@ -5,6 +5,10 @@
  * Hides whether the implementation uses combined transactions.
  *
  * This mostly creates new buffer so that it contains a prefix of the registerAddress
+ *
+ * Every method can return an error.
+ *
+ * Currently there are no convenience functions for single byte read/write
  */
 
 
