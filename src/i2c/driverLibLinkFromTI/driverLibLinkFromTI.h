@@ -14,7 +14,8 @@ private:
     static void waitForPriorTransactionComplete();
 
 public:
-    static void readMultipleBytes(unsigned char * const buffer, unsigned int count);
-    static void writeMultipleBytes(unsigned char * const buffer, unsigned int count);
+    // returns true on success
+    static bool readMultipleBytes(unsigned char * const buffer, unsigned int count);
+    static bool writeMultipleBytes(unsigned char * const buffer, unsigned int count);
 };
 

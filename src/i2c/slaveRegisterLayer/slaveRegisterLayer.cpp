@@ -9,11 +9,13 @@ static unsigned char bufferWithRegAddress[10];
 
 
 
-void SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buffer, unsigned int count){
+bool SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buffer, unsigned int count){
 
     // First link operation: send one byte of register address
     // !!! Uses this layers write, with count of zero, i.e. none of given buffer
-    SlaveRegisterLayer::write(registerAddress, buffer, 0);
+    if (not SlaveRegisterLayer::write(registerAddress, buffer, 0)) {
+        return false;
+    }
 
 
     // Second link operation: receive bytes from consecutive registers starting at stateful registerAddress
@@ -31,13 +33,13 @@ void SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buff
          readMultipleBytes(buffer, count);
      }
 #else
-     DriverLibLinkWISR::readMultipleBytes(buffer, count);
+     return DriverLibLinkWISR::readMultipleBytes(buffer, count);
 #endif
 }
 
 
 
-void SlaveRegisterLayer::write(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count) {
+bool SlaveRegisterLayer::write(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count) {
     /*
      * One long transaction.
      *
@@ -51,5 +53,5 @@ void SlaveRegisterLayer::write(unsigned int registerAddress, unsigned const char
     }
 
     // Not passing registerAddress as separate parameter, now it is in buffer
-    DriverLibLinkWISR::writeMultipleBytes(bufferWithRegAddress, count+1);
+    return DriverLibLinkWISR::writeMultipleBytes(bufferWithRegAddress, count+1);
 }

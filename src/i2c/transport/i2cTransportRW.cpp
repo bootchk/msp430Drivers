@@ -51,9 +51,7 @@ bool I2CTransport::read(
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::read(registerAddress, buffer, count);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
-    SlaveRegisterLayer::read(registerAddress, buffer, count);
-    // TODO return result if nacked
-    return true;
+    return SlaveRegisterLayer::read(registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
     return I2CDirect::readFromAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -79,9 +77,7 @@ bool I2CTransport::write(
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::write(registerAddress, buffer, count);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
-    SlaveRegisterLayer::write(registerAddress, buffer, count);
-    // TODO return result if nacked
-        return true;
+    return SlaveRegisterLayer::write(registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
     return I2CDirect::writeToAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)

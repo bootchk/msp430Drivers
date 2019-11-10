@@ -28,6 +28,8 @@ unsigned char* localBufferPtr;
 unsigned int localLength;
 unsigned int localBufferIndex;  // increment up, after using (postincrement)
 bool isSend;    // mode: sending or receiving
+bool wasError;  // result, set by ISR
+unsigned int countRetries;   // Counter for retries after nacks
 
 // state init once per run, set by ISR
 unsigned int countNacks = 0;
@@ -62,6 +64,9 @@ void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
     localBufferPtr = buffer;
     localBufferIndex = 0;
     isSend = false;
+    wasError = false;
+    countRetries = 0;
+
 
     initI2CPins();
 
@@ -109,6 +114,8 @@ void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
     localBufferPtr = buffer;
     localBufferIndex = 0;
     isSend = true;
+    wasError = false;
+    countRetries = 0;
 
     initI2CPins();
 
@@ -148,7 +155,7 @@ void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
 
 
 
-void DriverLibLinkWISR::readMultipleBytes(unsigned char * buffer, unsigned int count) {
+bool DriverLibLinkWISR::readMultipleBytes(unsigned char * buffer, unsigned int count) {
 
   initForRead(buffer, count);
 
@@ -160,11 +167,12 @@ void DriverLibLinkWISR::readMultipleBytes(unsigned char * buffer, unsigned int c
   __bis_SR_register(CPUOFF+GIE);
 
   // ISR will exit LPM0 after receiving last byte or on error
+  return (not wasError);
 }
 
 
 
-void DriverLibLinkWISR::writeMultipleBytes(unsigned char * buffer, unsigned int count) {
+bool DriverLibLinkWISR::writeMultipleBytes(unsigned char * buffer, unsigned int count) {
 
     initForWrite(buffer, count);
 
@@ -173,10 +181,11 @@ void DriverLibLinkWISR::writeMultipleBytes(unsigned char * buffer, unsigned int 
     // Note passing first byte to TX
     EUSCI_B_I2C_masterSendMultiByteStart(EUSCI_B0_BASE, buffer[localBufferIndex++]);
 
-  // Enter LPM0 w/ interrupt
-  __bis_SR_register(CPUOFF+GIE);
+    // Enter LPM0 w/ interrupt
+    __bis_SR_register(CPUOFF+GIE);
 
-  // ISR will exit LPM0 after RX or TX last byte or on error
+    // ISR will exit LPM0 after RX or TX last byte or on error
+    return (not wasError);
 }
 
 
@@ -202,14 +211,25 @@ void USCIB0_ISR(void)
             break;
         case USCI_I2C_UCNACKIFG:    // NAK received (master only)
             countNacks++;
-
-            // TODO is this restarting?  attempts until success?
-            if (isSend) {
-                // TODO this is the original from TI example, but ???? what about the data already sent?
-                EUSCI_B_I2C_masterSendStart(EUSCI_B0_BASE);
+            countRetries++;
+            if (countRetries > 5) {
+                wasError = true;
+                __bic_SR_register_on_exit(CPUOFF); // Exit LPM0
             }
             else {
-                 EUSCI_B_I2C_masterReceiveStart(EUSCI_B0_BASE);
+                // Retry
+                // TODO is this restarting?  attempts until success?
+                if (isSend) {
+                    // The original from TI example, but ???? what about the data already sent?
+                    // EUSCI_B_I2C_masterSendStart(EUSCI_B0_BASE);
+
+                    // Send previous byte again.  localBufferIndex is already incremented.
+                     EUSCI_B_I2C_masterSendMultiByteStart(EUSCI_B0_BASE, localBufferPtr[localBufferIndex - 1]);
+                }
+                else {
+                    EUSCI_B_I2C_masterReceiveStart(EUSCI_B0_BASE);
+                }
+                // Return to LPM0
             }
             break;
 
@@ -243,8 +263,7 @@ void USCIB0_ISR(void)
         // Send
         case USCI_I2C_UCTXIFG0:     // TXIFG0
             // Previous byte shifted out of peripheral register (wire transfer may not be done)
-            // Copy next byte from memory to peripheral register
-            EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, localBufferPtr[localBufferIndex++]);
+
             if (localBufferIndex >= localLength) {
                 // For safety (in case we get extra interrupts, reset index
                 localBufferIndex = 0;
@@ -252,6 +271,12 @@ void USCIB0_ISR(void)
                 EUSCI_B_I2C_masterSendMultiByteStop(EUSCI_B0_BASE);
                 // Exit LPM0
                 __bic_SR_register_on_exit(CPUOFF);
+            }
+            else {
+                // More bytes to send
+                // Copy next byte from memory to peripheral register
+                EUSCI_B_I2C_masterSendMultiByteNext(EUSCI_B0_BASE, localBufferPtr[localBufferIndex++]);
+                // stay in LPM0 until TXIFG again or NACKIFG
             }
             break;
 
