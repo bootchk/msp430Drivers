@@ -9,7 +9,7 @@
 //#include "../src/bridge/serialBus/i2c/i2cDirect.h"
 
 // Not direct
-#include "../src/bridge/serialBus/i2c/transport/i2cTransport.h"
+#include "../src/i2c/transport/i2cTransport.h"
 
 //#include "../src/pinFunction/i2cPins.h"
 
@@ -66,7 +66,8 @@ void testI2CTransport()
     //I2CTransport::setDataRate125kbps();
 
     // Choice
-    I2CTransport::configurePinsWithExternalPullups();
+    // Some implementations configure pins above
+    // TEMP I2CTransport::configurePinsWithExternalPullups();
     //I2CTransport::configurePinsWithInternalPullups();
 
     //I2CTransport::enable();
@@ -86,7 +87,8 @@ void testI2CTransport()
     // the current check isInitialized is foobar
 #endif
 
-myAssert(I2CTransport::isConfiguredPinsForModule());
+// TEMP for now, using TI DriverLib, pins init every read/write
+    // myAssert(I2CTransport::isConfiguredPinsForModule());
 // TODO assert data rate, slave, enabled, external pullups
 
 #define USE_LED

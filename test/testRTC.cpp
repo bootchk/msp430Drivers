@@ -5,7 +5,7 @@
 #include "../src/assert/myAssert.h"
 #include "../src/LED/led.h"
 
-#include "../src/bridge/serialBus/i2c/i2cPeripheral.h"
+#include "../src/i2c/i2cPeripheral.h"
 
 
 

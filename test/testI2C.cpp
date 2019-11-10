@@ -6,7 +6,7 @@
 #include "../src/LED/led.h"
 
 // Use transport layer interface to I2C
-#include "../src/bridge/serialBus/i2c/transport/i2cTransport.h"
+#include "../src/i2c/transport/i2cTransport.h"
 
 //#include "../src/pinFunction/i2cPins.h"
 

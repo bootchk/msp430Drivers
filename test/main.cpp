@@ -46,7 +46,7 @@ int main(void)
 	//testRTC();
 	//testRTC2();
 	//testRTCAlarmPoll();
-	testRTCAlarmPoll2();
+	//testRTCAlarmPoll2();
 	//testRTCTimeMonotonic();
 	// testAlarm();
 	//testAlarm2();

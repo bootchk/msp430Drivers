@@ -31,6 +31,8 @@
 
 #ifdef USE_DRIVERLIB_FOR_LINK
 #include "../driverLibLink/i2cDriverLibLink.h"
+#elif defined(USE_DRIVERLIB2_FOR_LINK)
+#include "../driverLibLink2/i2cDriverLibLink2.h"
 #elif defined(USE_DIRECT_FOR_LINK)
 #include "../direct/i2cDirect.h"
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -112,6 +114,7 @@ void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
     I2CDirect::initI2CPeripheral(slaveAddress);
     // assert data rate is set, and peripheral enabled
 #else
+    // Other implementations require no init: they init on each transaction
     // Note that other interrupts are enabled by stateMachine.
 
 #endif
