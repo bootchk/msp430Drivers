@@ -25,18 +25,37 @@
  */
 
 
+/*
+ * !!! Differs from testAlarm:   configure RTC in every loop
+ */
+
+
+static void delayHalfSecond() {  __delay_cycles(500000); // half second }
+
+
+
+}
 static const Duration duration = {3};
 
 
-void testAlarm()
+void testAlarm3()
 {
     //CentralSystem::configureAfterReset();
     SoC::enableBSLOffAndVacantMemoryNMI();
     SoC::disableFRAMWriteProtect();
 
+    // !!! Wait for RTC to come alive
+    delayHalfSecond();
+    delayHalfSecond();
+
     //AllPins::setHighOutput();
 
     PMM_unlockLPM5();
+
+
+
+    while (true)
+        {
 
     // WAS  Alarm::configureForAlarming();
     Alarm::configureAfterColdReset();   // Configure alarm pin, bus, and RTC
@@ -50,16 +69,12 @@ void testAlarm()
 
     Alarm::clearBothSidesOfSignal();
 
-    Alarm::clearBothSidesOfSignal();
 
     myAssert (Alarm::isClearOnMCUSide());
-
     myAssert (Alarm::isRTCReady() );
-
     myAssert(RTC::isAlarmInterruptEnabled());
 
-    while (true)
-    {
+
         bool didSet = Alarm::setAlarmDurationSecondsFromNow(duration);
         myAssert(didSet);
 

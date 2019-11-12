@@ -30,6 +30,8 @@
 
 // FUTURE omit Hundredth, our EpochTime is in seconds, we don't set alarm on Hundredth
 
+
+
 struct RTCTime {
 	unsigned char Hundredth;
 	unsigned char Second;
@@ -55,7 +57,8 @@ struct RTCTime {
 }  ;
 
 
-
+// Apparently, compiler is not padding the struct
+static_assert(sizeof(RTCTime) == 7, "Check sizeofRTCTime" );
 
 
 

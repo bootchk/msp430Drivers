@@ -136,13 +136,11 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
     TimeConverter::convertEpochTimeToRTCTime(alarmEpochTime, alarmRTCTime);
 
     // Takes a pointer, not a reference
-    RTCInterface::writeAlarm(&alarmRTCTime);
-
-    // Expensive assertion
-    myEnsure(verifyAlarmTime(&alarmRTCTime));
-
-    // Always true. FUTURE return false if alarm cannot be verified.
-    return true;
+    if (RTCInterface::writeAlarm(&alarmRTCTime)) {
+        // Expensive but should be done
+        return verifyAlarmTime(&alarmRTCTime);
+    }
+    else return false;
 }
 
 
@@ -151,8 +149,10 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
 bool RTC::verifyAlarmTime(const RTCTime* writtenTime) {
     RTCTime readAlarmRTCTime;
 
-    RTCInterface::readAlarm(&readAlarmRTCTime);
-    // equality operator is defined for type RTCTime, passing const RTCTime* on rhs
-    return(readAlarmRTCTime == writtenTime);
+    if (RTCInterface::readAlarm(&readAlarmRTCTime)) {
+        // equality operator is defined for type RTCTime, passing const RTCTime* on rhs
+        return(readAlarmRTCTime == writtenTime);
+    }
+    else return false;
 }
 

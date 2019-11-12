@@ -19,19 +19,19 @@
  * Since the configured RTC alarm mode is ignoring the "Weekday" register, this works.
  */
 
-void RTCInterface::writeAlarm(const RTCTime* alarm) {
-    Bridge::write(static_cast<unsigned char> (RTCAddress::Alarm),
+bool RTCInterface::writeAlarm(const RTCTime* alarm) {
+    return Bridge::write(static_cast<unsigned char> (RTCAddress::Alarm),
                  (unsigned char *) alarm,
-                 sizeof(RTCTime));
+                 COUNT_BYTES_READ_WRITE_TO_ALARM);  // OLD sizeof(RTCTime));
     // assert alarm parameter is unchanged.
     // assert alarm was written to RTC
 }
 
 
-void RTCInterface::readAlarm(RTCTime* alarm) {
-    Bridge::read(static_cast<unsigned char> (RTCAddress::Alarm),
+bool RTCInterface::readAlarm(RTCTime* alarm) {
+    return Bridge::read(static_cast<unsigned char> (RTCAddress::Alarm),
                        (unsigned char *) alarm,
-                       sizeof(RTCTime));
+                       COUNT_BYTES_READ_WRITE_TO_ALARM);
 }
 
 
@@ -40,8 +40,8 @@ void RTCInterface::readAlarm(RTCTime* alarm) {
 
 
 
-void RTCInterface::readTime(RTCTime* time) {
-    Bridge::read(static_cast<unsigned char> (RTCAddress::Time),
+bool RTCInterface::readTime(RTCTime* time) {
+    return Bridge::read(static_cast<unsigned char> (RTCAddress::Time),
                        (unsigned char *) time,
                        sizeof(RTCTime));
 }

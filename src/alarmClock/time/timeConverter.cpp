@@ -51,16 +51,18 @@ return 0;
 void TimeConverter::convertRTCTimeToCalendarTime(const RTCTime& rtcTime, CalendarTime& calendarTime) {
     // Not used: CalendarYrToTm(); // /*+ (buf.weekdays.GP * 100)*/) + 2000;
 
-    // FUTURE mask off the GP bits in the time registers of the RTC.
     /*
-     * We are not using the GP bits, so they should not be set, but for safety, mask them off anyway.
+     * The byte read from register includes high-bit GP bits (general purpose).
+     * IOW, the time is in bit-fields, not in bytes.
+     * We are not using the GP bits; they should always be zero.
+     * But for safety, mask them off anyway.
      */
-	calendarTime.Year = bcd2bin(rtcTime.YearOfCentury);
-	calendarTime.Month = bcd2bin(rtcTime.Month);
-	calendarTime.Day = bcd2bin(rtcTime.DayOfMonth);
-	calendarTime.Hour = bcd2bin(rtcTime.Hour24);
-	calendarTime.Minute = bcd2bin(rtcTime.Minute);
-	calendarTime.Second = bcd2bin(rtcTime.Second);
+	calendarTime.Year =  bcd2bin(rtcTime.YearOfCentury );
+	calendarTime.Month = bcd2bin(rtcTime.Month        & 0x1F );
+	calendarTime.Day =   bcd2bin(rtcTime.DayOfMonth   & 0x3F );
+	calendarTime.Hour =   bcd2bin(rtcTime.Hour24      & 0x3F );
+	calendarTime.Minute = bcd2bin(rtcTime.Minute      & 0x7F );
+	calendarTime.Second = bcd2bin(rtcTime.Second      & 0x7F );
 	/*
 	 * CalendarTime has no hundredths.
 	 */
@@ -68,6 +70,7 @@ void TimeConverter::convertRTCTimeToCalendarTime(const RTCTime& rtcTime, Calenda
 
 
 void TimeConverter::convertCalendarTimeToRTCTime(const CalendarTime& calendarTime, RTCTime& rtcTime ) {
+    // If rtcTime is written to device, it will clear GP bits.
 	rtcTime.YearOfCentury = bin2bcd(calendarTime.Year);
 	rtcTime.Month         = bin2bcd(calendarTime.Month);
 	rtcTime.DayOfMonth    = bin2bcd(calendarTime.Day);

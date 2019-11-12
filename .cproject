@@ -56,6 +56,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.DISPLAY_ERROR_NUMBER.1450413076" name="Emit diagnostic identifier numbers (--display_error_number, -pden)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.DISPLAY_ERROR_NUMBER" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.ALIGN_FOR_POWER.225139377" name="Align functions and loops for power (--align_for_power)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.ALIGN_FOR_POWER" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.OPT_FOR_SPEED.290779714" name="Speed vs. size trade-offs (--opt_for_speed, -mf)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.OPT_FOR_SPEED" value="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.OPT_FOR_SPEED.5" valueType="enumerated"/>
+								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.CHECK_MISRA.99556819" name="Enable checking of MISRA-C:2004 rules (--check_misra)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compilerID.CHECK_MISRA" value="" valueType="string"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__C_SRCS.481793294" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__C_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__CPP_SRCS.438046122" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__CPP_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__ASM_SRCS.732645533" name="Assembly Sources" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.compiler.inputType__ASM_SRCS"/>
@@ -75,7 +76,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.USE_HW_MPY.513492634" name="Deprecated: Now a compiler option instead of linker option (--use_hw_mpy)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.USE_HW_MPY" value="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.USE_HW_MPY.F5" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.CINIT_HOLD_WDT.1173026963" name="Hold watchdog timer during cinit auto-initialization (--cinit_hold_wdt)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.CINIT_HOLD_WDT" value="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.CINIT_HOLD_WDT.on" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.HEAP_SIZE.986860238" name="Heap size for C/C++ dynamic memory allocation (--heap_size, -heap)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.HEAP_SIZE" value="160" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.STACK_SIZE.688756608" name="Set C system stack size (--stack_size, -stack)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.STACK_SIZE" value="160" valueType="string"/>
+								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.STACK_SIZE.688756608" name="Set C system stack size (--stack_size, -stack)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.STACK_SIZE" value="500" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.MAP_FILE.114498944" name="Link information (map) listed into &lt;file&gt; (--map_file, -m)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.MAP_FILE" value="${ProjName}.map" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.OUTPUT_FILE.704476281" name="Specify output file name (--output_file, -o)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.OUTPUT_FILE" value="${ProjName}.out" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.DIAG_WRAP.1278036226" name="Wrap diagnostic messages (--diag_wrap)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.DIAG_WRAP" value="com.ti.ccstudio.buildDefinitions.MSP430_18.1.linkerID.DIAG_WRAP.off" valueType="enumerated"/>
@@ -306,4 +307,16 @@
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="DebugFR6989">
+			<resource resourceType="PROJECT" workspacePath="/msp430Drivers"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/msp430Drivers"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/msp430Drivers"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

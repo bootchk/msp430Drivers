@@ -31,7 +31,9 @@
 
 
 
-void RTC::clearAlarmFlag() {
+
+
+bool RTC::clearAlarmFlag() {
 	/*
 	 * Since we are only using one interrupt from RTC,
 	 * it is safe to clear them all by writing a zero to the flag byte.
@@ -41,9 +43,11 @@ void RTC::clearAlarmFlag() {
 	 * Bit name is ALM, but we clear all bits
 	 */
 
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Status),
+	bool result;
+	result = Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Status),
 	              0);
-	myEnsure(isAlarmFlagClear());
+	//myEnsure(isAlarmFlagClear());
+	return result;
 }
 
 bool RTC::isAlarmFlagClear(){
@@ -60,118 +64,9 @@ bool RTC::isAlarmFlagClear(){
 
 
 
-void RTC::configureRCCalibratedOscillatorMode() {
-    // TEMP
-    // TODO
-    // This is optional, and is failing to verify writes.
-    return;
-
-	// Set two separate registers
-	RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod();
-	RTC::enableAutocalibrationFilter();
-}
 
 
 
-void RTC::configureAlarmInterruptToFoutnIRQPin() {
-	// Set two separate registers
-
-	// Order not important
-	RTC::enablePulseInterruptForAlarm();
-	RTC::connectFoutnIRQPinToAlarmSignal();
-}
-
-
-
-
-
-/*
- * BIT7 == 0 -> not stopped
- * BIT6 == 0 -> 24 hour mode
- * BIT0 == 0 -> counter registers locked
- *
- * !!! Note that bit 5 is not writeable when LKO2 bits is set.
- * Must use writeBits: does not ensure that given mask is the final contents of register.
- */
-void RTC::configure24HourMode() {
-	Bridge::clearBits(static_cast<unsigned char>(RTCAddress::Control1),
-	                  (unsigned char) 0b01000000 ); // BIT6
-}
-
-
-/*
- * Private
- */
-
-
-void RTC::selectOscModeRCCalibratedWithAutocalibrationPeriod() {
-
-	unlockOscControlRegister();
-
-	/*
-	 * ??? Fails to verify often, thus we do not verify (writeByteWriteOnly() instead of writeByte())
-	 */
-
-	// OSEL on => BIT7;
-	// ACAL == 10 (17 minute autocalibration period) => BIT6
-	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::OscillatorControl),
-	              (unsigned char) 0b11000000 ); // (BIT7 | BIT6) );
-}
-
-
-void RTC::enableAutocalibrationFilter() {
-	unlockMiscRegisters();
-
-	// Enable filter
-	Bridge::writeByte(static_cast<unsigned char>(RTCAddress::AutocalibrationFilter),
-	              (unsigned char) Key::AutocalibrationFilterEnable );
-}
-
-
-
-
-/*
- * Related to alarm and its interrupt.
- */
-
-void RTC::enablePulseInterruptForAlarm() {
-	/*
-	 * Bit 2:  AIE: enable alarm interrupt
-	 * Bit 5,6: IM: == 11 :  1/4 second pulse width, requires least power
-	 */
-	// TODO
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
-	              0b01100100 );
-
-	// Polarity of interrupt is not configurable on RTC, occurs on high-to-low edge
-
-	myEnsure(RTC::isAlarmInterruptEnabled());
-}
-
-/*
- * Only bit 2, not the other bits that configure the pulse
- */
-bool RTC::isAlarmInterruptEnabled(){
-    return isRegisterHaveBitsSet(RTCAddress::InterruptMask, 0b100 );
-}
-
-bool RTC::isAlarmInterruptConfiguredPulse(){
-    return isRegisterHaveBitsSet(RTCAddress::InterruptMask, 0b01100000 );
-}
-
-
-
-
-void RTC::connectFoutnIRQPinToAlarmSignal() {
-	/*
-	 * Connects signals to pin.
-	 * Here, we connect only the rtc's internal nAIRQ signal (from alarm)
-	 * bits 0,1: OUT1S: == 11, pin is signal nAIRQ if AIE is set, else OUT
-	 */
-	// TODO
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),
-	              0b11 );
-}
 
 bool RTC::isRegisterHaveBitsSet(RTCAddress registerAddress, unsigned char bitMask) {
     unsigned char actualValue;
@@ -182,6 +77,17 @@ bool RTC::isRegisterHaveBitsSet(RTCAddress registerAddress, unsigned char bitMas
         return (bitMask & actualValue);
    }
 }
+
+bool RTC::isRegisterHaveBitsClear(RTCAddress registerAddress, unsigned char bitMask) {
+    unsigned char actualValue;
+   if ( not Bridge::readByte(static_cast<unsigned char>(registerAddress), &actualValue) ) {
+        return false;
+   }
+   else {
+        return ((bitMask & actualValue) == 0);
+   }
+}
+
 bool RTC::isRegisterHaveValue(RTCAddress registerAddress, unsigned char desiredValue) {
     unsigned char actualValue;
    if ( not Bridge::readByte(static_cast<unsigned char>(registerAddress), &actualValue) ) {
@@ -192,50 +98,6 @@ bool RTC::isRegisterHaveValue(RTCAddress registerAddress, unsigned char desiredV
    }
 }
 
-
-bool RTC::isAlarmConfiguredToFoutnIRQPin(){ return isRegisterHaveBitsSet(RTCAddress::Control2, 0b11); }
-
-
-void RTC::configureAlarmMatchPerYear() {
-    /*
-     * Reset state of TimerControl is 0b100011 ???.
-     *
-     * Bits [4:2]==1 => match once per year
-     * Bits [4:2]==0 => match disabled
-     */
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
-    myEnsure(isAlarmFlaggingConfigured());
-}
-
-void RTC::disableAlarm() {
-    Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0 );
-}
-
-
-
-bool RTC::isAlarmConfiguredMatchPerYear(){ return isRegisterHaveBitsSet(RTCAddress::TimerControl, 0b100); }
-// TODO why was 11100 ???
-
-
-
-
-
-/*
- * Unlocking.
- * !!! Writes to ConfigurationKey cannot be verified, since it resets to zero upon any write.
- * It is really a lock: writing the key unlocks other registers.
- * The write doesn't change the value in the register (it always reads zero.)
- */
-void RTC::unlockMiscRegisters() {
-	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
-	                           (unsigned char) Key::UnlockMiscRegisters );
-}
-
-
-void RTC::unlockOscControlRegister() {
-	Bridge::writeByteWriteOnly(static_cast<unsigned char>(RTCAddress::ConfigurationKey),
-	                           (unsigned char) Key::UnlockOscillatorControl );
-}
 
 
 
@@ -276,26 +138,3 @@ bool RTC::isOUTBitSet() {
 }
 
 
-/*
- * Whole chain of configuration re alarm.
- *
- * Starts with ALM bits set so that match sets a flag.
- * Followed by configuration so that flag setting causes interrupt pulse on a pin.
- *
- * These do NOT check that alarm registers have a value that is in the future.
- */
-bool RTC::isAlarmInterruptConfigured() {
-    return (isAlarmFlaggingConfigured()
-            and isAlarmInterruptEnabled()
-            and isAlarmInterruptConfiguredPulse()
-            and isAlarmConfiguredToFoutnIRQPin()
-            and isAlarmFlagClear()
-            );
-
-}
-
-
-bool RTC::isAlarmFlaggingConfigured() {
-    // FUTURE also must be 24 hour mode or alarm match might not work
-    return isAlarmConfiguredMatchPerYear();
-}

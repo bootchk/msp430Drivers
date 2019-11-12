@@ -104,7 +104,9 @@ bool I2CTransport::isConfiguredPinsForModule() {
 
 void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
 {
-    myRequire(not isEnabled());
+    /*
+     * Not require disabled: each init may disable peripheral as part of init()
+     */
 
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::initI2CPeripheral(slaveAddress);
@@ -118,6 +120,7 @@ void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
     // Note that other interrupts are enabled by stateMachine.
 
 #endif
+
     // Not all implementations ensure enabled, caller must do that
 }
 

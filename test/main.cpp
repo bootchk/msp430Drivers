@@ -13,6 +13,7 @@ void testRTCAlarmPoll2();
 void testRTCTimeMonotonic();
 void testAlarm();
 void testAlarm2();
+void testAlarm3();
 void testAlarmLPM45();
 void testTimer();
 void testLEDSensor();
@@ -43,12 +44,13 @@ int main(void)
 
 	//testI2CTransport();
 	//testI2C();
-	testRTC();
+	//testRTC();
 	//testRTC2();
 	//testRTCAlarmPoll();
 	//testRTCAlarmPoll2();
 	//testRTCTimeMonotonic();
-	// testAlarm();
+	//testAlarm();
 	//testAlarm2();
+	testAlarm3();
 	//testAlarmLPM45();
 }

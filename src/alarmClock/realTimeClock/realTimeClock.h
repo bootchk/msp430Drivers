@@ -16,6 +16,10 @@
  * Collaborates with Bridge, which hides SPI versus I2C
  */
 
+
+
+
+
 class RTC {
 public:
     /*
@@ -35,10 +39,11 @@ public:
 	 * if this is called after the interrupt on MCU side,
 	 * RTC should already have retuned high the Fout/nIRQ signal.
 	 *
-	 * No error return.
-	 * Caller must check that Fout/nIRQ is high.
+	 * Returns false on RTC bus errors.
+	 *
+	 * Caller should also check that Fout/nIRQ is high.
 	 */
-	static void clearAlarmFlag();
+	static bool clearAlarmFlag();
 
 
 	/*
@@ -120,6 +125,7 @@ public:
 	 * !!! If you omit, upper nibble of hour counter is NOT hours tens digit, but include bit for AM/PM
 	 */
 	static void configure24HourMode();
+	static bool is24HourModeConfigured();
 
 	/*
 	 * Configure RTC to use an oscillator that is both precise and low power.
@@ -160,6 +166,8 @@ private:
 	static bool isRegisterHaveValue(RTCAddress, unsigned char value);
 	// Returns false if register cannot be read or can be read but bits not set
 	static bool isRegisterHaveBitsSet(RTCAddress, unsigned char maskValue);
+	// Returns false if register cannot be read or can be read but bits not clear
+	static bool isRegisterHaveBitsClear(RTCAddress, unsigned char maskValue);
 
 	static bool isAlarmInterruptConfiguredPulse();
 	static bool isAlarmConfiguredMatchPerYear();

@@ -10,6 +10,11 @@
 #include "../time/rtcTime.h"
 
 
+#define COUNT_BYTES_READ_WRITE_TO_ALARM 6
+
+
+
+
 
 class RTCInterface {
 private:
@@ -24,7 +29,7 @@ public:
      * Also, we don't store any times long term,
      * so we never need to write time to restore clock that has stopped.
      */
-    static void readTime(RTCTime*);
+    static bool readTime(RTCTime*);
 
     /*
      * Write to the alarm registers (that we are using) of the RTC.
@@ -38,8 +43,8 @@ public:
      * writeAlarm() does write year to the alarm but to the weekday register!!!
      * Since the match is not configured to use the weekday register, this is OK.
      */
-    static void writeAlarm(const RTCTime*);
+    static bool writeAlarm(const RTCTime*);
 
 
-    static void readAlarm(RTCTime*);
+    static bool readAlarm(RTCTime*);
 };

@@ -42,7 +42,7 @@ bool Alarm::clearAlarmOnRTC() {
 	 * RTC should raise nIRQ signal to high if not already so.
 	 *  mcu interrupt occurred on rising edge.
 	 */
-	RTC::clearAlarmFlag();
+	if ( not RTC::clearAlarmFlag()) return false;
 
 	// Signal is high
 	result = isRTCReady();

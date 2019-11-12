@@ -91,10 +91,10 @@ public:
 	/*
 	 * Read/write many consecutive bytes
 	 */
-	static void read(const RegisterAddress registerAddress,
+	static bool read(const RegisterAddress registerAddress,
 	                  unsigned char * const buffer,
 	                  const unsigned int count);
-	static void write(const RegisterAddress registerAddress,
+	static bool write(const RegisterAddress registerAddress,
 	                      unsigned char * const buffer,
 	                      const unsigned int count);
 

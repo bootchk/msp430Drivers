@@ -24,19 +24,19 @@
 /*
  * Read/write
  */
-void Bridge::write(const RegisterAddress registerAddress,
+bool Bridge::write(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
     //myRequire(isConfigured());
-    I2CTransport::write(registerAddress, buffer, count);
+    return I2CTransport::write(registerAddress, buffer, count);
 }
 
 
-void Bridge::read(const RegisterAddress registerAddress,
+bool Bridge::read(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
                       const unsigned int count) {
     // myRequire(isConfigured());
-    I2CTransport::read(registerAddress, buffer, count);
+    return I2CTransport::read(registerAddress, buffer, count);
 }
 
 
@@ -78,13 +78,16 @@ void Bridge::configureToSleepState() {
 
 
 void Bridge::configureMcuSide(bool isRWBitHighForRead) {
-    // not require device ready since configuration is on the mcu side
+    // not require slave device ready since configuration is on the mcu side
 
     I2CTransport::initI2CPeripheral(0x69);
     // slave set
     // pins not configured
     // not enabled
 
+#ifdef TEMP
+
+    Cruft?  Need to decide on one API that allows setting data rate independently or not, that enables or not
     I2CTransport::setDataRate125kbps();
 
 #ifdef    I2C_HAS_EXTERNAL_PULLUPS
@@ -96,6 +99,8 @@ void Bridge::configureMcuSide(bool isRWBitHighForRead) {
 #endif
 
     I2CTransport::enable();
+#endif
+
 }
 
 

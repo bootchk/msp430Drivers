@@ -17,7 +17,7 @@ static void delayHalfSecond() {
     __delay_cycles(500000); // half second
 }
 
-
+const Duration ThreeSeconds = {3};
 
 /*
  * Test external RTC driver.
@@ -59,7 +59,7 @@ void testRTCAlarmPoll()
 
         RTC::clearAlarmFlag();
 
-        RTC::setAlarmDuration(3);
+        RTC::setAlarmDuration(ThreeSeconds);
 
         myAssert(RTC::isAlarmFlaggingConfigured());
 

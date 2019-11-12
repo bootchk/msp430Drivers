@@ -13,11 +13,10 @@
 #include <pmm.h>
 
 
-static void delayHalfSecond() {
-    __delay_cycles(500000); // half second
-}
+static void delayHalfSecond() {  __delay_cycles(500000);  }
 
 
+const Duration ThreeSeconds = {3};
 
 /*
  * Test external RTC driver.
@@ -93,7 +92,7 @@ void testRTC2()
 
         now = RTC::timeNowOrReset();
 
-        RTC::setAlarmDuration(3);
+        RTC::setAlarmDuration(ThreeSeconds);
         // wait for alarm flag on RTC.  No interrupt to MCU
         while ( RTC::isAlarmFlagClear() ) ;
         RTC::clearAlarmFlag();
