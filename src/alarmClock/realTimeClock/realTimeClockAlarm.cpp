@@ -136,7 +136,7 @@ bool RTC::setAlarmTime(EpochTime alarmEpochTime) {
     TimeConverter::convertEpochTimeToRTCTime(alarmEpochTime, alarmRTCTime);
 
     // Takes a pointer, not a reference
-    if (RTCInterface::writeAlarm(&alarmRTCTime)) {
+    if (RTCInterface::setAlarm(&alarmRTCTime)) {
         // Expensive but should be done
         return verifyAlarmTime(&alarmRTCTime);
     }

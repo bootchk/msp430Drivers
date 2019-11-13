@@ -43,7 +43,7 @@ void testAlarm()
 
 
     myAssert(Alarm::isRTCReadable());
-    myAssert(RTC::isAlarmInterruptEnabled());
+    // OLD not enabled until setAlarm     myAssert(RTC::isAlarmInterruptEnabled());
 
     // assert ready for setAlarm()
     // assert serial bus (Bridge) ready, was configured
@@ -56,7 +56,7 @@ void testAlarm()
 
     myAssert (Alarm::isRTCReady() );
 
-    myAssert(RTC::isAlarmInterruptEnabled());
+    // OLD not enabled until setAlarm    myAssert(RTC::isAlarmInterruptEnabled());
 
     while (true)
     {

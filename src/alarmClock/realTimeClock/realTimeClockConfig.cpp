@@ -3,6 +3,8 @@
 
 #include "AB08xxRegisters.h"
 
+#include "RTCInterface.h"
+
 #include "../../bridge/bridge.h"
 
 #include "../../assert/myAssert.h"
@@ -28,6 +30,14 @@
  */
 
 
+/*
+ * 24 hour mode is an implementation decision that affects math operations.
+ * Match once per year is an implentation decision that affects writing alarm registers.
+ */
+bool RTC::configureStandardAlarming() {
+    return ( RTCInterface::configureAlarmMatchPerYear()
+    and RTCInterface::configure24HourMode() );
+}
 
 
 
@@ -40,12 +50,10 @@ void RTC::configureRCCalibratedOscillatorMode() {
 
 
 
-void RTC::configureAlarmInterruptToFoutnIRQPin() {
-	// Set two separate registers
-
-	// Order not important
-	RTC::enablePulseInterruptForAlarm();
-	RTC::connectFoutnIRQPinToAlarmSignal();
+bool  RTC::configureAlarmInterruptToFoutnIRQPin() {
+	// OLD :RTC::enablePulseInterruptForAlarm();
+    // NEW : we don't enable until setAlarm()
+	return RTC::connectFoutnIRQPinToAlarmSignal();
 }
 
 
@@ -53,18 +61,7 @@ void RTC::configureAlarmInterruptToFoutnIRQPin() {
 
 
 
-/*
- * BIT7 == 0 -> not stopped
- * BIT6 == 0 -> 24 hour mode
- * BIT0 == 0 -> counter registers locked
- *
- * !!! Note that bit 5 is not writeable when LKO2 bits is set.
- * Must use writeBits: does not ensure that given mask is the final contents of register.
- */
-void RTC::configure24HourMode() {
-    (void) Bridge::clearBits(static_cast<unsigned char>(RTCAddress::Control1),  (unsigned char) 0b01000000 ); // BIT6
-    myAssert(is24HourModeConfigured());
-}
+
 
 bool RTC::is24HourModeConfigured() {
     return ( isRegisterHaveBitsClear(RTCAddress::Control1, 0b01000000) );
@@ -110,19 +107,6 @@ void RTC::enableAutocalibrationFilter() {
  * Related to alarm and its interrupt.
  */
 
-void RTC::enablePulseInterruptForAlarm() {
-	/*
-	 * Bit 2:  AIE: enable alarm interrupt
-	 * Bit 5,6: IM: == 11 :  1/4 second pulse width, requires least power
-	 */
-	// TODO
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::InterruptMask),
-	              0b01100100 );
-
-	// Polarity of interrupt is not configurable on RTC, occurs on high-to-low edge
-
-	myEnsure(RTC::isAlarmInterruptEnabled());
-}
 
 /*
  * Only bit 2, not the other bits that configure the pulse
@@ -138,15 +122,14 @@ bool RTC::isAlarmInterruptConfiguredPulse(){
 
 
 
-void RTC::connectFoutnIRQPinToAlarmSignal() {
+bool RTC::connectFoutnIRQPinToAlarmSignal() {
 	/*
 	 * Connects signals to pin.
 	 * Here, we connect only the rtc's internal nAIRQ signal (from alarm)
 	 * bits 0,1: OUT1S: == 11, pin is signal nAIRQ if AIE is set, else OUT
+	 * I.E. OUT is always 1, so signal on pin is high, but dips low when signal nAIRQ  dips
 	 */
-	// TODO
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),
-	              0b11 );
+    return Bridge::writeByte(static_cast<unsigned char>(RTCAddress::Control2),  0b11 );
 }
 
 bool RTC::isAlarmConfiguredToFoutnIRQPin(){ return isRegisterHaveBitsSet(RTCAddress::Control2, 0b11); }
@@ -154,16 +137,7 @@ bool RTC::isAlarmConfiguredToFoutnIRQPin(){ return isRegisterHaveBitsSet(RTCAddr
 
 
 
-void RTC::configureAlarmMatchPerYear() {
-    /*
-     * Reset state of TimerControl is 0b100011 ???.
-     *
-     * Bits [4:2]==001 => match once per year
-     * Bits [4:2]==000 => match disabled
-     */
-    (void) Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0b100 );
-    myEnsure(isAlarmFlaggingConfigured());
-}
+
 
 
 bool RTC::isAlarmConfiguredMatchPerYear(){
@@ -175,11 +149,13 @@ bool RTC::isAlarmConfiguredMatchPerYear(){
 
 
 
+#ifdef OLD
+This is NOT a good way to disable alarm.
 
 void RTC::disableAlarm() {
     Bridge::writeByte(static_cast<unsigned char>(RTCAddress::TimerControl), 0 );
 }
-
+#endif
 
 
 

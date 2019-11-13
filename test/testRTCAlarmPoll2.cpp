@@ -19,11 +19,8 @@ static void delayHalfSecond() {
 
 
 static void configureAlarm() {
-    RTC::disableAlarm();
     // Configure what is necessary for alarm flag set
-    RTC::configureAlarmMatchPerYear();
-    RTC::configure24HourMode();
-    //myEnsure()
+    RTC::configureStandardAlarming();
 }
 
 /*

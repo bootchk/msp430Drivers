@@ -26,6 +26,7 @@
  * Optional LED blinking.  ET will tell you whether it is working, LED's are superfluous.
  * coldstart: red
  * wake: green
+ * !!! Only when P1.1 is not used for RTC alarm.
  */
 
 // Optional actions on every wake

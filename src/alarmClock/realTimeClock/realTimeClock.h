@@ -23,6 +23,12 @@
 class RTC {
 public:
     /*
+     * Configuration for alarming.
+     * Standard: same as Linux driver: 24 hour mode, and alarm up to a year duration.
+     */
+    static bool configureStandardAlarming();
+
+    /*
      * Basic sanity test.
      * Tests chain: MCU SPI to RTC chip, and RTC is alive.
      *
@@ -44,6 +50,8 @@ public:
 	 * Caller should also check that Fout/nIRQ is high.
 	 */
 	static bool clearAlarmFlag();
+
+	static bool isAlarmFlagClear();
 
 
 	/*
@@ -84,18 +92,7 @@ public:
      */
 	static bool verifyAlarmTime(const RTCTime*);
 
-	/*
-	 * Configure RTC so that match(counter, alarm) generates AIRQ signal.
-	 * Match is on the entire alarm (i.e. once per year).
-	 * Alternatively, the match can partial on the alarm, and generate AIRQ repeatedly e.g. once per second.
-	 * AIRQ signal might be configured to generate an interrupt.
-	 *
-	 * For now, we configure it once at program start (cold reset.)
-	 * We don't use this to disable alarm.
-	 *
-	 * The alarm only goes off once per setAlarm().
-	 */
-	static void configureAlarmMatchPerYear();
+
 	// Set matching to no matching.
 	static void disableAlarm();
 
@@ -120,11 +117,7 @@ public:
 	 * - using XTAL oscillator mode
 	 */
 
-	/*
-	 * Configure hour counter to count to 24.
-	 * !!! If you omit, upper nibble of hour counter is NOT hours tens digit, but include bit for AM/PM
-	 */
-	static void configure24HourMode();
+
 	static bool is24HourModeConfigured();
 
 	/*
@@ -136,12 +129,16 @@ public:
 
 	/*
 	 * Configure mux in RTC so only alarm interrupts are on pin.
+	 *
+	 * This is optional:
+	 * The reset condition of the RTC is that any interrupt will appear on the pin, if any interrupts are enabled?
+	 * So this only restricts the interrupts to the alarm interrupt, and omits fault interrupts etc. ?
 	 */
-	static void configureAlarmInterruptToFoutnIRQPin();
+	static bool configureAlarmInterruptToFoutnIRQPin();
 
 	static bool isOUTBitSet();
 
-	static bool isAlarmFlagClear();
+
 
 private:
 
@@ -152,8 +149,9 @@ private:
 	 * Configure alarm for match once per year
 	 * AND enable alarm interrupt
 	 */
-	static void enablePulseInterruptForAlarm();
-	static void connectFoutnIRQPinToAlarmSignal();
+	// OLD static void enablePulseInterruptForAlarm();
+	// FUTURE duplicate with configureAlarmInterruptToFoutnIRQPin
+	static bool connectFoutnIRQPinToAlarmSignal();
 
 	static void unlockMiscRegisters();
 	static void unlockOscControlRegister();

@@ -16,7 +16,7 @@
 /*
  * Test alarms go off forever.
  *
- * Use EnergyTrace and expect one energy pulse every 10 seconds of sleep.
+ * Use EnergyTrace and expect one energy pulse every x seconds of sleep.
  * !!! The code below won't set a second alarm unless the ISR is modified to exit LPM.
  *
  * This seemed like it was failing before I revamped the I2C code (when I was using the stateMachine I2C implementation.)
@@ -30,12 +30,32 @@
  */
 
 
-static void delayHalfSecond() {  __delay_cycles(500000); // half second }
+static void delayHalfSecond() {  __delay_cycles(500000);  }
 
 
-
-}
 static const Duration duration = {3};
+
+
+static void configureAlarm() {
+        // WAS  Alarm::configureForAlarming();
+        Alarm::configureAfterColdReset();   // Configure alarm pin, bus, and RTC
+
+
+        myAssert(Alarm::isRTCReadable());
+        // OLD interrupt not enabled until setAlarm.    myAssert(RTC::isAlarmInterruptEnabled());
+
+        // assert ready for setAlarm()
+        // assert serial bus (Bridge) ready, was configured
+
+        Alarm::clearBothSidesOfSignal();
+
+
+        myAssert (Alarm::isClearOnMCUSide());
+        myAssert (Alarm::isRTCReady() );
+        // OLD interrupt not enabled until setAlarm.    myAssert(RTC::isAlarmInterruptEnabled());
+}
+
+
 
 
 void testAlarm3()
@@ -52,27 +72,11 @@ void testAlarm3()
 
     PMM_unlockLPM5();
 
-
+    // Should only need to configure alarm once
+    configureAlarm();
 
     while (true)
         {
-
-    // WAS  Alarm::configureForAlarming();
-    Alarm::configureAfterColdReset();   // Configure alarm pin, bus, and RTC
-
-
-    myAssert(Alarm::isRTCReadable());
-    myAssert(RTC::isAlarmInterruptEnabled());
-
-    // assert ready for setAlarm()
-    // assert serial bus (Bridge) ready, was configured
-
-    Alarm::clearBothSidesOfSignal();
-
-
-    myAssert (Alarm::isClearOnMCUSide());
-    myAssert (Alarm::isRTCReady() );
-    myAssert(RTC::isAlarmInterruptEnabled());
 
 
         bool didSet = Alarm::setAlarmDurationSecondsFromNow(duration);
@@ -100,8 +104,8 @@ void testAlarm3()
         // while (not Alarm::isRTCReady());
 
         // Other alternatives for waiting.
-        // _low_power_mode_3();
-        _low_power_mode_0();
+        _low_power_mode_3();
+        //_low_power_mode_0();
         __no_operation();
 
         // Test whether delay affects crash on clearAlarm

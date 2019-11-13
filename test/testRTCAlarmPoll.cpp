@@ -45,8 +45,7 @@ void testRTCAlarmPoll()
     myAssert(RTC::isReadable());
 
     // Configure what is necessary for alarm flag set
-    RTC::configureAlarmMatchPerYear();
-    RTC::configure24HourMode();
+    RTC::configureStandardAlarming();
 
     LED::configureLED1();
 

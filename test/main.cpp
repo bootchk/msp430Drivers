@@ -51,6 +51,6 @@ int main(void)
 	//testRTCTimeMonotonic();
 	//testAlarm();
 	//testAlarm2();
-	testAlarm3();
-	//testAlarmLPM45();
+	//testAlarm3();
+	testAlarmLPM45();
 }

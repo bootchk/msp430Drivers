@@ -4,6 +4,9 @@
 
 #include "../realTimeClock/realTimeClock.h"
 
+#ifdef MEMOIZED_TIME
+
+This is dangerous to use.  Easy to set an alarm to time in the past.
 
 namespace {
 
@@ -25,6 +28,7 @@ EpochTime timeNow = 0;
 }
 
 
+
 EpochTime EpochClock::timeNowOrReset() {
 
     if (timeNow == 0) {
@@ -36,6 +40,11 @@ EpochTime EpochClock::timeNowOrReset() {
     };
     return timeNow;
 }
+#endif
+
+
+// Delegate: RTC knows now in the type EpochTime.  FUTURE, RTC only knows RTCTime.
+EpochTime EpochClock::timeNowOrReset() { return RTC::timeNowOrReset(); }
 
 
 

@@ -77,9 +77,9 @@ void testRTC2()
     }
 #endif
 
-    // Configure what is necessary for alarm flag set
-    RTC::configureAlarmMatchPerYear();
-    RTC::configure24HourMode();
+    // Configure what is necessary for alarm flag set and IRQ
+    bool wasConfig = RTC::configureStandardAlarming();
+    myAssert(wasConfig);
 
     LED::configureLED1();
 

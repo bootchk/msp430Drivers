@@ -155,19 +155,16 @@ void Alarm::configureRTC() {
      * Miscellaneous configuration choices not critical to alarm function
      */
     // This just affects time math implementation
-    RTC::configure24HourMode();
+    RTC::configureStandardAlarming();
+    // OLD RTC::configure24HourMode();
 
     // This is not critical to functionality, it just saves power at slight expense of accuracy
     RTC::configureRCCalibratedOscillatorMode();
 
     /*
-     * Configuration of alarming function.
+     * Configure internal signal to external pin
      */
-
     RTC::configureAlarmInterruptToFoutnIRQPin();
-
-    // Tell RTC chip to trigger interrupt on alarm register match once per year (match Hund,S,M,H,D,M)
-    RTC::configureAlarmMatchPerYear();
 
     // FUTURE more comprehensive, test the entire chain of configurations re the alarm
     // myEnsure(RTC::isAlarmInterruptEnabled());
