@@ -12,12 +12,14 @@
 
 // DriverLib
 #include <pmm.h>
+#include <cs.h>
 
 
 
 
 /*
  * Test: repeat alarms with LPM4.5 in between.
+ * AND use LowPowerTimer to blink LED.
  *
  * Here, we reconfigure Alarm after every sleep.
  *
@@ -41,7 +43,7 @@
 // Optional actions on every wake
 //#define BLINK_GREEN_LED
 #define BLINK_RED_LED
-#define CHECK_LIGHT
+//#define CHECK_LIGHT
 
 
 #ifdef CHECK_LIGHT
@@ -51,11 +53,14 @@
 
 
 #pragma PERSISTENT
-EpochTime previousTime = 0;
+static EpochTime previousTime = 0;
+
+uint32_t smClockRate;   // !!! 32 bit
 
 
 
-void testAlarmLPM45()
+
+void testAlarmLPM45AndTimer()
 {
     // assert watchdog stopped
 
@@ -75,6 +80,10 @@ void testAlarmLPM45()
 
         SoC::clearIFGForResetWakeFromSleep();
         SoC::unlockGPIOFromSleep();
+
+        smClockRate = CS_getSMCLK();
+        myAssert(smClockRate >0);
+
         /*
          * HW would call ISR here, except we have not enabled interrupt on alarm,
          * so no ISR is actually called.
@@ -84,6 +93,9 @@ void testAlarmLPM45()
         // assert bus to RTC ready and RTC still configured
         Alarm::clearBothSidesOfSignal();
 
+        smClockRate = CS_getSMCLK();
+        myAssert(smClockRate >0);
+
         // >>>>> Monotonic
         EpochTime now = EpochClock::timeNowOrReset();
         myAssert(now > previousTime);
@@ -91,13 +103,22 @@ void testAlarmLPM45()
 
 
 #ifdef BLINK_RED_LED
-        LED::configureLED1();
-        LED::turnOn();
-        __delay_cycles(50000);
-        LED::turnOff();
+        smClockRate = CS_getSMCLK();
+        myAssert(smClockRate >0);
 
-        //BlinkingLED::blinkFirst();
+        LED::configureLED1();
+// >>>>>>>>>> Crux
+        BlinkingLED::blinkFirst();
+        // Try a delay here to solve crash of setAlarm
+        __delay_cycles(500000);
+
+        smClockRate = CS_getSMCLK();
+        // WAS a bug: fails after LPM3
+        myAssert(smClockRate >0);
 #endif
+
+        // Test I2C is still functional
+        now = EpochClock::timeNowOrReset();
 
 #ifdef CHECK_LIGHT
         // discard result

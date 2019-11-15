@@ -43,22 +43,30 @@
 
 void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     // Init the clock each time
-    VeryLowOscillator::start();
+    // Nov. 15, 2019 This is suspect: see implementation, it does not really start the VLO, the VLO turns on by itsefl?
+    // VeryLowOscillator::start();
 
     // Init RTC each time
     Counter::init(ticks);
 
     Counter::start();
+    // Race to sleep before counter interrupts
 
     // Enter low power until interrupt for RTC.
     // Does not return until RTC interrupt.
     // Since ISR exits low power, continues after this call.
 
+    // Nov. 14, 2019 Trying mode 0 does not affect crash of setAlarm()
+    //_low_power_mode_0();
+
+    // Can tolerate extra wakeup time from LPM3
     _low_power_mode_3();
+
     __no_operation();
 
     // shutdown resources(
     // Let VLO stop when RTC stops using it
+    // FUTURE not neccessary
     VeryLowOscillator::allowOff();
     Counter::stop();
 

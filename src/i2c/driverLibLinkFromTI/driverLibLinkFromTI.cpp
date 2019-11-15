@@ -10,6 +10,11 @@
 
 #include "driverLibLinkFromTI.h"
 
+// Depends on MCU clocks
+#include "../../clock/submainClock.h"
+
+#include "../../assert/myAssert.h"
+
 #include "driverlib.h"  // CS, GPIO, and eUSCI
 
 
@@ -72,10 +77,22 @@ void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
 
     PMM_unlockLPM5();
 
+    // Require SMCLK is running.  Reset condition is: running at 1Mhz, divider 1
+    // SubmainClock::init();
+    // SubmainClock::turnOn();
+
     EUSCI_B_I2C_initMasterParam param = {0};
 
+    /*
+     * The driverlib function calculates the setting of the eUSCI divider from actual MCU clock freq and desired bit rate.
+     * Less robustly, you can pass constants that should reflect the actual MCU clock freq.
+     */
     param.selectClockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK;
-    param.i2cClk = CS_getSMCLK();
+    uint32_t smclkFreq = CS_getSMCLK();
+    // typically 1Mhz
+    myAssert(smclkFreq > 0);
+    param.i2cClk = smclkFreq;
+    // param.i2cClk = 10000000;
     param.dataRate = BIT_RATE;
     param.byteCounterThreshold = count;
     param.autoSTOPGeneration = EUSCI_B_I2C_SEND_STOP_AUTOMATICALLY_ON_BYTECOUNT_THRESHOLD;

@@ -15,6 +15,7 @@ void testAlarm();
 void testAlarm2();
 void testAlarm3();
 void testAlarmLPM45();
+void testAlarmLPM45AndTimer();
 void testTimer();
 void testLEDSensor();
 void testLEDSensor2();
@@ -52,5 +53,6 @@ int main(void)
 	//testAlarm();
 	//testAlarm2();
 	//testAlarm3();
-	testAlarmLPM45();
+	//testAlarmLPM45();
+	testAlarmLPM45AndTimer();
 }

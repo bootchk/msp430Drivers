@@ -4,8 +4,15 @@
 // Implementation uses Driverlib
 #include <cs.h>
 
-
+#ifdef NOTUSED
 void VeryLowOscillator::start() {
+    /*
+     * Nov 15, 2019 This is suspect.
+     * This is saying: init the FLLREF signal to have the VLO source.
+     * But what is it really doing?
+     *
+     * VLOCLK has no divider on FR2433??
+     */
 #ifdef __MSP430FR2433__
     CS_initClockSignal(
              CS_FLLREF,
@@ -15,6 +22,7 @@ void VeryLowOscillator::start() {
     // FR6989 signal is always connected to oscillator
 #endif
 }
+#endif
 
 void VeryLowOscillator::allowOff() {
 #ifdef __MSP430FR2433__
