@@ -8,6 +8,8 @@
 
 #include "../assert/myAssert.h"
 
+#ifdef BRIDGE_USE_SERIAL
+
 
 void Bridge::write(const RegisterAddress registerAddress,
                       unsigned char * const buffer,
@@ -31,4 +33,4 @@ void Bridge::read(const RegisterAddress registerAddress,
     Serial::deselectSlave();
 }
 
-
+#endif  // BRIDGE_USE_SERIAL

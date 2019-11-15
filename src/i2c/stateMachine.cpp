@@ -123,8 +123,9 @@ void I2CStateMachine::initForWrite(const uint8_t registerAddress,
 
 
 
-
-
+// Exclude from build unless using stateMachine implementation of I2CTransport
+// If you don't exclude, multiply defines symbols
+#ifdef USE_STATE_MACHINE_ISR
 
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__IAR_SYSTEMS_ICC__)
@@ -287,3 +288,5 @@ void __attribute__ ((interrupt(USCI_B0_VECTOR))) USCI_B0_ISR (void)
         break;
   }
 }
+
+#endif

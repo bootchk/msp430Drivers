@@ -4,6 +4,8 @@
  *
  * Hides whether the implementation uses combined transactions.
  *
+ * Also hides the need to pass slaveAddress to deeper functions.
+ *
  * This mostly creates new buffer so that it contains a prefix of the registerAddress
  *
  * Every method can return an error.
@@ -14,6 +16,9 @@
 
 class SlaveRegisterLayer {
 public:
+    // FUTURE should be passed at runtime, or set at compile-time from board.h
+    static const unsigned int slaveAddress;
+
     static bool read(unsigned int registerAddress, unsigned char * buffer, unsigned int count);
     static bool write(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count);
 };

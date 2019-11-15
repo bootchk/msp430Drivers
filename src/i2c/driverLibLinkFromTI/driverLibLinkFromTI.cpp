@@ -11,20 +11,30 @@
 #include "driverLibLinkFromTI.h"
 
 // Depends on MCU clocks
-#include "../../clock/submainClock.h"
+// #include "../../clock/submainClock.h"
 
 #include "../../assert/myAssert.h"
 
 #include "driverlib.h"  // CS, GPIO, and eUSCI
 
+#include "board.h"  // configuration of pullups
+#include "../../pinFunction/i2cPins.h"
 
-// TODO
-#define SLAVE_ADDRESS 0x69
-// TODO bit rate
+
+// FUTURE bit rate not hard coded
 #define BIT_RATE EUSCI_B_I2C_SET_DATA_RATE_100KBPS
 
 
-
+/*
+ * This configures pin each session.
+ * Also note that TI recommends configuring pins after initializing peripheral and before enabling peripheral,
+ * but this does not.
+ */
+/*
+ * FUTURE
+ * Migrate config pins to once per session.
+ * Migrate initialization of peripheral to once per session instead of once per R/W transaction.
+ */
 
 
 namespace {
@@ -42,6 +52,17 @@ unsigned int countNacks = 0;
 
 
 void DriverLibLinkWISR::initI2CPins() {
+#ifdef I2C_HAS_EXTERNAL_PULLUPS
+    I2CPins::configureWithExternalPullup();
+#elif defined(I2C_HAS_INTERNAL_PULLUPS)
+    I2CPins::configureWithInternalPullup();
+#else
+#error "No config of pullups in board.h"
+#endif
+}
+
+
+#ifdef ORIGINAL_TI_EXAMPLE
     /*
      * Set P1.2, 1.33 to input with function, (UCB0SIMO/UCB0SDA, UCB0SOMI/UCB0SCL).
      */
@@ -51,10 +72,13 @@ void DriverLibLinkWISR::initI2CPins() {
             GPIO_PRIMARY_MODULE_FUNCTION
         );
     // ??? TI demo for masterTXMultiple does it a little differently
-}
+#endif
 
-void DriverLibLinkWISR::setSlaveAddress() {
-    EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, SLAVE_ADDRESS );
+
+
+void DriverLibLinkWISR::setSlaveAddress(unsigned int slaveAddress) {
+    // Slave address converted to 8 bits, only 7-bits valid for most I2C busses
+    EUSCI_B_I2C_setSlaveAddress(EUSCI_B0_BASE, slaveAddress );
 }
 
 void DriverLibLinkWISR::waitForPriorTransactionComplete() {
@@ -62,7 +86,11 @@ void DriverLibLinkWISR::waitForPriorTransactionComplete() {
 }
 
 
-void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
+void
+DriverLibLinkWISR::initForRead (
+        unsigned int slaveAddress,
+        unsigned char* buffer,
+        unsigned int count)
 {
     // local state
     localLength = count;
@@ -72,10 +100,9 @@ void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
     wasError = false;
     countRetries = 0;
 
-
     initI2CPins();
 
-    PMM_unlockLPM5();
+    // assert is PMM_unlockLPM5();
 
     // Require SMCLK is running.  Reset condition is: running at 1Mhz, divider 1
     // SubmainClock::init();
@@ -98,7 +125,7 @@ void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
     param.autoSTOPGeneration = EUSCI_B_I2C_SEND_STOP_AUTOMATICALLY_ON_BYTECOUNT_THRESHOLD;
     EUSCI_B_I2C_initMaster(EUSCI_B0_BASE, &param);
 
-    setSlaveAddress();
+    setSlaveAddress(slaveAddress);
 
     //Set Master in receive mode
     EUSCI_B_I2C_setMode(EUSCI_B0_BASE,
@@ -124,7 +151,10 @@ void DriverLibLinkWISR::initForRead (unsigned char* buffer, unsigned int count)
 
 
 // Not using autostop
-void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
+void DriverLibLinkWISR::initForWrite (
+        unsigned int slaveAddress,
+        unsigned char* buffer,
+        unsigned int count)
 {
     // local state accessed by ISR
     localLength = count;
@@ -136,7 +166,7 @@ void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
 
     initI2CPins();
 
-    PMM_unlockLPM5();
+    // assert is PMM_unlockLPM5();
 
     EUSCI_B_I2C_initMasterParam param = {0};
     param.selectClockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK;
@@ -148,7 +178,7 @@ void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
     //param.autoSTOPGeneration = EUSCI_B_I2C_SEND_STOP_AUTOMATICALLY_ON_BYTECOUNT_THRESHOLD;
     EUSCI_B_I2C_initMaster(EUSCI_B0_BASE, &param);
 
-    setSlaveAddress();
+    setSlaveAddress(slaveAddress);
 
     //Set Master in transmit mode
     EUSCI_B_I2C_setMode(EUSCI_B0_BASE,
@@ -172,9 +202,12 @@ void DriverLibLinkWISR::initForWrite (unsigned char* buffer, unsigned int count)
 
 
 
-bool DriverLibLinkWISR::readMultipleBytes(unsigned char * buffer, unsigned int count) {
+bool DriverLibLinkWISR::readMultipleBytes(
+        unsigned int slaveAddress,
+        unsigned char * buffer,
+        unsigned int count) {
 
-  initForRead(buffer, count);
+  initForRead(slaveAddress, buffer, count);
 
   waitForPriorTransactionComplete();
 
@@ -189,9 +222,12 @@ bool DriverLibLinkWISR::readMultipleBytes(unsigned char * buffer, unsigned int c
 
 
 
-bool DriverLibLinkWISR::writeMultipleBytes(unsigned char * buffer, unsigned int count) {
+bool DriverLibLinkWISR::writeMultipleBytes(
+        unsigned int slaveAddress,
+        unsigned char * buffer,
+        unsigned int count) {
 
-    initForWrite(buffer, count);
+    initForWrite(slaveAddress, buffer, count);
 
     waitForPriorTransactionComplete();
 
@@ -225,6 +261,7 @@ void USCIB0_ISR(void)
         case USCI_NONE:             // No interrupts break;
             break;
         case USCI_I2C_UCALIFG:      // Arbitration lost
+            // FUTURE abort
             break;
         case USCI_I2C_UCNACKIFG:    // NAK received (master only)
             countNacks++;
@@ -300,7 +337,6 @@ void USCIB0_ISR(void)
 
         case USCI_I2C_UCBCNTIFG:    // Byte count limit reached (UCBxTBCNT)
             // Should be concurrent with RXIFG for last byte received?
-
             break;
         case USCI_I2C_UCCLTOIFG:    // Clock low timeout - clock held low too long
             break;

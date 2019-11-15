@@ -12,7 +12,7 @@
 #include "../driverConfig.h"
 
 
-
+#ifdef BRIDGE_USE_SERIAL
 
 namespace {
 
@@ -134,3 +134,5 @@ unsigned char Bridge::readByte(RegisterAddress registerAddress) {
 	Serial::deselectSlave();
 	return buffer[0];
 }
+
+#endif  // BRIDGE_USE_SERIAL

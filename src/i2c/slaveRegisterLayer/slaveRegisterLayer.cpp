@@ -3,9 +3,15 @@
 
 #include "../driverLibLinkFromTI/driverLibLinkFromTI.h"
 
-// TODO magic buffer size, not checked
-static unsigned char bufferWithRegAddress[10];
+// FUTURE magic buffer size, assert count is less
 
+//namespace slaveRegisterLayer {
+// Local buffer to which we have prepended a register address
+static unsigned char bufferWithRegAddress[10];
+//}
+
+
+const unsigned int SlaveRegisterLayer::slaveAddress = 0x69;
 
 
 
@@ -33,7 +39,7 @@ bool SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buff
          readMultipleBytes(buffer, count);
      }
 #else
-     return DriverLibLinkWISR::readMultipleBytes(buffer, count);
+     return DriverLibLinkWISR::readMultipleBytes(slaveAddress, buffer, count);
 #endif
 }
 
@@ -53,5 +59,5 @@ bool SlaveRegisterLayer::write(unsigned int registerAddress, unsigned const char
     }
 
     // Not passing registerAddress as separate parameter, now it is in buffer
-    return DriverLibLinkWISR::writeMultipleBytes(bufferWithRegAddress, count+1);
+    return DriverLibLinkWISR::writeMultipleBytes(slaveAddress, bufferWithRegAddress, count+1);
 }
