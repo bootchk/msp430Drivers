@@ -1,8 +1,10 @@
 
 #include <msp430.h> // RTC_VECTOR
 
-// msp430Drivers
-#include "../../src/timer/counter.h"
+#include "../timer/counter.h"
+
+#include "../driverConfig.h"
+
 
 
 /*
@@ -10,9 +12,12 @@
  */
 
 
+
+
 #pragma vector = RTC_VECTOR
 __interrupt void RTC_ISR(void)
 {
+#ifdef LOW_POWER_TIMER_USE_RTC
     Counter::setOverflowFlag();
 
     /*
@@ -28,4 +33,11 @@ __interrupt void RTC_ISR(void)
      * The continuation is after the call to _low_power_mode_x();
      */
     _low_power_mode_off_on_exit();
+#else
+    // trap
+    while(true) ;
+#endif
 }
+
+
+

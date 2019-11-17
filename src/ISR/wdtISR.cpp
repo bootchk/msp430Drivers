@@ -14,6 +14,7 @@
 #pragma vector = WDT_VECTOR
 __interrupt void WDT_A_ISR(void)
 {
+#ifdef LOW_POWER_TIMER_USE_WDT
     /*
      * The IFG flag for the WDT is cleared automatically on return from interrupt.
      */
@@ -23,4 +24,8 @@ __interrupt void WDT_A_ISR(void)
      * The continuation is after the call to _low_power_mode_x();
      */
     _low_power_mode_off_on_exit();
+#else
+    // trap
+    while (true)  ;
+#endif
 }

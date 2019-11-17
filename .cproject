@@ -93,7 +93,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/i2c/driverLibLink2/i2cDriverLibLink2.cpp|test/ISR/externalRtcISR.cpp|MSP430FR5xx_6xx|cruft/bridgeSPI.cpp|cruft/i2c.cpp|lnk_msp430fr6989.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="srcExtra/stateMachineISR.cpp|src/i2c/driverLibLink2/i2cDriverLibLink2.cpp|test/ISR/externalRtcISR.cpp|MSP430FR5xx_6xx|cruft/bridgeSPI.cpp|cruft/i2c.cpp|lnk_msp430fr6989.cmd" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -284,7 +284,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/timer/counter.cpp|src/ADC/voltBandgapRef.cpp|lnk_msp430fr2433.cmd|test/ISR/internalRtcISR.cpp|cruft/bridgeSPI.cpp|src/ADC/ADCConfigure.cpp|cruft/i2c.cpp|src/ADC/adc.cpp|MSP430FR2xx_4xx" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/timer/counter.cpp|src/ADC/voltBandgapRef.cpp|lnk_msp430fr2433.cmd|cruft/bridgeSPI.cpp|src/ADC/ADCConfigure.cpp|cruft/i2c.cpp|src/ADC/adc.cpp|MSP430FR2xx_4xx" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
