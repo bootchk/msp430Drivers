@@ -170,9 +170,9 @@ void sendRegisterAccessPreamble(unsigned int registerAddress, bool isMultiByte) 
 
 
 
-unsigned int receiveOneByte(unsigned int registerAddress) {
+unsigned int receiveOneByte(unsigned int slaveAddress, unsigned int registerAddress) {
 
-    configureMasterDevice(LIS3MDLAddress);
+    configureMasterDevice(slaveAddress);
 
     // Require mode is EUSCI_B_I2C_TRANSMIT_MODE
     // EUSCI_B_I2C_setMode(EUSCI_B_I2C_TRANSMIT_MODE);
@@ -265,10 +265,11 @@ unsigned int receiveOneByte(unsigned int registerAddress) {
 }
 
 
-void receiveMultipleBytes(unsigned int registerAddress,
+void receiveMultipleBytes(unsigned int slaveAddress,
+                          unsigned int registerAddress,
                           unsigned char *buffer,
                           unsigned int length) {
-    configureMasterDevice(LIS3MDLAddress);
+    configureMasterDevice(slaveAddress);
     sendRegisterAccessPreamble(registerAddress, true);
     EUSCI_B_I2C_masterReceiveStart(I2CInstanceAddress);
 
@@ -279,8 +280,8 @@ void receiveMultipleBytes(unsigned int registerAddress,
 }
 
 
-void I2CTransaction::writeByte(unsigned char data) {
-    configureMasterDevice(LIS3MDLAddress);
+void I2CTransaction::writeByte(unsigned int slaveAddress, unsigned char data) {
+    configureMasterDevice(slaveAddress);
 
     // assert mode is TX
 

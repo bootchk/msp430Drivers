@@ -72,6 +72,10 @@ class I2CTransport {
 
 
 public:
+
+    // Modal cache of slaveAddress set on the master device
+    static unsigned int slaveAddress;
+
     static void configurePinsWithExternalPullups();
     static void configurePinsWithInternalPullups();
     // Are pins configured for module function?  Says nothing about pullups.
@@ -104,7 +108,7 @@ public:
     /*
      * Is I2C master, slave address set, bit rate set and other stuff
      */
-    static bool isInitialized();
+    static bool isInitialized(unsigned int slaveAddress);
 
     static bool isInitToAddressSlave(unsigned int slaveAddress);
 
@@ -115,7 +119,9 @@ public:
     static bool isEnabled();
 
 
-    // Write data to register.
+    // Read and write to modal slaveAddress
+
+    // Write data to register
     static bool write( const RegisterAddress registerAddress,
                        unsigned const char * const dataOut,
                        const unsigned int count);

@@ -28,14 +28,14 @@ void Serial::configureToSleepState() {
 
 
 
-void Serial::begin(unsigned int slave, bool isRWBitHighForRead) {
+void Serial::begin(unsigned int slaveAddress, bool isRWBitHighForRead) {
 
     SERIAL_DEVICE_CLASS::disable(); // Can only configure when disabled.
 
 	//Configure the mcu peripheral as master with parameters compatible with slave
-	SERIAL_DEVICE_CLASS::configureMaster(isRWBitHighForRead);
+	SERIAL_DEVICE_CLASS::configureMaster(slaveAddress, isRWBitHighForRead);
 
-	SERIAL_DEVICE_CLASS::selectSlave(slave);
+	SERIAL_DEVICE_CLASS::selectSlave(slaveAddress);
 
 	// TODO for i2c, don't enable until after set mode???
 	SERIAL_DEVICE_CLASS::enable();

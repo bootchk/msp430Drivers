@@ -11,15 +11,16 @@ static unsigned char bufferWithRegAddress[10];
 //}
 
 
-const unsigned int SlaveRegisterLayer::slaveAddress = 0x69;
 
 
-
-bool SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buffer, unsigned int count){
+bool SlaveRegisterLayer::read(unsigned int slaveAddress,
+                              unsigned int registerAddress,
+                              unsigned char * buffer,
+                              unsigned int count){
 
     // First link operation: send one byte of register address
     // !!! Uses this layers write, with count of zero, i.e. none of given buffer
-    if (not SlaveRegisterLayer::write(registerAddress, buffer, 0)) {
+    if (not SlaveRegisterLayer::write(slaveAddress, registerAddress, buffer, 0)) {
         return false;
     }
 
@@ -45,7 +46,10 @@ bool SlaveRegisterLayer::read(unsigned int registerAddress, unsigned char * buff
 
 
 
-bool SlaveRegisterLayer::write(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count) {
+bool SlaveRegisterLayer::write(unsigned int slaveAddress,
+                               unsigned int registerAddress,
+                               unsigned const char * const buffer,
+                               unsigned int count) {
     /*
      * One long transaction.
      *

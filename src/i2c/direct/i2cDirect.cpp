@@ -66,9 +66,6 @@ unsigned int bufferIndex = 0;
 //waitForBusReady();
 
 
-// TEST
-setSlaveAddress(0x69);
-
 UCB0CTLW0 |= UCTR;
 UCB0CTLW0 |= UCTXSTT;
 
@@ -131,8 +128,7 @@ I2CDirect::writeToAddress(unsigned int registerAddress, const unsigned char * co
     unsigned int bufferIndex = 0;
 
 
-    // TEST
-    setSlaveAddress(0x69);
+    // to modal slave address
 
     // start for tx
     UCB0CTLW0 |= UCTR;

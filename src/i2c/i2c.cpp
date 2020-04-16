@@ -75,14 +75,13 @@ bool I2C::isEnabled() { return I2CTransport::isEnabled(); }
 
 
 
-void I2C::configureMaster(bool isRWBitHighForRead) {
+void I2C::configureMaster(unsigned int slaveAddress, bool isRWBitHighForRead) {
     // require disabled to config
     myRequire( not isEnabled() );
 
     I2CTransport::configurePinsWithInternalPullups();
 
-    // TODO slave address parameter
-    I2CTransport::initI2CPeripheral(0x69);
+    I2CTransport::initI2CPeripheral(slaveAddress);
 
     I2CPeripheral::clearInterruptFlags();
 }

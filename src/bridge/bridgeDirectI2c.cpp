@@ -77,10 +77,10 @@ void Bridge::configureToSleepState() {
 
 
 
-void Bridge::configureMcuSide(bool isRWBitHighForRead) {
+void Bridge::configureMcuSide(unsigned int slaveAddress, bool isRWBitHighForRead) {
     // not require slave device ready since configuration is on the mcu side
 
-    I2CTransport::initI2CPeripheral(0x69);
+    I2CTransport::initI2CPeripheral(slaveAddress);
     // slave set
     // pins not configured
     // not enabled

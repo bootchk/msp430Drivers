@@ -29,10 +29,9 @@
 
 
 
-bool I2CTransport::read(
-                        const RegisterAddress registerAddress,
+bool I2CTransport::read(const RegisterAddress registerAddress,
                         unsigned char * const buffer,
-                        unsigned int count)
+                        const unsigned int count)
 {
     // TODO some implentations init and enable peripheral per call
     //myRequire( isInitialized() );
@@ -49,9 +48,9 @@ bool I2CTransport::read(
     // TODO some implementation do not ensure this???  I2CPeripheral::clearInterruptFlags();
 
 #ifdef USE_DRIVERLIB_FOR_LINK
-    I2CDriverLibLink::read(registerAddress, buffer, count);
+    I2CDriverLibLink::read(slaveAddress, registerAddress, buffer, count);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
-    return SlaveRegisterLayer::read(registerAddress, buffer, count);
+    return SlaveRegisterLayer::read(I2CTransport::slaveAddress, registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
     return I2CDirect::readFromAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -77,7 +76,7 @@ bool I2CTransport::write(
 #ifdef USE_DRIVERLIB_FOR_LINK
     I2CDriverLibLink::write(registerAddress, buffer, count);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
-    return SlaveRegisterLayer::write(registerAddress, buffer, count);
+    return SlaveRegisterLayer::write(I2CTransport::slaveAddress, registerAddress, buffer, count);
 #elif defined(USE_DIRECT_FOR_LINK)
     return I2CDirect::writeToAddress(registerAddress, buffer, count);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -106,7 +105,7 @@ bool I2CTransport::read(const RegisterAddress registerAddress, unsigned char* va
     I2CPeripheral::waitUntilPriorTransportComplete();
     return I2CDriverLibLink::read(registerAddress);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
-    return SlaveRegisterLayer::read(registerAddress, value, 1);
+    return SlaveRegisterLayer::read(I2CTransport::slaveAddress, registerAddress, value, 1);
 #elif defined(USE_DIRECT_FOR_LINK)
     return I2CDirect::readFromAddress(registerAddress);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
@@ -124,7 +123,7 @@ bool I2CTransport::write(const RegisterAddress registerAddress, const unsigned c
     I2CDriverLibLink::write(registerAddress, value);
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
     // Pass address of value on stack
-    return SlaveRegisterLayer::write(registerAddress, &value, 1);
+    return SlaveRegisterLayer::write(I2CTransport::slaveAddress, registerAddress, &value, 1);
 #elif defined(USE_DIRECT_FOR_LINK)
     I2CDirect::writeToAddress(registerAddress, value);
 #elif defined(USE_STATE_MACHINE_FOR_LINK)

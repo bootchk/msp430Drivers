@@ -23,6 +23,7 @@ void testStepperDriver();
 void testLogging();
 void testI2C();
 void testI2CTransport();
+void testUVSensor();
 
 
 
@@ -54,5 +55,6 @@ int main(void)
 	//testAlarm2();
 	//testAlarm3();
 	//testAlarmLPM45();
-	testAlarmLPM45AndTimer();
+	//testAlarmLPM45AndTimer();
+	testUVSensor();
 }

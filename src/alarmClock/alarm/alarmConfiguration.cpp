@@ -8,7 +8,7 @@
 
 #include "../../assert/myAssert.h"
 #include "../../PMM/powerMgtModule.h"  // for assertions only
-
+#include "../../busConfig.h"
 
 
 /*
@@ -114,7 +114,7 @@ void Alarm::configureMcuBusInterface(){
      * This works for AB0815 SPI, false means RW bit is not high (is low) for a read
      * Also works for AB0805 I2C, which ignores the actual parameter.
      */
-    Bridge::configureMcuSide(false);
+    Bridge::configureMcuSide(RTCBusAddress, false);
 }
 
 

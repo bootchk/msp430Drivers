@@ -1,12 +1,14 @@
 
-#include "../src/alarmClock/realTimeClock/realTimeClock.h"
+#include "../src/UVSensor/UVSensor.h"
 
 #include "../src/bridge/bridge.h"
 #include "../src/assert/myAssert.h"
 #include "../src/LED/led.h"
 
 #include "../src/i2c/i2cPeripheral.h"
+
 #include "../src/busConfig.h"
+
 
 
 // DriverLib
@@ -20,9 +22,9 @@ static void delayHalfSecond() {
 
 
 /*
- * Test external RTC driver.
+ * Test UVA sensor driver.
  *
- * In a loop, read time and toggle LED on Launchpad.
+ * In a loop, read UVA and toggle LED on Launchpad.
  * Expect: LED to blink forever.
  *
  * Exception: if something hangs, LED will stop blinking.
@@ -35,28 +37,28 @@ static void delayHalfSecond() {
  *
  * More testing of RTC is in test of Alarm
  */
-void testRTC()
+void testUVSensor()
 {
     PMM_unlockLPM5();
 
-    Bridge::configureMcuSide(RTCBusAddress, false);
+    Bridge::configureMcuSide(UVSensorBusAddress, false);
     // assert serial bus ready
 
     unsigned int interruptFlags = I2CPeripheral::getInterruptFlags();
 
     // Test sanity
     // Registers are readable even before RTC is configured
-    bool foo = RTC::isReadable();
+    bool foo;
+    foo = UVSensor::isSane();
     myAssert(foo);
 
 
     interruptFlags = I2CPeripheral::getInterruptFlags();
 
-    // Test reading the time
-    // Clock should be ticking even without any configuration
-    EpochTime now;
-    now = RTC::timeNowOrReset();
-    // Expect now is a small integer (seconds since started testing.)
+    // Test reading UV
+
+    unsigned int uva;
+    //uva = UVSensor::readSingleUVA();
 
     LED::configureLED1();
 
@@ -66,6 +68,6 @@ void testRTC()
 
         LED::toggle();
 
-        now = RTC::timeNowOrReset();
+        //uva = UVSensor::readSingleUVA();
     }
 }

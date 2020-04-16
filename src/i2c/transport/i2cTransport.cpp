@@ -44,7 +44,7 @@
 
 
 
-
+unsigned int I2CTransport::slaveAddress;
 
 
 void I2CTransport::enable() { EUSCI_B_I2C_enable(I2CInstanceAddress); }
@@ -156,14 +156,14 @@ bool I2CTransport::isInitI2CMaster() {
 }
 
 bool I2CTransport::isInitToAddressSlave(unsigned int slaveAddress) {
-    return (UCB0I2CSA == RTCBusAddress);
+    return (UCB0I2CSA == slaveAddress);
 }
 
-bool I2CTransport::isInitialized() {
+bool I2CTransport::isInitialized(unsigned int slaveAddress) {
 #ifdef FULL_INIT_CHECK
     return
             isInitI2CMaster()
-            and isInitToAddressSlave(RTCBusAddress)
+            and isInitToAddressSlave(slaveAddress)
             // no autostop    clock low timeout
             and (UCB0CTLW1 == UCCLTO_1 )
             // divisor is four, yielding 250kbps
@@ -172,7 +172,7 @@ bool I2CTransport::isInitialized() {
 #else
     return
             isInitI2CMaster()
-            and isInitToAddressSlave(RTCBusAddress);
+            and isInitToAddressSlave(slaveAddress);
 #endif
 }
 

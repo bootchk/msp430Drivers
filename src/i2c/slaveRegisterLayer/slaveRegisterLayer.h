@@ -16,10 +16,7 @@
 
 class SlaveRegisterLayer {
 public:
-    // FUTURE should be passed at runtime, or set at compile-time from board.h
-    static const unsigned int slaveAddress;
-
-    static bool read(unsigned int registerAddress, unsigned char * buffer, unsigned int count);
-    static bool write(unsigned int registerAddress, unsigned const char * const buffer, unsigned int count);
+    static bool read(unsigned int slaveAddress, unsigned int registerAddress, unsigned char * buffer, unsigned int count);
+    static bool write(unsigned int slaveAddress,  unsigned int registerAddress, unsigned const char * const buffer, unsigned int count);
 };
 

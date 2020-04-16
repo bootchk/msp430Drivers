@@ -4,6 +4,8 @@
 //#include "../pinFunction/spiPins.h"
 #include "../src/bridge/bridge.h"
 
+#include "../src/busConfig.h"
+
 // DriverLib
 #include <pmm.h>
 
@@ -16,7 +18,7 @@ void testCompass()
     // Compass::turnPowerOn();
     // Compass is not ready until later, require a delay
 
-    Bridge::configureMcuSide(true);
+    Bridge::configureMcuSide(LIS3MDLAddress, true);
     // assert serial bus ready
 
     bool foo = Compass::isSane();

@@ -7,6 +7,10 @@
 
 #include "../src/compass/mangler.h"
 
+#include "../src/busConfig.h"
+
+
+
 // DriverLib
 #include <pmm.h>  // unlock LPM5
 
@@ -21,7 +25,7 @@ void testCompass2()
     // Test separate transactions
 
     // Configure to read the ID register
-    I2CTransaction::writeByte(CompassAddress::Identifier);
+    I2CTransaction::writeByte(LIS3MDLAddress, CompassAddress::Identifier);
     // Read the configured register
     result = I2CTransaction::readByte();
     if (result == LIS3MDLIdentifier)

@@ -70,7 +70,7 @@ public:
 	 *
 	 * Ensures bridge ready for use.
 	 */
-	static void configureMcuSide(bool isRWBitHighForRead);
+	static void configureMcuSide(unsigned int slaveAddress, bool isRWBitHighForRead);
 
 	/*
 	 * Configure Bridge pins to low power state.

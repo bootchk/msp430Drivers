@@ -28,17 +28,14 @@ public:
 	static bool isEnabled();
 
 	/*
-	 * Configure SPI.
 	 * When there are multiple slaves, call this before switching to another slave.
 	 * When there is only one slave, can call this once during each booted session.
-	 *
-	 * TODO I2C comments
 	 */
-	static void configureMaster(bool isRWBitHighForRead);
+	static void configureMaster(unsigned int slaveAddress, bool isRWBitHighForRead);
 
 	/*
 	 * Leave device configured, but configure pins for low power.
-	 * After this, no SPI methods should be used until configured again.
+	 * After this, no methods should be used until configured again.
 	 */
 	static void unconfigureMaster();
 

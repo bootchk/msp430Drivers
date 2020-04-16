@@ -7,6 +7,8 @@
 
 #include "../src/i2c/i2cPeripheral.h"
 
+#include "../src/busConfig.h"
+
 
 
 // DriverLib
@@ -38,7 +40,7 @@ void testRTCAlarmPoll()
 
     PMM_unlockLPM5();
 
-    Bridge::configureMcuSide(false);
+    Bridge::configureMcuSide(RTCBusAddress, false);
     // assert serial bus ready
 
     // Test sanity

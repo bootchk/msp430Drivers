@@ -9,7 +9,7 @@ public:
     /*
      * Write a register address
      */
-    static void writeByte(unsigned char data);
+    static void writeByte(unsigned int slaveAddress, unsigned char data);
 
     /*
      * Read from whatever register was addressed (modal.)
