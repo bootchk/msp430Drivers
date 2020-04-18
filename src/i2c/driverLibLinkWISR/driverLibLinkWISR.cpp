@@ -8,11 +8,7 @@
  * - uses ISR
  */
 
-#include "driverLibLinkFromTI.h"
-
-// Depends on MCU clocks
-// #include "../../clock/submainClock.h"
-
+#include <src/i2c/driverLibLinkWISR/driverLibLinkWISR.h>
 #include "../../assert/myAssert.h"
 
 #include "driverlib.h"  // CS, GPIO, and eUSCI
@@ -101,6 +97,7 @@ DriverLibLinkWISR::initForRead (
     wasError = false;
     countRetries = 0;
 
+    // !!! TI recommends configuring pins AFTER init EUSCI
     initI2CPins();
 
     // assert is PMM_unlockLPM5();
@@ -124,6 +121,8 @@ DriverLibLinkWISR::initForRead (
     param.dataRate = BIT_RATE;
     param.byteCounterThreshold = count;
     param.autoSTOPGeneration = EUSCI_B_I2C_SEND_STOP_AUTOMATICALLY_ON_BYTECOUNT_THRESHOLD;
+
+    // !!! This resets (disables) and re enables
     EUSCI_B_I2C_initMaster(EUSCI_B0_BASE, &param);
 
     setSlaveAddress(slaveAddress);
@@ -149,6 +148,10 @@ DriverLibLinkWISR::initForRead (
         EUSCI_B_I2C_NAK_INTERRUPT
         );
 }
+
+
+
+
 
 
 // Not using autostop

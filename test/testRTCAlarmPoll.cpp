@@ -7,7 +7,7 @@
 
 #include "../src/i2c/i2cPeripheral.h"
 
-#include "../src/busConfig.h"
+#include "../src/config/busConfig.h"
 
 
 

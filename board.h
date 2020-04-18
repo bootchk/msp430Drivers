@@ -17,8 +17,8 @@
 #include <gpio.h>
 
 // Depends on configuration of app
-#include "src/driverConfig.h"
-#include "src/busConfig.h"
+#include "src/config/driverConfig.h"
+#include "src/config/busConfig.h"
 
 
 
@@ -38,8 +38,8 @@
 
 // Choose exactly one configuration of board.
 // Board may be a breadboard of Launchpad's target and sub-boards
-#define MYPCB_BOARD_R5
-//#define FULL_PROTO_LAUNCHPAD
+//#define MYPCB_BOARD_R5
+#define FULL_PROTO_LAUNCHPAD
 //#define BLINKERBQ_BOARD
 
 

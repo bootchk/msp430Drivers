@@ -2,7 +2,7 @@
 /*
  * Interface to I2C peripheral of MSP430
  *
- *
+ * Low-level functions implemented by direct register access.
  */
 
 

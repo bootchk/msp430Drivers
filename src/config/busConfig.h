@@ -27,5 +27,5 @@
 #define RTCBusAddress AB0805BusAddress
 
 
-// 7-bit 0x10, shifted left is 0x20
-#define UVSensorBusAddress 0x20
+// 7-bit 0x10
+#define UVSensorBusAddress 0x10

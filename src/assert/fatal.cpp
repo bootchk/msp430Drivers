@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-#include "../driverConfig.h"
+#include "../config/driverConfig.h"
 
 
 

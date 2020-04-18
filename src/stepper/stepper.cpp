@@ -11,7 +11,7 @@
 
 #include "board.h"  // motor coil pins
 
-#include "../driverParameters.h"    // SingleStepDelay
+#include "../config/driverParameters.h"    // SingleStepDelay
 
 
 #ifdef USE_STEPPER

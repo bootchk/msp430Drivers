@@ -11,6 +11,11 @@
  *
  * The only read/write calls are for multiple bytes.
  * Of course you can just use count of 1.
+ *
+ * No combined transactions: all bytes read or all bytes write.
+ * No register address is passed:
+ * - write operation: in buffer already
+ * - read operation: written on a previous call, the slave remembers it as a modal "current register address" which autoincrements
  */
 
 class DriverLibLinkWISR {

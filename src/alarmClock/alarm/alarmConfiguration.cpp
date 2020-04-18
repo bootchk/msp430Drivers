@@ -8,7 +8,7 @@
 
 #include "../../assert/myAssert.h"
 #include "../../PMM/powerMgtModule.h"  // for assertions only
-#include "../../busConfig.h"
+#include "../../config/busConfig.h"
 
 
 /*

@@ -1,7 +1,7 @@
 
+#include <src/i2c/driverLibLinkWISR/driverLibLinkWISR.h>
 #include "slaveRegisterLayer.h"
 
-#include "../driverLibLinkFromTI/driverLibLinkFromTI.h"
 
 // FUTURE magic buffer size, assert count is less
 

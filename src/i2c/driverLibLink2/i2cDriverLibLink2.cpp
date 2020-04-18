@@ -8,6 +8,7 @@
 
 #include "../../assert/myAssert.h"
 
+#include "../driverLibEUSCI/EUSCI.h"
 
 
 #define TRANSACTION_TIMEOUT 200
@@ -122,9 +123,13 @@ bool I2CDriverLibLink2::isStopComplete() {
 /*
  * Public, transport layer API
  *
- * Each is a separate transaction meaning STOP was sent and completed.
+ *
+ *
+ * Each read/write is a separate transaction meaning STOP was sent and completed.
  * Caller does not need to wait for STOP complete.
  */
+
+
 
 void I2CDriverLibLink2::read(unsigned int registerAddress, unsigned char * buffer, unsigned int count) {
     /*

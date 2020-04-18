@@ -22,21 +22,25 @@
 #include "../i2cPeripheral.h"
 #include "../../pinFunction/i2cPins.h"
 
-
-
-#include "../../driverParameters.h"  // I2C bus speed
+#include "../../config/driverParameters.h"  // I2C bus speed
 
 #include "../../assert/myAssert.h"
 
 
+
+
 #ifdef USE_DRIVERLIB_FOR_LINK
+#include "../driverLibEUSCI/EUSCI.h"
 #include "../driverLibLink/i2cDriverLibLink.h"
 #elif defined(USE_DRIVERLIB2_FOR_LINK)
+#include "../driverLibEUSCI/EUSCI.h"
 #include "../driverLibLink2/i2cDriverLibLink2.h"
 #elif defined(USE_DIRECT_FOR_LINK)
 #include "../direct/i2cDirect.h"
 #elif defined(USE_STATE_MACHINE_FOR_LINK)
 #include "../stateMachine.h"
+#elif defined(USE_DRIVERLIBWISR_FOR_LINK)
+//
 #else
 #error "No link implementation defined"
 #endif
@@ -89,6 +93,9 @@ bool I2CTransport::isUnconfigurePins() {
              );
 }
 
+/*
+ * !!! Hardcoded for prototype board.
+ */
 bool I2CTransport::isConfiguredPinsForModule() {
     return (
              ((P1SEL1 & (BIT2 | BIT3)) == 0 ) // are PSEL1 bits clear
@@ -108,17 +115,34 @@ void I2CTransport::initI2CPeripheral(unsigned int slaveAddress)
      * Not require disabled: each init may disable peripheral as part of init()
      */
 
-#ifdef USE_DRIVERLIB_FOR_LINK
-    I2CDriverLibLink::initI2CPeripheral(slaveAddress);
-    setDataRate125kbps();
+    // Modal on slaveAddress.
+    I2CTransport::slaveAddress = slaveAddress;
 
-#elif defined(USE_DIRECT_FOR_LINK)
-    I2CDirect::initI2CPeripheral(slaveAddress);
+#if defined(USE_DIRECT_FOR_LINK)
+    I2CDirect::initI2CPeripheral
     // assert data rate is set, and peripheral enabled
-#else
-    // Other implementations require no init: they init on each transaction
-    // Note that other interrupts are enabled by stateMachine.
+#elif defined(USE_DRIVERLIBWISR_FOR_LINK)
+    // No init of peripheral required
+    // !!! but I2CTransport::slaveAddress must be set
+# elif defined(USE_DRIVERLIB_FOR_LINK)
+    // All driverlib implementations init peripheral the same way
+    EusciDriver::initI2CPeripheral(slaveAddress);
+    myAssert(isInitialized(slaveAddress));
+    // setDataRate125kbps();
+#elif defined(USE_STATE_MACHINE_FOR_LINK)
+    // TODO needed for stateMachine
 
+    // Enable NACK interrupt.  So we can catch bus errors.
+    EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_NAK_INTERRUPT);
+
+    // So we can catch slave gone wild.
+    // Enable "clock low" interrupt.
+    EUSCI_B_I2C_enableInterrupt(I2CInstanceAddress, EUSCI_B_I2C_CLOCK_LOW_TIMEOUT_INTERRUPT );
+    // Set timeout
+    EUSCI_B_I2C_setTimeout(I2CInstanceAddress, EUSCI_B_I2C_TIMEOUT_28_MS);
+
+#else
+#error "No link implementation defined"
 #endif
 
     // Not all implementations ensure enabled, caller must do that
@@ -158,6 +182,7 @@ bool I2CTransport::isInitI2CMaster() {
 bool I2CTransport::isInitToAddressSlave(unsigned int slaveAddress) {
     return (UCB0I2CSA == slaveAddress);
 }
+
 
 bool I2CTransport::isInitialized(unsigned int slaveAddress) {
 #ifdef FULL_INIT_CHECK

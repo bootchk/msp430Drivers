@@ -5,7 +5,7 @@
 
 #include <msp430.h> // LPM3 macro
 
-#include "../driverConfig.h"    // choose implementation
+#include "../config/driverConfig.h"    // choose implementation
 
 #ifdef LOW_POWER_TIMER_USE_RTC
 #include "../timer/counter.h"

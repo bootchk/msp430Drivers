@@ -85,9 +85,6 @@ void Bridge::configureMcuSide(unsigned int slaveAddress, bool isRWBitHighForRead
     // pins not configured
     // not enabled
 
-#ifdef TEMP
-
-    Cruft?  Need to decide on one API that allows setting data rate independently or not, that enables or not
     I2CTransport::setDataRate125kbps();
 
 #ifdef    I2C_HAS_EXTERNAL_PULLUPS
@@ -97,10 +94,10 @@ void Bridge::configureMcuSide(unsigned int slaveAddress, bool isRWBitHighForRead
 #else
 #error "I2C pullups unspecified in board.h"
 #endif
+    myAssert(I2CTransport::isConfiguredPinsForModule());
 
     I2CTransport::enable();
-#endif
-
+    myAssert(I2CTransport::isEnabled());
 }
 
 

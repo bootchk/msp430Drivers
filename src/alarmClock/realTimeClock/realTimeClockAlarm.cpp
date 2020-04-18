@@ -14,7 +14,7 @@
 
 
 
-#include "../../driverParameters.h"   // MaxPracticalAlarmDuration
+#include "../../config/driverParameters.h"   // MaxPracticalAlarmDuration
 
 #include "../../assert/myAssert.h"
 

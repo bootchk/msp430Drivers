@@ -9,7 +9,7 @@
 
 #include "../assert/myAssert.h"
 
-#include "../driverConfig.h"
+#include "../config/driverConfig.h"
 
 
 #ifdef BRIDGE_USE_SERIAL

@@ -4,7 +4,7 @@
 //#include "../pinFunction/spiPins.h"
 #include "../src/bridge/bridge.h"
 
-#include "../src/busConfig.h"
+#include "../src/config/busConfig.h"
 
 // DriverLib
 #include <pmm.h>

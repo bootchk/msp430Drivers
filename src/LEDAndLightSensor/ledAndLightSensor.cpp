@@ -1,7 +1,7 @@
 
 #include "ledAndLightSensor.h"
-#include "../driverConfig.h"
-#include "../driverParameters.h"
+#include "../config/driverConfig.h"
+#include "../config/driverParameters.h"
 
 #include "../softFault/softFault.h"
 

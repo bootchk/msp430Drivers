@@ -31,7 +31,6 @@ public:
     static void write(unsigned int registerAddress, unsigned const char value);
 
     /*
-     * Config
+     * Config is done separately
      */
-    static void initI2CPeripheral(unsigned int slaveAddress);
 };

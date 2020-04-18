@@ -3,7 +3,7 @@
 
 #include "../timer/counter.h"
 
-#include "../driverConfig.h"
+#include "../config/driverConfig.h"
 
 
 

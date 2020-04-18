@@ -1,7 +1,7 @@
 
 #include "serial.h"
 
-#include "../../driverConfig.h"
+#include "../../config/driverConfig.h"
 #include "../../assert/myAssert.h"
 
 

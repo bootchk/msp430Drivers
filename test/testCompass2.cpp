@@ -7,7 +7,7 @@
 
 #include "../src/compass/mangler.h"
 
-#include "../src/busConfig.h"
+#include "../src/config/busConfig.h"
 
 
 

@@ -1,5 +1,5 @@
 #include "ledAndLightSensor.h"
-#include "../driverParameters.h"
+#include "../config/driverParameters.h"
 #include "../timer/counter.h"
 #include "../assert/myAssert.h"
 
