@@ -24,6 +24,7 @@ void testLogging();
 void testI2C();
 void testI2CTransport();
 void testUVSensor();
+void testEInk();
 
 
 
@@ -56,5 +57,6 @@ int main(void)
 	//testAlarm3();
 	//testAlarmLPM45();
 	//testAlarmLPM45AndTimer();
-	testUVSensor();
+	//testUVSensor();
+	testEInk();
 }
