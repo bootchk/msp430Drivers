@@ -7,6 +7,10 @@
  * If implementation is async, may require Timer ready for use.
  *
  * Requires persistent memory (FRAM) write is enabled.
+ *
+ * References:
+ * - the datasheet
+ * - http://essentialscrap.com/eink/Driving_E_Ink_Displays.pdf
  */
 class EInkBargraph {
     /*

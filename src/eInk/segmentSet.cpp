@@ -23,6 +23,8 @@ static int foobar = 1;
  * You must call configure() once during lifetime, to configure at runtime, at POR.
  *
  * The #pragma PERSISTENT requires compile time initialization, unfortunately, so can't be used easily here.
+ * Since C++ has no static constructors.
+ * Thus we require a run-time call to configure()
  */
 #pragma DATA_SECTION( ".TI.persistent" )
 Segment segTop;

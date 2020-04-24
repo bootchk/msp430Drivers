@@ -44,7 +44,6 @@ void testUVSensor()
     Bridge::configureMcuSide(UVSensorBusAddress, false);
     // assert serial bus ready
 
-    unsigned int interruptFlags = I2CPeripheral::getInterruptFlags();
 
     // Test sanity
     // Registers are readable even before RTC is configured
@@ -52,13 +51,11 @@ void testUVSensor()
     foo = UVSensor::isSane();
     myAssert(foo);
 
-
-    interruptFlags = I2CPeripheral::getInterruptFlags();
-
     // Test reading UV
-
     unsigned int uva;
-    //uva = UVSensor::readSingleUVA();
+    unsigned int didFail = UVSensor::readSingleUVA(&uva);
+    myAssert( not didFail );
+
 
     LED::configureLED1();
 
@@ -68,6 +65,7 @@ void testUVSensor()
 
         LED::toggle();
 
-        //uva = UVSensor::readSingleUVA();
+        unsigned int didFail = UVSensor::readSingleUVA(&uva);
+        myAssert( not didFail );
     }
 }

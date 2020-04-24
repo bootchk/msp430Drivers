@@ -57,6 +57,6 @@ int main(void)
 	//testAlarm3();
 	//testAlarmLPM45();
 	//testAlarmLPM45AndTimer();
-	//testUVSensor();
-	testEInk();
+	testUVSensor();
+	//testEInk();
 }

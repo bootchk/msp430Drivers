@@ -27,5 +27,15 @@
 #define RTCBusAddress AB0805BusAddress
 
 
+/*
+ * VEML6075
+ */
 // 7-bit 0x10
-#define UVSensorBusAddress 0x10
+//#define UVSensorBusAddress 0x10
+
+/*
+ * Si1133
+ */
+#define UVSensorBusAddress 0x55
+
+
