@@ -14,12 +14,12 @@ public:
     enum Parameter {
         ChannelList =         0x1,
         ADCConfig0 =          0x2,
-        ADCSensitivity0 =           0x3,
+        ADCSensitivity0 =     0x3,
         ADCPost0 =            0x4
 
     };
 
-    static UVCommands::UVCommand buildParamSetCommandForAddress(unsigned int address);
+    static UVCommands::UVCommand buildParamSetCommandForParameter(Parameter address);
 
 
 

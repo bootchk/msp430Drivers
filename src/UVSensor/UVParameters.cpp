@@ -13,9 +13,10 @@
  * A ParamSet command has an address embedded in it.
  */
 UVCommands::UVCommand
-UVParameters::buildParamSetCommandForAddress(unsigned int address) {
+UVParameters::buildParamSetCommandForParameter(Parameter address) {
     // assert address is 6-bit
     // Set the seventh bit
+    //  0x80 + ((uint8_t)address & 0x3F);
     UVCommands::UVCommand result = static_cast<UVCommands::UVCommand>  ((1 << 6) + address);
     return result;
 }
@@ -39,7 +40,7 @@ UVParameters::set(unsigned char value, Parameter address) {
     // Simple set register with the value for the parameter
     fail += UVCommands::setInput(value);
 
-    UVCommands::UVCommand command = buildParamSetCommandForAddress(address);
+    UVCommands::UVCommand command = buildParamSetCommandForParameter(address);
 
     /*
      * This is a *send*, which waits for command to finish

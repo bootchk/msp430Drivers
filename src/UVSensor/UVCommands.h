@@ -17,6 +17,7 @@ private:
         IRQStatus =       0x12,
         HostOut =         0x13,
         HostOut1 =        0x14,
+        HostOut2 =        0x15,
     };
 
 
@@ -45,7 +46,7 @@ public:
     static unsigned int setInput(unsigned char buffer);
     static unsigned int getResponse(unsigned char *buffer);
     static unsigned int setParam(unsigned int address);
-    static unsigned int getUVSample(unsigned int *sample);
+    static unsigned int getUVSample(long* sample);
     static unsigned int getIRQStatus(unsigned char *status);
     static unsigned int setIRQEnable(unsigned char value);
 

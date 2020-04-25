@@ -51,6 +51,6 @@ public:
      *
      * Returns non-zero on error
      */
-    static unsigned int readSingleUVA(unsigned int *UVResult);
+    static unsigned int readSingleUVA(long *UVResult);
 
 };

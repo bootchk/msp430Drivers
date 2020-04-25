@@ -7,8 +7,9 @@
 
 #include "../src/i2c/i2cPeripheral.h"
 
-#include "../src/config/busConfig.h"
+#include "../src/config/busConfig.h"  // slave address
 
+#include "../src/UVSensor/UVCommands.h"
 
 
 // DriverLib
@@ -46,14 +47,23 @@ void testUVSensor()
 
 
     // Test sanity
-    // Registers are readable even before RTC is configured
+    // Registers are readable even before configured
     bool foo;
     foo = UVSensor::isSane();
     myAssert(foo);
 
+    unsigned char status;
+    unsigned int didFail;
+
+    didFail =  UVCommands::getIRQStatus(&status);
+    didFail =  UVCommands::getResponse(&status);
+
+
     // Test reading UV
-    unsigned int uva;
-    unsigned int didFail = UVSensor::readSingleUVA(&uva);
+    // Result is signed, 24-bit
+    long uva;
+
+    didFail = UVSensor::readSingleUVA(&uva);
     myAssert( not didFail );
 
 

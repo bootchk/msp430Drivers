@@ -4,6 +4,28 @@
 #include "UVParameters.h"
 
 
+//#define ALT_PARAMS 1
+#ifdef ALT_PARAMS
+/*
+ * Zero decimation rate
+ * mux is UV sensor, bits 4:0 => 11000
+ * 0x18
+ */
+const unsigned char ADCConfig = 0x18;
+// ADCSENSx defaults to one measurement
+// Set to 128 measurements, time 48 uSec
+const unsigned char ADCSensitivity = 0x71;
+#else
+/*
+ * White light sensor
+ */
+const unsigned char ADCConfig = 0x4d;
+
+const unsigned char ADCSensitivity = 0x1b;
+// 24-bit result
+// Default is 16-bit result, no shift, no thresholds
+const unsigned char ADCPost = 0x40;
+#endif
 
 /*
  * Each channel has four params, but we accept most of the reset defaults
@@ -12,14 +34,12 @@ unsigned int
 setParametersForUVRead() {
     unsigned int fail;
 
-    // Zero decimation rate, mux is UV sensor, bits 4:0 => 11000
-    fail = UVParameters::set(0x18, UVParameters::Parameter::ADCConfig0);
 
-    // ADCSENSx defaults to one measurement
-    // Set to 126 measurements, time 48 uSec
-    fail += UVParameters::set(0x71, UVParameters::Parameter::ADCSensitivity0);
 
-    // Omit ADCPOSTx     Default is 16-bit result, no shift, no thresholds
+    fail = UVParameters::set(ADCConfig, UVParameters::Parameter::ADCConfig0);
+    fail += UVParameters::set(ADCSensitivity, UVParameters::Parameter::ADCSensitivity0);
+    fail += UVParameters::set(ADCPost, UVParameters::Parameter::ADCPost0);
+
     // Omit MEASCONFIGx
 
     // TODO not sure this is necessary
@@ -64,7 +84,7 @@ configureToReadUV() {
  *
  * Returns non-zero on error.
  */
-unsigned int measureUV(unsigned int * result) {
+unsigned int measureUV(long* result) {
     unsigned int fail;
 
     fail = UVCommands::sendCommandForceRead();
@@ -104,7 +124,7 @@ UVSensor::isSane() {
 
 
 unsigned int
-UVSensor::readSingleUVA(unsigned int *UVResult) {
+UVSensor::readSingleUVA(long *UVResult) {
     unsigned int fail;
 
     fail = reset();

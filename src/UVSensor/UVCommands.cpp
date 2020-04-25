@@ -12,9 +12,10 @@
 
 
 enum Response {
-        RSP0_CHIPSTAT_MASK  = 0xE0, /**< Chip state mask in Response0 register                              */
-        RSP0_COUNTER_MASK   = 0x1F, /**< Command counter and error indicator mask in Response0 register     */
-        RSP0_SLEEP          = 0x20, /**< Sleep state indicator bit mask in Response0 register               */
+        RSP0_CHIPSTAT_MASK  = 0xE0, // Chip state mask
+        RSP0_COUNTER_MASK   = 0x0F, // Command counter mask
+        RSP0_ERROR_MASK     = 0x10, // error indicator mask
+        RSP0_SLEEP          = 0x20, // Sleep state indicator bit mask
     };
 
 
@@ -179,10 +180,16 @@ UVCommands::setCommand(UVCommand command) {
 }
 
 
+/*
+ * Also returns error if error bit set in response
+ */
 unsigned int
 UVCommands::getResponse(unsigned char *buffer) {
     unsigned int fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::Response0), buffer);
-    return fail;
+    if (fail) return fail;
+
+    if (*buffer & RSP0_ERROR_MASK) return UVSensor::DeviceError;
+    else return 0;
 }
 
 
@@ -202,7 +209,7 @@ unsigned int UVCommands::sendCommandForceRead()           { return sendCommand(U
  * This is a simple *set*
  */
 unsigned int UVCommands::sendCommandResetCommandCounter() { return setCommand(UVCommand::ResetCommandCounter); }
-// This isn't sendCommand since it delays anyway
+// This isn't sendCommand since caller delays anyway
 unsigned int UVCommands::sendCommandReset() { return setCommand(UVCommand::Reset); }
 
 
@@ -211,15 +218,26 @@ unsigned int UVCommands::sendCommandReset() { return setCommand(UVCommand::Reset
  * Read two bytes of 16-bit sample, one at a time, and form a 16-bit value
  */
 unsigned int
-UVCommands::getUVSample(unsigned int *sample) {
-    unsigned char lowerByte, upperByte;
+UVCommands::getUVSample(long* sample) {
+    unsigned char lowerByte, middleByte, upperByte;
     unsigned int fail;
 
-    // TODO Little endian: LSB is at lower address
+    // Big endian: MSB is at lower index
 
-    fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::HostOut), &lowerByte);
-    fail += not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::HostOut1), &upperByte);
-    unsigned int result = lowerByte + (upperByte << 8);
+    fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::HostOut), &upperByte);
+    fail += not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::HostOut1), &middleByte);
+    fail += not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::HostOut2), &lowerByte);
+
+    // piece together 24 bit result
+    unsigned long result;
+    result = (unsigned long) upperByte << 16;
+    result |= middleByte << 8;
+    result |= lowerByte;
+
+    if ( result & 0x800000 ) {  // if 24-bit negative
+        result |= 0xFF000000;  // extend sign
+    }
+
     *sample = result;
     return fail;
 }
@@ -259,7 +277,7 @@ UVCommands::sleepWhileResetting() {
 void
 UVCommands::sleepWhileReadingChannel() {
     // 200 mSec for four channels, 50mSec for one channel
-    __delay_cycles(50000);
+    __delay_cycles(200000);
 }
 
 
