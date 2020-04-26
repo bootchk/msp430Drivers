@@ -34,7 +34,7 @@ UVCommands::waitUntilSleep() {
    *  or count exceeded
    */
   while ( count < 5 ) {
-    fail = getResponse (&response);
+    fail = getResponseWithErrorCheck(&response);
     if ( fail ) return fail;
 
     bool isSleep = (response & (unsigned char)RSP0_CHIPSTAT_MASK)
@@ -60,7 +60,7 @@ UVCommands::waitForConsistentCommandCount(unsigned int * commandCount) {
     unsigned int fail;
 
 
-    fail = getResponse (&response);
+    fail = getResponseWithErrorCheck(&response);
     if ( fail ) return fail;
 
     firstCount = response & (unsigned char)RSP0_COUNTER_MASK;
@@ -69,7 +69,7 @@ UVCommands::waitForConsistentCommandCount(unsigned int * commandCount) {
        fail = waitUntilSleep();
        if ( fail )  return fail;
 
-       fail = getResponse( &response);
+       fail = getResponseWithErrorCheck(&response);
        if ( fail) return fail;
 
        secondCount = response & (unsigned char)RSP0_COUNTER_MASK;
@@ -101,7 +101,7 @@ UVCommands::waitForChangedCommandCount(unsigned int priorCommandCount) {
     while ( count < 5 ) {
         // Why don't we waitUntilSleep here ?
 
-       fail = getResponse( &response);
+       fail = getResponseWithErrorCheck(&response);
        if ( fail) {
             return fail;
        }
@@ -184,12 +184,25 @@ UVCommands::setCommand(UVCommand command) {
  * Also returns error if error bit set in response
  */
 unsigned int
-UVCommands::getResponse(unsigned char *buffer) {
-    unsigned int fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::Response0), buffer);
+UVCommands::getResponseWithErrorCheck(unsigned char *buffer) {
+    unsigned int fail = getResponse0(buffer);
     if (fail) return fail;
 
+    // If the error bit is set, return an error *on the prior command*
     if (*buffer & RSP0_ERROR_MASK) return UVSensor::DeviceError;
-    else return 0;
+    else return UVSensor::SensorOK;
+}
+
+
+unsigned int
+UVCommands::getResponse0(unsigned char *buffer) {
+    unsigned int fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::Response0), buffer);
+    return fail;
+}
+unsigned int
+UVCommands::getResponse1(unsigned char *buffer) {
+    unsigned int fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::Response1), buffer);
+    return fail;
 }
 
 

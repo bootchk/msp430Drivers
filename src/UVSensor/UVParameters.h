@@ -20,13 +20,15 @@ public:
     };
 
     static UVCommands::UVCommand buildParamSetCommandForParameter(Parameter address);
+    static UVCommands::UVCommand buildParamQueryCommandForParameter(Parameter address);
 
-
-
+    // Write <value> to <parameter>
+    static unsigned int set(unsigned char value, Parameter parameter);
+    // Read <value> to <parameter>
+    static unsigned int get(unsigned char *value, Parameter parameter);
 
     /*
-     * Write <value> to <parameter>
+     * Return whether <parameter> has <value>
      */
-    static unsigned int set(unsigned char value, Parameter parameter);
-
+    static bool verify(unsigned char value, Parameter parameter);
 };

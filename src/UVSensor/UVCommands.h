@@ -13,6 +13,7 @@ private:
         Input0 =          0x0A,
         Command =         0x0B,
         IRQEnable =       0x0F,
+        Response1 =       0x10,
         Response0 =       0x11,
         IRQStatus =       0x12,
         HostOut =         0x13,
@@ -44,11 +45,15 @@ public:
     static unsigned int getID(unsigned char *ID);
     static unsigned int setCommand(UVCommand command);
     static unsigned int setInput(unsigned char buffer);
-    static unsigned int getResponse(unsigned char *buffer);
+    static unsigned int getResponse0(unsigned char *buffer);
+    static unsigned int getResponse1(unsigned char *buffer);
     static unsigned int setParam(unsigned int address);
     static unsigned int getUVSample(long* sample);
     static unsigned int getIRQStatus(unsigned char *status);
     static unsigned int setIRQEnable(unsigned char value);
+
+    // Get response and check the error bit is not set
+    static unsigned int getResponseWithErrorCheck(unsigned char *buffer);
 
 
     // convienience

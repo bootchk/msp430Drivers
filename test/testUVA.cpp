@@ -55,8 +55,12 @@ void testUVSensor()
     unsigned char status;
     unsigned int didFail;
 
+    // Test simple get of IRQ status
     didFail =  UVCommands::getIRQStatus(&status);
-    didFail =  UVCommands::getResponse(&status);
+    myAssert( not didFail );
+    // Test simple get of response register
+    didFail =  UVCommands::getResponseWithErrorCheck(&status);
+    myAssert( not didFail );
 
 
     // Test reading UV

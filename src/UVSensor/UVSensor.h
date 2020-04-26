@@ -8,8 +8,9 @@ class UVSensor {
 public:
 
     enum Error {
+        SensorOK,       // OK must be first, to ensure zero
         I2CBusError,
-        DeviceError,         // Wrong register or parameter address
+        DeviceError,    // Wrong register or parameter address
         TimingError
     };
 
