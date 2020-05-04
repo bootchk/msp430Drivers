@@ -14,14 +14,7 @@
  * from which I derived this code.
  */
 
-#ifdef OLD
-void ADC::configureExternalPinVoltagePin() {
-    GPIO_setAsPeripheralModuleFunctionInputPin(
-            ExternalPinVoltagePort,
-            ExternalPinVoltagePin,
-            ExternalPinVoltagePinFunction);
-}
-#endif
+
 
 
 // For 8-bit resolution
@@ -73,6 +66,7 @@ unsigned int ADC::measureExternalPinProportionTo1_5VBG() {
 
 
 #ifdef WRONG
+This is wrong because the conversion of a proportion to absolute volts is wrong???
 
 
 unsigned long ADC::measureExternalPinCentiVolts() {

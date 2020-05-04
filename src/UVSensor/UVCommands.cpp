@@ -23,7 +23,7 @@ enum Response {
 
 
 unsigned int
-UVCommands::waitUntilSleep() {
+UVCommands::waitUntilSleep(unsigned int maxLoopCount) {
   unsigned int fail;
   unsigned char response;
   unsigned int count = 0;
@@ -33,7 +33,7 @@ UVCommands::waitUntilSleep() {
    *  or an i2c error occurs
    *  or count exceeded
    */
-  while ( count < 5 ) {
+  while ( count < maxLoopCount ) {
     fail = getResponseWithErrorCheck(&response);
     if ( fail ) return fail;
 
@@ -66,7 +66,7 @@ UVCommands::waitForConsistentCommandCount(unsigned int * commandCount) {
     firstCount = response & (unsigned char)RSP0_COUNTER_MASK;
 
     while ( count < 5 ) {
-       fail = waitUntilSleep();
+       fail = waitUntilSleep(5);
        if ( fail )  return fail;
 
        fail = getResponseWithErrorCheck(&response);
@@ -92,14 +92,18 @@ UVCommands::waitForConsistentCommandCount(unsigned int * commandCount) {
 
 
 unsigned int
-UVCommands::waitForChangedCommandCount(unsigned int priorCommandCount) {
+UVCommands::waitForChangedCommandCount(unsigned int priorCommandCount, unsigned int maxLoopCount) {
     unsigned int count = 0;
     unsigned char response;
     unsigned int newCount;
     unsigned int fail;
 
-    while ( count < 5 ) {
-        // Why don't we waitUntilSleep here ?
+    while ( count < maxLoopCount ) {
+        /*
+         * Not waitUntilSleep here.
+         * The commandCount should change soon,
+         * but device not sleeping for some commands, i.e. ForceRead, device is measuring.
+         */
 
        fail = getResponseWithErrorCheck(&response);
        if ( fail) {
@@ -144,8 +148,13 @@ UVCommands::sendCommand(UVCommand command)
     /* Set command register */
     fail = setCommand(command);
     if ( fail ) return fail;
+    // If command is ForceRead, immediately will start measurement and may not be sleep
 
-    fail = waitForChangedCommandCount(priorCommandCount);
+    // CommandCount should change soon, but measurement may be not ready.
+    // I found that increasing HW_SENS and SW_SENS increases the required maxCount
+    // I.E. command count is NOT changing soon, but only after measuring is done?
+    // 5, 50, 200
+    fail = waitForChangedCommandCount(priorCommandCount, 1000);
 
     return fail;
 }

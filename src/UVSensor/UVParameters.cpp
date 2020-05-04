@@ -64,7 +64,7 @@ UVParameters::set(unsigned char value, Parameter address) {
 
     // An optimization can be to set both Input and Command register in same transfer, since they are together.
 
-    fail = UVCommands::waitUntilSleep();
+    fail = UVCommands::waitUntilSleep(5);
     if (fail) return fail;
 
     // Simple set register with the value for the parameter

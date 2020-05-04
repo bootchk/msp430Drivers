@@ -80,13 +80,17 @@ public:
 
     /*
      * Wait limited tries for Response to show device is sleeping.
+     *
+     * Better to use IRQ.
+     * A more sensitive reading takes more time.
+     * You must experiment to know how many loops it normally takes to read.
      */
-    static unsigned int waitUntilSleep();
+    static unsigned int waitUntilSleep(unsigned int maxLoopCount);
 
 
 
 private:
     static unsigned int waitForConsistentCommandCount(unsigned int * );
-    static unsigned int waitForChangedCommandCount(unsigned int priorCommandCount);
+    static unsigned int waitForChangedCommandCount(unsigned int priorCommandCount, unsigned int maxLoopCount);
 
 };

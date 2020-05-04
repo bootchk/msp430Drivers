@@ -329,6 +329,16 @@
 
 
 
+// GPIO config for pin used for ADC reads
+// GPIO_PORT_ADC7, GPIO_PIN_ADC7, GPIO_FUNCTION_ADC7 are used in examples, but undefined
+// The module function is moot??? GPIO_PRIMARY_MODULE_FUNCTION
+#define ExternalPinVoltagePort        GPIO_PORT_P1
+#define ExternalPinVoltagePin         GPIO_PIN7
+#define ExternalPinVoltagePinFunction GPIO_SECONDARY_MODULE_FUNCTION
+
+
+// Constant for configuring ADC
+#define    ExternalPinVoltagePinADCSelection   ADC_INPUT_A7
 
 /*
  * Constants defined by chip manufacturer

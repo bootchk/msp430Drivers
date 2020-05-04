@@ -56,22 +56,25 @@ void testUVSensor()
     unsigned int didFail;
 
     // Test simple get of IRQ status
-    didFail =  UVCommands::getIRQStatus(&status);
-    myAssert( not didFail );
+    //didFail =  UVCommands::getIRQStatus(&status);
+    //myAssert( not didFail );
+
     // Test simple get of response register
-    didFail =  UVCommands::getResponseWithErrorCheck(&status);
-    myAssert( not didFail );
+    //didFail =  UVCommands::getResponseWithErrorCheck(&status);
+    //myAssert( not didFail );
 
 
     // Test reading UV
     // Result is signed, 24-bit
-    long uva;
+    long uvaArray[10];
+    unsigned int index = 0;
 
-    didFail = UVSensor::readSingleUVA(&uva);
+    didFail = UVSensor::readSingleUVA(&uvaArray[0]);
     myAssert( not didFail );
 
 
     LED::configureLED1();
+    LED::configureLED2();   // green
 
     while (true)
     {
@@ -79,7 +82,13 @@ void testUVSensor()
 
         LED::toggle();
 
-        unsigned int didFail = UVSensor::readSingleUVA(&uva);
+        unsigned int didFail = UVSensor::readSingleUVA(&uvaArray[index]);
         myAssert( not didFail );
+
+        if (uvaArray[index] > 3)  LED::turnOnLED2();
+        else LED::turnOffLED2();
+
+        index++;
+        if (index > 9) index = 0;
     }
 }

@@ -18,17 +18,34 @@ const unsigned char ADCConfig = 0x18;
 // ADCSENSx defaults to one measurement
 // Set to 128 measurements, time 48 uSec
 const unsigned char ADCSensitivity = 0x71;
+
 #elif defined(UV_PARAMS)
+// short decimation 11 UV diode 11000 => 1111000 n0x78
 const unsigned char ADCConfig = 0x78;
-const unsigned char ADCSensitivity = 0x09;
+
+// 12.5 mSec HW_SENS
+//const unsigned char ADCSensitivity = 0x09;
+// 50 mSec HW_SENS
+const unsigned char ADCSensitivity = 0x0b;
+// 50 mSec HW_SENS and High range
+//const unsigned char ADCSensitivity = 0x8b;
+
 // 24-bit result
 const unsigned char ADCPost = 0x40;
 #else
 /*
  * White light sensor
  */
-const unsigned char ADCConfig = 0x4d;
-const unsigned char ADCSensitivity = 0x1b;
+// decimation 2 and didode is large white
+// const unsigned char ADCConfig = 0x4d;
+// decimation 0 and dido is large white
+const unsigned char ADCConfig = 0x0d;
+// HW_SENS = 50ms, and 2 reads
+// const unsigned char ADCSensitivity = 0x1b;
+// HW_SENS = 50ms and 1 read
+//const unsigned char ADCSensitivity = 0xb;
+// HW_SENS = 24uSec and 1 read
+const unsigned char ADCSensitivity = 0x0;
 // 24-bit result
 // Default is 16-bit result, no shift, no thresholds
 const unsigned char ADCPost = 0x40;

@@ -25,8 +25,15 @@ class ADCConfigure {
 
     static void disableVoltageBandgapReference();
 
+
+    // Configure the GPIO function of the pin to be read by ADC
+    static void configureExternalPinVoltagePin();
+
+
+
 public:
-    // Both configurations of external pin hijack the GPIO function of the pin
+    // External pin as defined by board.h.
+    // Both methods hijack the GPIO function of the pin
 
     // configure to measure external pin proportion to Vcc
     // Since Vcc varies, this doesn't give an absolute voltage
@@ -35,6 +42,13 @@ public:
     // configure to measure external pin proportion to 1.5V band gap ref
     // The VBG also varies slightly with Vcc, but this is more accurate than the above.
     static void configureForExternalPinVoltageProportionTo1_5VBG();
+
+    // Undo ADC hijacking the GPIO function of pin
+    static void releaseExternalPin();
+
+
+
+
 
     // configure to measure Vcc in centiVolts
     // Does not hijack GPIO
@@ -47,8 +61,9 @@ public:
      */
     static void unconfigureForVccMeasure();
 
-    // Undo ADC hijacking the GPIO function of pin
-    static void releaseExternalPin();
+
+
+
 
     /*
      * Unpower the ADC module.

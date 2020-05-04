@@ -7,10 +7,6 @@
 #include <gpio.h>
 #include <adc.h>
 
-
-// App
-#include <board.h>
-
 #include "../assert/myAssert.h"
 
 
@@ -20,21 +16,6 @@
 /*
  * Private
  */
-
-#ifdef OBSOLETE
-// didn't work, reverse powered mcu through analog pin
-
-void ADCConfigure::releaseExternalPin() {
-    // bit clear A0
-    SYSCFG2 &= ~BIT0;
-    /*
-     * assert configuration and release of an external GPIO pin for ADC use
-     * does not alter the configuration of the GPIO pin
-     * e.g. if it was GPIO out, it still is
-     */
-}
-#endif
-
 
 
 
@@ -48,7 +29,7 @@ void ADCConfigure::configureCommon() {
      * Use default clock divider of 1
      */
     ADC_init(ADC_BASE,
-    ADC_SAMPLEHOLDSOURCE_SC,
+             ADC_SAMPLEHOLDSOURCE_SC,
              ADC_CLOCKSOURCE_ADCOSC,
              ADC_CLOCKDIVIDER_1);
     // assert ADC is off
@@ -69,6 +50,8 @@ void ADCConfigure::configureCommon() {
 
     ADC_setResolution(ADC_BASE,
             ADC_RESOLUTION_8BIT);
+
+    // Initialization is not complete until caller configures input
 }
 
 
@@ -141,40 +124,3 @@ void ADCConfigure::disableConversions() {
 
 
 
-#ifdef OBSOLETE
-void ADCConfigure::configureForExternalPinVoltageProportionToVcc() {
-    configureCommon();
-
-    //Configure Memory Buffer
-    /*
-     * Base Address for the ADC Module
-     * Use input A7
-     * Use positive reference of AVcc
-     * Use negative reference of AVss
-     */
-    ADC_configureMemory(ADC_BASE,
-            ExternalPinVoltagePinADCSelection,              // <<<<<<<< typically ADC_INPUT_A4
-            ADC_VREFPOS_AVCC,
-            ADC_VREFNEG_AVSS);
-}
-
-
-void ADCConfigure::configureForExternalPinVoltageProportionTo1_5VBG() {
-    configureVoltageBandgapReference();
-    configureCommon();
-
-    //Configure Memory Buffer
-    /*
-     * Base Address for the ADC Module
-     * Use input A7
-     * Use positive reference of AVBG
-     * Use negative reference of AVss
-     */
-    ADC_configureMemory(ADC_BASE,
-            ExternalPinVoltagePinADCSelection,              // <<<<<<<< typically ADC_INPUT_A4
-            ADC_VREFPOS_INT,    // Internal reference VBG
-            ADC_VREFNEG_AVSS);
-
-    waitForVoltageBandgapReference();
-}
-#endif
