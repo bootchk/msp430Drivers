@@ -25,7 +25,7 @@ unsigned int overflowCount;
 
 
 /*
- * Uses VLO at approx 10kHz: a tick is about 100uSec
+ * Uses VLO at approx 12kHz: a tick is about 100uSec
  * On MSP430 unsigned int is 16 bits max 65,535
  * Thus max duration yields duration of 6.50M uSec i.e. about 6.5 sec
  * 5k ticks is 500kuSec is .5 seconds
@@ -33,8 +33,12 @@ unsigned int overflowCount;
  * RTC is periodic.
  * It will interrupt repeatedly unless stopped.
  * Overflow clears counter register in HW, and reloads modulo value (compare register.)
+ *
+ * RTC has pre-dividers of 1,10, .. and 1,64,256,...
  */
-void Counter::init(unsigned int durationInTicks)
+
+void Counter::initWithDivisor(unsigned int durationInTicks,
+                              unsigned int divisor)
 {
     /*
      * Can be arbitrarily short, but not zero (which makes no sense.)
@@ -50,9 +54,19 @@ void Counter::init(unsigned int durationInTicks)
     RTC_init(
         RTC_BASE,
         durationInTicks,  // compare reg value at which will trigger interrupt
-        RTC_CLOCKPREDIVIDER_1);
+        divisor);
     // assert predivider is set and clock is none and modulo register is set
     // not assert counter is zero
+}
+
+void Counter::init12kHz(unsigned int durationInTicks)
+{
+    initWithDivisor(durationInTicks, RTC_CLOCKPREDIVIDER_1);
+}
+
+void Counter::init1_2kHz(unsigned int durationInTicks)
+{
+    initWithDivisor(durationInTicks, RTC_CLOCKPREDIVIDER_10);
 }
 
 
@@ -73,7 +87,7 @@ void Counter::start() {
     enableAndClearOverflowInterrupt();
 
     /*
-     * This sets the clock source and resets the RTC.
+     * Set the clock source and reset the RTC.
      * Resetting clears the counter and reloads the shadow reg from modulo register.
      */
     RTC_start(RTC_BASE, RTC_CLOCKSOURCE_VLOCLK);

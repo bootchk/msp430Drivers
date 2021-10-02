@@ -8,11 +8,22 @@
  * !!! Shares RTC with Timer (which does blocking delays.)
  *
  * You can use the RTC without interrupts, but this does use interrupts.
+ *
+ * Uses the VLO clock i.e. 12kHz.
+ * Ticks are:
+ *    12kHz for divisor 1
+ *    1.5kHz for divisor 8
+ *
  */
 
 class Counter {
+private:
+    static void initWithDivisor(unsigned int durationInTicks,
+                                  unsigned int divisor);
 public:
-    static void init(unsigned int durationInTicks);
+
+    static void init12kHz(unsigned int durationInTicks);
+    static void init1_2kHz(unsigned int durationInTicks);
 
     /*
      * Returns immediately.

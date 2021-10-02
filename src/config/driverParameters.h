@@ -43,7 +43,11 @@ static const unsigned int MaxItersInDarkToDischargeLEDCapacitance = 50000;
 
 // Max duration of measuring light
 //static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 5000;   // 0.5 seconds
-static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 10000;   // 1 seconds
+// 10000 is good for a Cree LED measuring visible light
+// static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 10000;   // 1 seconds
+// Temporary: for measuring using a UV LED
+static const unsigned int MaxTicksInDarkToDischargeLEDCapacitance = 65000;   // 6.5 seconds, nearly max int
+
 
 // Experimentally determined ticks for LED capacitance to discharge in 10 lux.
 // Typically about 6k ticks were measured.

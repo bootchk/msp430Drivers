@@ -48,7 +48,7 @@
 #define USE_EXP430FR2433
 //#define USE_EXP430FRFR698
 
-#include "ledAndLightSensorConfig.h"
+#include "src/config/ledAndLightSensorConfig.h"
 
 
 /*

@@ -51,10 +51,10 @@ unsigned int sampleInLightOrReset() {
 
 
 
-unsigned int LEDAndLightSensor::measureLight() {
+unsigned long LEDAndLightSensor::measureLight() {
     // assert state Off
 
-    unsigned int result;
+    unsigned long result;
 
     // Charge capacitance of LED
     toReversedFromOff();

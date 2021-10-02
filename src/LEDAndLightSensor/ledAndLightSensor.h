@@ -104,7 +104,7 @@ public:
      * Return value indicates light level.
      * Low value means high illumination to LED.
      */
-    static unsigned int measureLight();
+    static unsigned long measureLight();
 
     /*
      * Understands what measurements are dark.

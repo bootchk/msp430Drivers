@@ -54,9 +54,17 @@ unsigned int LEDAndLightSensor::measureCapacitanceDischargeSleeping() {
      * IFG is set already if pin is already low.
      */
 
-    // Start a counter parallel to other process (capacitor discharging.)
-    // Typically, 5000 ticks = 0.5 second, time to discharge Cree566 in 10 lux
-    Counter::init(DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance);
+    /*
+     * Start a counter parallel to other process (capacitor discharging.)
+     *
+     * @ 12kHz max duration is 64k ticks, i.e. 5 seconds
+     * @ 1.5kHz max duration is 64k ticks, i.e. 42 seconds
+     *
+     * 5000 ticks = 0.5 second, time to discharge Cree566 in 10 lux
+     */
+    // Counter::init12kHz(DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance);
+    Counter::init1_2kHz(DriverConstant::MaxTicksInDarkToDischargeLEDCapacitance);
+
     Counter::start();
     // assert counter is near zero since start() clears it.
 

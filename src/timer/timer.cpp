@@ -47,7 +47,7 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
     // VeryLowOscillator::start();
 
     // Init RTC each time
-    Counter::init(ticks);
+    Counter::init12kHz(ticks);
 
     Counter::start();
     // Race to sleep before counter interrupts
