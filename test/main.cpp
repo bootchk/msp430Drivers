@@ -18,6 +18,7 @@ void testAlarmLPM45();
 void testAlarmLPM45AndTimer();
 void testTimer();
 void testLEDSensor();
+void testLED();
 void testLEDSensor2();
 void testLEDSensor3();
 void testStepperDriver();
@@ -40,9 +41,10 @@ int main(void)
 	//testCompass2();
 
 	//testTimer();
+	testLED();
 	//testLEDSensor();
     //testLEDSensor2();
-	testLEDSensor3();
+	//testLEDSensor3();
     //testStepperDriver();
 	//testLogging();
 
