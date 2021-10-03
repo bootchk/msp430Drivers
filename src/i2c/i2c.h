@@ -44,8 +44,8 @@ public:
 
 
 	static void write(const RegisterAddress registerAddress,
-	                      unsigned char * const buffer,
-	                      const unsigned int count);
+	                  unsigned char * const buffer,
+	                  const unsigned int    count);
 	static void read(const RegisterAddress registerAddress,
 	                          unsigned char * const buffer,
 	                          const unsigned int count);

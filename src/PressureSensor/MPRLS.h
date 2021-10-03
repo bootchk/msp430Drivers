@@ -7,12 +7,15 @@
 
 #define MPRLS_READ_TIMEOUT (20)     ///< millis
 
-// RegisterAddress
+// There are no RegisterAddress, only a "command" (i.e. a single register)
+#define MPRLS_MEASURE_COMMAND (0xAA)
 
-#define MPRLS_STATUS_POWERED (0x40) ///< Status SPI powered bit
-#define MPRLS_STATUS_BUSY (0x20)    ///< Status busy bit
-#define MPRLS_STATUS_FAILED (0x04)  ///< Status bit for integrity fail
-#define MPRLS_STATUS_MATHSAT (0x01) ///< Status bit for math saturation
+// Status bits
+#define MPRLS_STATUS_POWERED (0x40)  // powered
+#define MPRLS_STATUS_BUSY    (0x20)  // busy
+#define MPRLS_STATUS_FAILED  (0x04)  // integrity fail
+#define MPRLS_STATUS_MATHSAT (0x01)  // math saturation fail
+
 #define MPRLS_STATUS_MASK (0b01100101) ///< Sensor status mask: only these bits are set
 
 #define COUNTS_224 (16777216L)      ///< Constant: 2^24
@@ -31,16 +34,18 @@ public:
                  float K = PSI_to_HPA);
   */
 
-  bool    begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);  // , TwoWire *twoWire = &Wire);
-  uint8_t readStatus(void);
-  float   readPressure(void);
+  bool       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);  // , TwoWire *twoWire = &Wire);
+  uint8_t    readStatus(void);
+  float      readPressure(void);
+  uint32_t   readRawPressure(void);
 
   //uint8_t lastStatus; /*!< status byte after last operation */
 
 
 private:
 
-  // read 3 bytes of raw measurement data
+  // read 3 bytes of raw measurement data.
+  // Returns -1 on error
   uint32_t readData(void);
 
 /*

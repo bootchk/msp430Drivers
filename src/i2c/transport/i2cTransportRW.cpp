@@ -65,6 +65,17 @@ bool I2CTransport::read(const RegisterAddress registerAddress,
 }
 
 
+
+bool
+I2CTransport::readWORegister(
+                unsigned char * const buffer,
+                const unsigned int    count) {
+    // TODO ifdefs for other implementations
+    return SlaveRegisterLayer::readWORegister(I2CTransport::slaveAddress, buffer, count);
+}
+
+
+
 bool I2CTransport::write(
         const RegisterAddress registerAddress,
         unsigned const char * const buffer, // buffer data is const but stateMachine wants a buffer that is changeable

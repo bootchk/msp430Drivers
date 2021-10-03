@@ -135,7 +135,12 @@ public:
     // Read from register into buffer
     static bool read( const RegisterAddress registerAddress,
                       unsigned char * const bufferIn,
-                      const unsigned int count);
+                      const unsigned int    count);
+
+    // Read from unspecified register into buffer
+    static bool readWORegister(
+            unsigned char * const bufferIn,
+            const unsigned int    count);
 
     /*
      * single byte operations.

@@ -45,6 +45,16 @@ bool SlaveRegisterLayer::read(unsigned int slaveAddress,
 }
 
 
+bool
+SlaveRegisterLayer::readWORegister(
+          unsigned int slaveAddress,
+          unsigned char * buffer,
+          unsigned int count){
+
+    // First link operation: receive bytes from consecutive registers starting at stateful or unspecified registerAddress
+     return DriverLibLinkWISR::readMultipleBytes(slaveAddress, buffer, count);
+}
+
 
 bool SlaveRegisterLayer::write(unsigned int slaveAddress,
                                unsigned int registerAddress,

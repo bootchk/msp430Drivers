@@ -25,9 +25,12 @@ void testPressureSensor()
 
     LED::configureLED1();
 
+    mprls.begin();
+
     while (true)
     {
-        mprls.begin();
+        // uint8_t status = mprls.readStatus();
+        uint32_t data = mprls.readRawPressure();
 
         LED::toggle();
         __delay_cycles(1000000);
