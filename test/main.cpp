@@ -28,6 +28,7 @@ void testI2CTransport();
 void testUVSensor();
 void testUVSensor2();
 void testEInk();
+void testPressureSensor();
 
 
 
@@ -41,7 +42,7 @@ int main(void)
 	//testCompass2();
 
 	//testTimer();
-	testLED();
+	//testLED();
 	//testLEDSensor();
     //testLEDSensor2();
 	//testLEDSensor3();
@@ -65,4 +66,5 @@ int main(void)
 	//testUVSensor();
 	//testUVSensor2();
 	//testEInk();
+	testPressureSensor();
 }

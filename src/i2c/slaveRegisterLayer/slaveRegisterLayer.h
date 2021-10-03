@@ -13,10 +13,17 @@
  * Currently there are no convenience functions for single byte read/write
  */
 
+/*
+
+
+ */
 
 class SlaveRegisterLayer {
 public:
-    static bool read(unsigned int slaveAddress, unsigned int registerAddress, unsigned char * buffer, unsigned int count);
-    static bool write(unsigned int slaveAddress,  unsigned int registerAddress, unsigned const char * const buffer, unsigned int count);
+    static bool read (unsigned int    slaveAddress,
+                      unsigned int    registerAddress,
+                      unsigned char * buffer,
+                      unsigned int    count);
+    static bool write(unsigned int slaveAddress, unsigned int registerAddress, unsigned const char * const buffer, unsigned int count);
 };
 
