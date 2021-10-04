@@ -43,12 +43,13 @@ MPRLS::begin(uint8_t i2c_addr) {
 
 void
 waitForDataReady(void) {
-    // Option 1 wait for busy flag in status to clear
+    // Option 1 poll for busy flag in status to clear
     // TODO
 
     // Option 2 wait for 5 ms
     __delay_cycles(5000);
 
+    // Option 3 wait for interrupt on a pin of the device
 }
 
 
@@ -56,7 +57,7 @@ uint32_t
 MPRLS::readData(void) {
     // Initialize buffer all bytes zero
     // Same buffer used for write and read
-    uint8_t buffer[4] = {MPRLS_MEASURE_COMMAND, 0, 0, 0};
+    uint8_t buffer[4] = {0, 0, 0, 0};
 
     // Write command to wake device out of standby and begin measuring.
     // Send command and two bytes of the buffer, not all.
@@ -99,5 +100,40 @@ MPRLS::readStatus(void) {
 uint32_t
 MPRLS::readRawPressure(void) {
     return readData();
+}
+
+
+/*
+See datasheet section "8 .0 MPR SERIES SENSOR OUTPUT PRESSURE CALCULATION"
+
+These constants are for a particular device in the MPR series.
+
+M P R    L    S    0025PA    0000    1    A
+
+L      long port
+S      silicone gel
+0025PA 0-25psi
+0000   low pressure
+1      serial bus is I2C at address 0x18
+A      transfer function 10-90%
+
+ */
+#define OutputMax 15099494   // Max raw data in units counts, (90% of 2^24 counts or 0xE66666)
+#define OutputMin 1677722    // Min raw date in units counts (10% of 224 counts or 0x19999A)
+#define PSIMin    0          // Min PSI the device will read
+#define PSIMax    25         // Max PSI the device will read
+
+float
+MPRLS::readPressure(void) {
+    uint32_t rawPressurePSI = readData();
+
+
+    float measuredPsi =  ( (rawPressurePSI - OutputMin) * (PSIMax - PSIMin) )
+                           / (float)(OutputMax - OutputMin);
+
+    // Conversion to hPa
+    // TODO
+
+    return measuredPsi;
 }
 

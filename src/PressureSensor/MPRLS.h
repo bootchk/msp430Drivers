@@ -40,10 +40,21 @@ public:
     void       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);
 
     uint8_t    readStatus(void);
-    float      readPressure(void);
-    uint32_t   readRawPressure(void);
 
-    //uint8_t lastStatus; /*!< status byte after last operation */
+
+    /*
+     Read pressure in units of PSI.
+     Gage: relative to an open on the backside.
+     Ambient pressure which is about 14 PSI
+     */
+    float      readPressure(void);
+
+    /*
+     Read 24 bits of raw pressure data.
+     Returned in 32 bits, upper byte is zero if successful.
+     On error, returns -1 ( all bits one)
+     */
+    uint32_t   readRawPressure(void);
 
 
 private:
@@ -52,11 +63,4 @@ private:
   // Returns -1 on error
   uint32_t readData(void);
 
-/*
-  Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
-  int8_t _reset, _eoc;
-  uint16_t _PSI_min, _PSI_max;
-  uint32_t _OUTPUT_min, _OUTPUT_max;
-  float _K;
-  */
 };
