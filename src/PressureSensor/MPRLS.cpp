@@ -4,30 +4,40 @@
 // Use transport layer interface to I2C
 #include "../../src/i2c/transport/i2cTransport.h"
 
+#include "../../src/assert/myAssert.h"
 
-/*
-setup and initialize communication with the hardware
 
-returns True on success, False if sensor not found
-*/
 
-bool
+
+void
 MPRLS::begin(uint8_t i2c_addr) {
     // Init peripheral
     I2CTransport::initI2CPeripheral(i2c_addr);
     I2CTransport::configurePinsWithExternalPullups();
     I2CTransport::enable();
 
+    myAssert(I2CTransport::isInitialized);
+    myAssert(I2CTransport::isConfiguredPinsForModule());
+    myAssert(I2CTransport::isEnabled());
 
-  // allow time for device to start
-  //__delay_cycles(1000000);
-  //delay(10);
+    /*
+     *  Caller must allow time for device to come out of power on reset..
+     *  Datasheet says one ms before first command.
+     *
+     *  The above only configures the master and does not talk to the device.
+     */
+}
 
+
+/*
+
+ WIP
   // ensure device is active
   // uint8_t status = readStatus();
   return true;
   // ((status & MPRLS_STATUS_MASK) == MPRLS_STATUS_POWERED);
-}
+
+   */
 
 
 
@@ -37,19 +47,21 @@ waitForDataReady(void) {
     // TODO
 
     // Option 2 wait for 5 ms
-    __delay_cycles(500000);
+    __delay_cycles(5000);
 
 }
 
 
 uint32_t
 MPRLS::readData(void) {
-    // Initialize buffer with command and first two remaining bytes zero
+    // Initialize buffer all bytes zero
+    // Same buffer used for write and read
     uint8_t buffer[4] = {MPRLS_MEASURE_COMMAND, 0, 0, 0};
 
     // Write command to wake device out of standby and begin measuring.
-    // Send three bytes of the buffer, not all.
-    I2CTransport::readWORegister(buffer, 3);
+    // Send command and two bytes of the buffer, not all.
+    // The two zero bytes are command parameters, not used by the device.
+    I2CTransport::write(MPRLS_MEASURE_COMMAND, buffer, 2);
 
     waitForDataReady();
 

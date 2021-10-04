@@ -2,7 +2,8 @@
 #include "../src/LED/led.h"
 #include "../src/PressureSensor/MPRLS.h"
 
-
+// TI DriverLib
+#include <pmm.h>    // PMM_unlockLPM5
 
 
 /*
@@ -18,19 +19,24 @@
  * Set breakpoints at measurement cycle.
  */
 
+uint32_t data;
 
 void testPressureSensor()
 {
+    PMM_unlockLPM5();
+
     MPRLS mprls = MPRLS();
 
     LED::configureLED1();
 
     mprls.begin();
 
+    // Ensure enough time elapsed for device to be ready
+
     while (true)
     {
         // uint8_t status = mprls.readStatus();
-        uint32_t data = mprls.readRawPressure();
+        data = mprls.readRawPressure();
 
         LED::toggle();
         __delay_cycles(1000000);

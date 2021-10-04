@@ -18,8 +18,8 @@
 
 
 // FUTURE bit rate not hard coded
-//#define BIT_RATE EUSCI_B_I2C_SET_DATA_RATE_100KBPS
-#define BIT_RATE EUSCI_B_I2C_SET_DATA_RATE_400KBPS
+#define BIT_RATE EUSCI_B_I2C_SET_DATA_RATE_100KBPS
+//#define BIT_RATE EUSCI_B_I2C_SET_DATA_RATE_400KBPS
 
 
 /*
@@ -173,8 +173,14 @@ void DriverLibLinkWISR::initForWrite (
     // assert is PMM_unlockLPM5();
 
     EUSCI_B_I2C_initMasterParam param = {0};
+
     param.selectClockSource = EUSCI_B_I2C_CLOCKSOURCE_SMCLK;
-    param.i2cClk = CS_getSMCLK();
+
+    uint32_t smclkFreq = CS_getSMCLK();
+    // typically 1Mhz
+    myAssert(smclkFreq > 0);
+    param.i2cClk = smclkFreq;
+
     param.dataRate = BIT_RATE;
     // For writing, not using autostop.  Why not???
     param.byteCounterThreshold = 0;

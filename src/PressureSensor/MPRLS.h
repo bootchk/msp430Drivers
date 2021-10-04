@@ -33,13 +33,17 @@ public:
                  float OUTPUT_min = 10, float OUTPUT_max = 90,
                  float K = PSI_to_HPA);
   */
+    /*
+    setup and initialize communication with the hardware
+    No built-in delay, but one is required before reading.
+    */
+    void       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);
 
-  bool       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);  // , TwoWire *twoWire = &Wire);
-  uint8_t    readStatus(void);
-  float      readPressure(void);
-  uint32_t   readRawPressure(void);
+    uint8_t    readStatus(void);
+    float      readPressure(void);
+    uint32_t   readRawPressure(void);
 
-  //uint8_t lastStatus; /*!< status byte after last operation */
+    //uint8_t lastStatus; /*!< status byte after last operation */
 
 
 private:
