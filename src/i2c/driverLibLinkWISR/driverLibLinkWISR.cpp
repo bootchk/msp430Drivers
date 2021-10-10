@@ -214,7 +214,7 @@ void DriverLibLinkWISR::initForWrite (
 
 bool DriverLibLinkWISR::readMultipleBytes(
         unsigned int slaveAddress,
-        unsigned char * buffer,
+        unsigned char * const buffer,
         unsigned int count) {
 
   initForRead(slaveAddress, buffer, count);
@@ -234,7 +234,7 @@ bool DriverLibLinkWISR::readMultipleBytes(
 
 bool DriverLibLinkWISR::writeMultipleBytes(
         unsigned int slaveAddress,
-        unsigned char * buffer,
+        unsigned char * const buffer,
         unsigned int count) {
 
     initForWrite(slaveAddress, buffer, count);
