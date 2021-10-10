@@ -9,6 +9,8 @@
 // Uses chip driver
 #include "driverChipInterface.h"
 
+#include "motor.h"
+
 
 
 void StepperIndexer::syncDriverWithMotor() {
@@ -43,14 +45,38 @@ void StepperIndexer::syncDriverWithMotor() {
 
 
 
+/*
+ * Stepping
+ */
 
-// DriverChip is in Half step mode.
-// TODO allow other step modes
-void StepperIndexer::stepDetent() {
+void
+StepperIndexer::stepDetent() {
     // !!! Call to self, not to DriverChipInterface.  Self controls speed.
+#if STEPPER_HARD_STEP_SIZE_FULL
+    // Each microstep is one full detentstep
+    stepMicrostep();
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    // Two microstep per detentstep
     stepMicrostep();
     stepMicrostep();
+#endif
     maintainShadowStep();
+}
+
+
+void
+StepperIndexer::stepManyDetents(unsigned int stepCount) {
+    for (unsigned int i = stepCount; i>0; i--) {
+        // TODO without calling this, we don't maintain shadowstep
+        // stepDetent();
+        // TODO temporarily avoid call overhead
+#if STEPPER_HARD_STEP_SIZE_FULL
+        // Each microstep is one full detentstep
+        stepMicrostep();
+
+#endif
+    }
+    // TODO maintain shadow
 }
 
 

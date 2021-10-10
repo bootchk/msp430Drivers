@@ -38,15 +38,18 @@ int main(void)
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
 	//testStepper();
+	testStepperDriver();
+
 	//testCompass();
 	//testCompass2();
 
 	//testTimer();
+
 	//testLED();
 	//testLEDSensor();
     //testLEDSensor2();
 	//testLEDSensor3();
-    //testStepperDriver();
+
 	//testLogging();
 
 	// These tests are usually run in this order, from low level implementation to high
@@ -63,8 +66,11 @@ int main(void)
 	//testAlarm3();
 	//testAlarmLPM45();
 	//testAlarmLPM45AndTimer();
+
 	//testUVSensor();
 	//testUVSensor2();
+
 	//testEInk();
-	testPressureSensor();
+
+	//testPressureSensor();
 }

@@ -47,7 +47,7 @@ waitForDataReady(void) {
     // TODO
 
     // Option 2 wait for 5 ms
-    __delay_cycles(5000);
+    __delay_cycles(  5000); // (unsigned long int)
 
     // Option 3 wait for interrupt on a pin of the device
 }

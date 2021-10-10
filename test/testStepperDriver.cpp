@@ -77,18 +77,27 @@ void delayOneMilliSecond() { __delay_cycles(1000); }
  * Motor is 200 steps.
  * 800 pulses per second would be rev per second, i.e. 60 rpm
  */
-void step360() {
+void step360Jerky() {
     for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
         StepperIndexer::stepDetent();
         // No delay here.  stepDetent delays between microsteps appropriate to speed
-        // This may still appear a little jerky because of loop overhead.
+        // This may still be jerky and slow because of loop overhead.
     }
 }
 
+
+// Turn one reve as fast as SW and HW allow
+void step360Smooth() {
+
+    unsigned int stepsPerRev = DriverChipInterface::detentstepsPerRev();
+    StepperIndexer::stepManyDetents(stepsPerRev);
+}
+
+
 /*
- * Sleep between steps, i.e. jerky
+ * Sleep between steps, i.e. slowly
  */
-void step360Incrementally() {
+void step360Slowly() {
     for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
 
         StepperIndexer::stepDetent();
@@ -109,6 +118,13 @@ void wakefourStep() {
 
 
 
+void
+sleepAndDelayBetweenTests() {
+    StepperIndexer::sleep();
+    delayOneSecond();
+    StepperIndexer::wake();
+    // Motor should not move on wake
+}
 
 
 
@@ -117,15 +133,25 @@ void testBackAndForth() {
      * Test repeatability by stepping back and forth one rev:
      * expect flag to stop at same place every time.
      */
-    step360Incrementally();
-    DriverChipInterface::setDirection(MotorDirection::Forward);
-    StepperIndexer::sleep();
-    delayOneSecond();
-    StepperIndexer::wake();
 
-    step360Incrementally();
-    delayOneSecond();
+    // Forward jerkily
+    DriverChipInterface::setDirection(MotorDirection::Forward);
+    step360Jerky();
+
+    sleepAndDelayBetweenTests();
+
+    // Backward smooth
     DriverChipInterface::setDirection(MotorDirection::Backward);
+    step360Smooth();
+
+    sleepAndDelayBetweenTests();
+
+    // Forward slowly
+    DriverChipInterface::setDirection(MotorDirection::Forward);
+    step360Slowly();
+
+    // Delay
+    delayOneSecond();
 }
 
 
@@ -149,7 +175,7 @@ void wakeStepSleep() {
             delayTenthSecond();
 }
 
-
+// TODO wrong
 void stepQuarterRev() {
         // 5 steps is 90 degrees
         wakeStepSleep();
@@ -161,28 +187,29 @@ void stepQuarterRev() {
 
 /*
  * Expect motor twitch back and forth one step i.e. 18 degrees.
+ *
+ * For about 20 reps
  */
-void testHomeState() {
+void
+testHomeState() {
 
     // assert DriverChip just powered up and is awake (NotSleep pin defaults to low)
 
     StepperIndexer::syncDriverWithMotor();
     // assert is wake
 
-    while (true)
-    {
+    for (unsigned int i = 20; i>0; i--) {
         DriverChipInterface::setDirection(MotorDirection::Forward);
         wakeStepSleep();
         DriverChipInterface::setDirection(MotorDirection::Backward);
         // undo forward
         wakeStepSleep();
-
-        stepQuarterRev();
     }
 }
 
 
-void testStepperDriver() {
+void
+testStepperDriver() {
 
     //launchpadLEDOff();
     setAllOutputsLow();
@@ -193,8 +220,11 @@ void testStepperDriver() {
     StepperIndexer::initialWake();
     // assert in home state
 
-    //StepperIndexer::toQuarterStepMode();
-    DriverChipInterface::toHalfStepMode();
+    // Not runtime configurable for some boards
+    // DriverChipInterface::toHalfStepSizeMode();
+
+    // assert is FullStepSize
+    DriverChipInterface::getStepSize();
 
     StepperIndexer::syncDriverWithMotor();
 
@@ -208,5 +238,7 @@ void testStepperDriver() {
         // never returns
         //testWakeStep();
         testHomeState();
+
+        // TODO stepQuarterRev();
     }
 }

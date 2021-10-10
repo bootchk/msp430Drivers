@@ -4,31 +4,15 @@
 // DriverLib
 #include <gpio.h>
 
-
-
-
-/*
- * Connections:
- * MSP430 to TI DRV8834 stepper motor driver
- *
- * Chip Pin : MSP430pin
- * --------------------
- * Step     : P1.2
- * Dir      : P1.3
- * Not sleep: P1.4
- * M0       : P1.5
- * Enable   : P1.6
- *
- * Config pin: unconnected, is internal high i.e. indexer mode
- * M1       : unconnected, is internal low
- */
+#include "motor.h"
 
 
 
 
-// depends on motor
-//#define STEPS_PER_REV 200
-#define MOTOR_STEPS_PER_REV 20
+
+
+
+
 
 
 namespace {
@@ -44,7 +28,9 @@ namespace {
  * Currently code assumes Half (except stepsPerRev references it)
  * In many cases, the pins will be hardwired to a certain stepMode.
  */
-StepMode stepMode = StepMode::Half;
+#if STEPPER_HARD_STEP_SIZE_FULL
+    StepSizeMode stepMode = StepSizeMode::Full;
+#endif
 
 /*
  * initially: DIR pin  low, direction is forward???
@@ -124,6 +110,7 @@ void DriverChipInterface::sleep() {
 
 
 
+#if STEPPER_STEP_SIZE_RUNTIME_CHOOSEABLE
 
 /*
  * Mode of driver (whether is microstepping)
@@ -138,38 +125,47 @@ void DriverChipInterface::sleep() {
  * Requires current limit of driver set low enough (in hardware potentionmeter)
  * otherwise may skip microsteps
  */
-void DriverChipInterface::toFullStepMode() {
+void DriverChipInterface::toFullStepSizeMode() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN5);
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
-    stepMode = StepMode::Full;
+    stepMode = StepSizeMode::Full;
 }
-void DriverChipInterface::toHalfStepMode() {
+void DriverChipInterface::toHalfStepSizeMode() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN5);
     GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
-    stepMode = StepMode::Half;
+    stepMode = StepSizeMode::Half;
 }
-void DriverChipInterface::toQuarterStepMode() {
+void DriverChipInterface::toQuarterStepSizeMode() {
     // Make pin float
     GPIO_setAsInputPin(GPIO_PORT_P1, GPIO_PIN5);
     delayForCommandChange();
-    stepMode = StepMode::Quarter;
+    stepMode = StepSizeMode::Quarter;
 }
 
+#endif
 
 
+StepSizeMode
+DriverChipInterface::getStepSize() {
 
+#if STEPPER_HARD_STEP_SIZE_FULL
+    return StepSizeMode::Full;
+#else
+#warning
+#endif
+}
 
 
 
 void DriverChipInterface::setDirection(MotorDirection direction) {
     switch(direction) {
     case MotorDirection::Forward:
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN3);
+        GPIO_setOutputHighOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
         break;
     case MotorDirection::Backward:
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN3);
+        GPIO_setOutputLowOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
         break;
     }
     delayForCommandChange();
@@ -199,19 +195,20 @@ void DriverChipInterface::enableCoilDrive() {
 
 
 
-
-void DriverChipInterface::stepMicrostep() {
-    /*
-     * Pulse high the "step" pin.
-     * If microstepping, not a full step.
-     */
+/*
+ * Pulse high the "step" pin.
+ * A microstep might not be a full step.
+ */
+#pragma inline
+void
+DriverChipInterface::stepMicrostep() {
     /*
      * Chip spec requires > 1.7uSec pulse high and low.
      * We assume procedure call overhead is enough
      * i.e. cpu speed is about 1Mhz and procedure call requires greater than two uSec.
      */
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
+    GPIO_setOutputHighOnPin(STEPPER_STEP_PORT, STEPPER_STEP_PIN);
     // assert 2 uSec have passed
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
+    GPIO_setOutputLowOnPin (STEPPER_STEP_PORT, STEPPER_STEP_PIN);
     // assert 2 uSec have passed
 }

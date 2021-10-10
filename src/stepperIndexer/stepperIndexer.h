@@ -120,5 +120,5 @@ public:
      * Step microsteps equivalent to a whole step, one that will detent if sleep (coils deenergized.)
      */
     static void stepDetent();
-
+    static void stepManyDetents(unsigned int detents);
 };

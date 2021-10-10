@@ -5,9 +5,17 @@
 
 
 /*
+ * Size of a microstep.
  * Value is microsteps per detent step.
+ *
+ * A detent is where the motor stops if not driven
+ * Where the residual magnetism stops the rotation.
+ *
+ * Some driver chips and boards allow step size to be set at runtime.
+ * Whether the board does  (whether hardwired to a specific step size)
+ * is defined in board.h, conditional compilation.
  */
-enum class StepMode {
+enum class StepSizeMode {
     Full = 1,
     Half = 2,
     Quarter = 4
@@ -27,10 +35,12 @@ public:
     static unsigned int detentstepsPerRev();
 
 
-    // Stepping mode
-    static void toFullStepMode();
-    static void toHalfStepMode();
-    static void toQuarterStepMode();
+    // Stepsize mode
+    static void toFullStepSizeMode();
+    static void toHalfStepSizeMode();
+    static void toQuarterStepSizeMode();
+
+    static StepSizeMode getStepSize();
 
     // Sleep is a reset, especially the current step, to "home state"
     static void wake();
