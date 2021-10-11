@@ -10,16 +10,21 @@
 #define DRIVER_POLOLU_TI8834 1
 
 
-
+// PPS is defined for full step pulses
 
 #if MOTOR_SOYO_NIDEC
 
 #define MOTOR_STEPS_PER_REV 200
+// for 1.95k RPM @200 steps/rev
+#define MOTOR_MAX_PPS       6500
 
 
 #elif MOTOR_SYMBOL_TECH
 
 #define MOTOR_STEPS_PER_REV 20
+// for 2k RPM @20 steps/rev
+// Max PPS and RPM not known from datasheet which is not available
+#define MOTOR_MAX_PPS       670
 
 #endif
 
@@ -44,10 +49,20 @@
  * M1       : unconnected, is internal low
  */
 
-// The board does not bring out the pins that allow StepSize to be chosen
+/*
+ * The board does not bring out the pins that allow StepSize to be chosen.
+ * It is hardwired.
+ * For the default M1 (not connected, internally pulled down) :
+ * If M0 pin is tied to ground, is full step.
+ * If M0 pin floats, is half step.
+ *
+ * Uncomment one to match the board and jumpers.
+ */
 #define STEPPER_STEP_SIZE_RUNTIME_CHOOSEABLE 0
-// The board hardwires step size to a full detent step
-#define STEPPER_HARD_STEP_SIZE_FULL 1
+// The board hardwires step size to a full detent step, pin M0 is grounded
+//#define STEPPER_HARD_STEP_SIZE_FULL 1
+// The board hardwires step size to a half detent step, pin M0 is floating
+#define STEPPER_HARD_STEP_SIZE_HALF 1
 
 
 // Declare pinout for DIR pin

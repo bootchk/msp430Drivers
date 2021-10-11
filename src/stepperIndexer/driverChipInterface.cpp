@@ -30,6 +30,10 @@ namespace {
  */
 #if STEPPER_HARD_STEP_SIZE_FULL
     StepSizeMode stepMode = StepSizeMode::Full;
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    StepSizeMode stepMode = StepSizeMode::Half;
+#else
+error
 #endif
 
 /*
@@ -152,8 +156,10 @@ DriverChipInterface::getStepSize() {
 
 #if STEPPER_HARD_STEP_SIZE_FULL
     return StepSizeMode::Full;
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    return StepSizeMode::Half;
 #else
-#warning
+error
 #endif
 }
 
@@ -197,7 +203,7 @@ void DriverChipInterface::enableCoilDrive() {
 
 /*
  * Pulse high the "step" pin.
- * A microstep might not be a full step.
+ * A microstep might not be a full detent step.
  */
 //#pragma FUNC_ALWAYS_INLINE
 //inline

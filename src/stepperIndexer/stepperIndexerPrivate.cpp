@@ -110,7 +110,23 @@ StepperIndexer::delayFor100PPS() {
 #if STEPPER_HARD_STEP_SIZE_FULL
     Delay::tenMilliseconds();
 #elif STEPPER_HARD_STEP_SIZE_HALF
-    delayFiveMilliSecond();
+    Delay::fiveMilliseconds();
+#endif
+}
+
+void
+StepperIndexer::delayFor250PPS() {
+    delayFor500PPS();
+    delayFor500PPS();
+}
+
+void
+StepperIndexer::delayFor500PPS() {
+#if STEPPER_HARD_STEP_SIZE_FULL
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    Delay::oneMillisecond();
 #endif
 }
 

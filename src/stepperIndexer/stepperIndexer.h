@@ -62,6 +62,9 @@ private:
     static void maintainShadowStep();
 
     static void delayFor100PPS();
+    static void delayFor250PPS();
+    static void delayFor500PPS();
+    static void delayFor6000PPS();
     static void delayAccordingToSpeed();
 
     /*
@@ -123,7 +126,7 @@ public:
      * !!! These are NOT speed controlled i.e. have no built-in delay.
      * If called faster than the driver chip supports, they may fail to drive motor properly.
      */
-    static void stepDetent();
+    static void stepDetent(unsigned int delayMillseconds);
     static void stepManyDetents(unsigned int detents);
 
     /*

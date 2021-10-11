@@ -7,6 +7,7 @@
 
 #include "../src/stepperIndexer/stepperIndexer.h"
 #include "../src/stepperIndexer/driverChipInterface.h"
+#include "../src/delay/delay.h"
 
 
 
@@ -61,13 +62,6 @@ void configureGPIOLowPower() {
 
 
 
-void delayOneSecond()      { __delay_cycles(1000000); }  // 1 second at 1Mhz clock
-void delayTenthSecond()    { __delay_cycles(100000); }
-void delayOneMilliSecond() { __delay_cycles(1000); }
-
-
-
-
 
 
 
@@ -83,7 +77,7 @@ void step360Jerky() {
 }
 
 
-// Turn one reve as fast as SW and HW allow
+// Turn one rev as fast as SW and HW allow
 void step360Smooth() {
 
     unsigned int stepsPerRev = DriverChipInterface::detentstepsPerRev();
@@ -92,42 +86,36 @@ void step360Smooth() {
 
 
 /*
- * Sleep between steps, i.e. slowly
+ * Delay between steps, i.e. slowly.
+ * Here we do our own delays, instead of delays in the called routine.
  */
 void step360Slowly() {
     for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
 
-        StepperIndexer::stepDetent();
+        // Delay after each detent step, so it is jerky
+        StepperIndexer::stepDetent(100);
 
-        // Delay after each step, so it is jerky
-        delayTenthSecond();
+
+        // Delay::hundredMilliseconds();
     }
 }
 
-
-#ifdef NOT_USED
-void wakefourStep() {
-    StepperIndexer::wake();
-    fourStepSmooth();
-    StepperIndexer::sleep();
-}
-#endif
 
 
 
 void
 sleepAndDelayBetweenTests() {
     StepperIndexer::sleep();
-    delayOneSecond();
-    delayOneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
     StepperIndexer::wake();
     // Motor should not move on wake
 }
 
 void
 delayBetweenTests() {
-    delayOneSecond();
-    delayOneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
 }
 
 
@@ -143,6 +131,7 @@ void testBackAndForth() {
     delayBetweenTests();
     DriverChipInterface::setDirection(MotorDirection::Forward);
     step360Jerky();
+    delayBetweenTests();
     DriverChipInterface::setDirection(MotorDirection::Backward);
     step360Jerky();
 
@@ -155,8 +144,6 @@ void testBackAndForth() {
     step360Slowly();
     DriverChipInterface::setDirection(MotorDirection::Backward);
     step360Slowly();
-
-
 }
 
 
@@ -172,12 +159,12 @@ void wakeStepSleep() {
             // assert wake restored driver to motor step
 
             // Step one detent
-            StepperIndexer::stepDetent();
+            StepperIndexer::stepDetent(100);
 
             StepperIndexer::sleep();
 
-            delayTenthSecond();
-            delayTenthSecond();
+            Delay::hundredMilliseconds();
+            Delay::hundredMilliseconds();
 }
 
 // TODO wrong
@@ -240,6 +227,7 @@ testStepperDriver() {
     while(true) {
 
         testBackAndForth();
+
 
         delayBetweenTests();
 
