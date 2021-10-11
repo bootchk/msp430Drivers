@@ -53,7 +53,9 @@ void delayForCommandChange() {
  * Low-level, not concerned with shadowing.
  */
 void DriverChipInterface::wake() {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN4);
+    GPIO_setOutputHighOnPin(
+            STEPPER_NSLEEP_PORT,
+            STEPPER_NSLEEP_PIN);
 
     delayForWakeChange();
 
@@ -62,7 +64,9 @@ void DriverChipInterface::wake() {
 }
 
 void DriverChipInterface::sleep() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
+    GPIO_setOutputLowOnPin(
+            STEPPER_NSLEEP_PORT,
+            STEPPER_NSLEEP_PIN);
 }
 
 
@@ -74,10 +78,14 @@ void DriverChipInterface::sleep() {
  * DriverChip has internal pulldown i.e. unconnected pin is in "enable" state
  */
 void DriverChipInterface::disableCoilDrive() {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN6);
+    GPIO_setOutputHighOnPin(
+            STEPPER_ENABLE_COILS_PORT,
+            STEPPER_ENABLE_COILS_PIN);
     delayForCommandChange();
 }
 void DriverChipInterface::enableCoilDrive() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN6);
+    GPIO_setOutputLowOnPin(
+            STEPPER_ENABLE_COILS_PORT,
+            STEPPER_ENABLE_COILS_PIN);
     delayForCommandChange();
 }

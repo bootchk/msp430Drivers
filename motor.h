@@ -94,7 +94,13 @@
 
 // Declare pinout for notSLEEP pin
 #define STEPPER_NSLEEP_PORT GPIO_PORT_P1
-#define STEPPER_NSLEEP_PIN  GPIO_PIN2
+#define STEPPER_NSLEEP_PIN  GPIO_PIN5
+
+// Declare pinout for pin that enables motor coil outputs
+#define STEPPER_ENABLE_COILS_PORT GPIO_PORT_P1
+#define STEPPER_ENABLE_COILS_PIN  GPIO_PIN6
+
+
 
 
 #endif
