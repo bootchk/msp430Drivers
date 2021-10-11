@@ -2,12 +2,10 @@
 // DriverLib
 #include <pmm.h>
 #include <gpio.h>
-
-
-
+#include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "../src/stepperIndexer/stepperIndexer.h"
-#include "../src/stepperIndexer/driverChipInterface.h"
 #include "../src/delay/delay.h"
+#include "../src/assert/myAssert.h"
 
 
 
@@ -100,6 +98,16 @@ void step360Slowly() {
     }
 }
 
+void turnQuarterRev() {
+    StepperIndexer::wake();
+    // 5 steps @18degrees is 90 degrees
+    StepperIndexer::stepDetentMaxSpeed();
+    StepperIndexer::stepDetentMaxSpeed();
+    StepperIndexer::stepDetentMaxSpeed();
+    StepperIndexer::stepDetentMaxSpeed();
+    StepperIndexer::stepDetentMaxSpeed();
+    StepperIndexer::sleep();
+}
 
 
 
@@ -119,6 +127,25 @@ delayBetweenTests() {
 }
 
 
+
+void
+testQuarterRevs() {
+    while (true) {
+        DriverChipInterface::setDirection(MotorDirection::Forward);
+        turnQuarterRev();
+
+        // one mS is not enough
+        // ten mS
+        // Delay::hundredMilliseconds();
+        Delay::oneSecond();
+
+        // assert is asleep?
+        DriverChipInterface::setDirection(MotorDirection::Backward);
+        turnQuarterRev();
+
+        Delay::oneSecond();
+    }
+}
 
 
 
@@ -167,15 +194,7 @@ void wakeStepSleep() {
             Delay::hundredMilliseconds();
 }
 
-// TODO wrong
-void stepQuarterRev() {
-        // 5 steps is 90 degrees
-        wakeStepSleep();
-        wakeStepSleep();
-        wakeStepSleep();
-        wakeStepSleep();
-        wakeStepSleep();
-}
+
 
 /*
  * Expect motor twitch back and forth one step i.e. 18 degrees.
@@ -225,6 +244,10 @@ testStepperDriver() {
     //StepperIndexer::disableOutput();
 
     while(true) {
+
+        delayBetweenTests();
+        // does not return
+        testQuarterRevs();
 
         testBackAndForth();
 

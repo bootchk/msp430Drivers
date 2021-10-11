@@ -42,16 +42,30 @@ public:
 
     static StepSizeMode getStepSize();
 
-    // Sleep is a reset, especially the current step, to "home state"
+    /*
+     * Sleep saves power.
+     *
+     * Sleep is a reset, especially the current microstep, to "home state"
+     *
+     * Datasheet is not clear that sleep also disables outputs.
+     *
+     * Built-in delay for wake.
+     */
     static void wake();
     static void sleep();
 
 
+    /*
+     * Change direction of motor.
+     * Has a built-in delay.
+     */
     static void setDirection(MotorDirection);
     static MotorDirection getDirection();
 
     /*
      * Disabled allows advancing current step in driver without moving motor.
+     * Disabling saves power but gives smaller holding torque
+     * and motor will assume a detent position (if using microsteps and not already at a detent step.)
      */
     static void disableCoilDrive();
     static void enableCoilDrive();

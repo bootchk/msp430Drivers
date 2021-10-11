@@ -5,11 +5,10 @@
  */
 
 
+#include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "stepperIndexer.h"
 
 // Uses chip driver
-#include "driverChipInterface.h"
-
 #include "motor.h"
 
 #include "../../src/delay/delay.h"
@@ -60,7 +59,7 @@ StepperIndexer::stepDetent(unsigned int milliseconds) {
 #if STEPPER_HARD_STEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
-    Delay::delayMilliseconds(milliseconds);
+    Delay::inMilliseconds(milliseconds);
 #elif STEPPER_HARD_STEP_SIZE_HALF
     // Two microstep per detentstep
     DriverChipInterface::stepMicrostep();
@@ -114,38 +113,11 @@ StepperIndexer::stepDetentMaxSpeed() {
 }
 
 
-/*
- * sleep/wake
- */
-
-void StepperIndexer::initialWake() {
-    DriverChipInterface::wake();
-}
 
 
-void StepperIndexer::wake() {
-    // assert coil drive is disabled
-    DriverChipInterface::wake();
-    // assert driver chip is wake and reset
-    // !!! but not enable coil drive
-
-    // assert DriverChip in state 2
-    // assert motor is at remembered motor step
-
-    restoreDriverToMotorStep();
-    // assert DriverChip is at same step as motor
-    // assert coil drive enabled
-}
 
 
-void
-StepperIndexer::sleep() {
 
-    DriverChipInterface::disableCoilDrive();
-    DriverChipInterface::sleep();
-
-    rememberMotorStep();
-}
 
 
 
@@ -168,7 +140,7 @@ StepperIndexer::delayForMaxSpeed() {
 
 
 #elif MOTOR_SOYO_NIDEC
-    StepperIndexer::delayFor65000PPS();
+    StepperIndexer::delayFor6000PPS();
 #else
 #warning
 #endif

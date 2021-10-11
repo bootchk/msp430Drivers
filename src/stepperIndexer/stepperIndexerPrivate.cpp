@@ -1,9 +1,8 @@
 
+#include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "stepperIndexer.h"
 
 // Uses chip driver
-#include "driverChipInterface.h"
-
 #include "motor.h"
 
 #include "src/delay/delay.h"
@@ -127,6 +126,21 @@ StepperIndexer::delayFor500PPS() {
     Delay::oneMillisecond();
 #elif STEPPER_HARD_STEP_SIZE_HALF
     Delay::oneMillisecond();
+#endif
+}
+
+void
+StepperIndexer::delayFor6000PPS() {
+#if STEPPER_HARD_STEP_SIZE_FULL
+    // At 200 or 300 uS, SOYO NEMA skips steps.
+    // At 400 uS, SOYO NEMA works.  This might be the fastest it will spin.
+    // At 1 mS, SOYO NEMA works, but slowly.
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    Delay::hundredMicroseconds();
 #endif
 }
 

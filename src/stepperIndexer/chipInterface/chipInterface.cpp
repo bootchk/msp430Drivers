@@ -1,10 +1,10 @@
 
-#include "driverChipInterface.h"
-
-// DriverLib
-#include <gpio.h>
+#include <src/stepperIndexer/chipInterface/chipInterface.h>
 
 #include "motor.h"
+
+#include "../../assert/myAssert.h"
+#include "../../delay/delay.h"
 
 
 
@@ -19,9 +19,9 @@ namespace {
 
 /*
  * When:
- * - M0 is connected to P1.5 and P1.5 is low
+ * - M0 is connected to low
  * - M1 is unconnected and internally pulled down
- * => mode is half
+ * => step mode is full
  */
 /*
  * Not persistent.
@@ -49,32 +49,12 @@ MotorDirection _direction = MotorDirection::Forward;
 
 
 
-
-void delayOneMilliSecond() { __delay_cycles(1000); }
-void delayOneMicroSecond() { __delay_cycles(1); }
-
-/*
- * Chip spec requires delay after any wake before chip is active.
- * Ensure 1 milliSec before any subsequent step.
- */
-void delayForWakeChange() {
-    delayOneMilliSecond();
+void delayForDirectionChange() {
+    //Delay::oneMillisecond();
+    Delay::tenMilliseconds();
 }
 
-/*
- * Delay for any command (other than wake) till next step
- */
-void delayForCommandChange() {
-    delayOneMicroSecond();
-}
-
-
-
-
-
-}
-
-
+} // namespace
 
 
 /*
@@ -88,27 +68,6 @@ unsigned int DriverChipInterface::detentstepsPerRev() {
     return MOTOR_STEPS_PER_REV;
 }
 
-
-
-
-
-/*
- * Toggle NotSleep pin.
- *
- * Low-level, not concerned with shadowing.
- */
-void DriverChipInterface::wake() {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN4);
-
-    delayForWakeChange();
-
-    // assert DriverChip in state 2
-    // assert motor is at remembered motor step, not necessarily 2
-}
-
-void DriverChipInterface::sleep() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN4);
-}
 
 
 
@@ -173,8 +132,10 @@ void DriverChipInterface::setDirection(MotorDirection direction) {
     case MotorDirection::Backward:
         GPIO_setOutputLowOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
         break;
+    default:
+        myAssert(false);
     }
-    delayForCommandChange();
+    delayForDirectionChange();
     _direction = direction;
 }
 
@@ -182,22 +143,6 @@ void DriverChipInterface::setDirection(MotorDirection direction) {
 MotorDirection DriverChipInterface::getDirection() { return _direction; }
 
 
-
-
-
-/*
- * Pin is NotEnable: low is enabled, high is disabled.
- *
- * DriverChip has internal pulldown i.e. unconnected pin is in "enable" state
- */
-void DriverChipInterface::disableCoilDrive() {
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN6);
-    delayForCommandChange();
-}
-void DriverChipInterface::enableCoilDrive() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN6);
-    delayForCommandChange();
-}
 
 
 
