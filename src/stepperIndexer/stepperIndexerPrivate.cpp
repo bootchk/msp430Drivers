@@ -4,7 +4,9 @@
 // Uses chip driver
 #include "driverChipInterface.h"
 
+#include "motor.h"
 
+#include "src/delay/delay.h"
 
 
 
@@ -36,29 +38,6 @@ unsigned int shadowMicrostepOfDriver;
  */
 #pragma PERSISTENT
 unsigned int shadowMicrostepOfMotor;
-
-
-
-
-
-void delayOneMilliSecond() { __delay_cycles(1000); }
-
-void delayFiveMilliSecond() { __delay_cycles(5000); }
-
-void delayTenMilliSecond() { __delay_cycles(10000); }
-
-/*
- * Delay so motor turns at 100PPS (pulses per second).
- * For 20 step motor, that is 5 steps a second, or 300 RPM.
- *
- * This is called for each microstep.
- * PPS is for whole steps.
- * We are in half step mode.
- * So each delay is half of the delay for one pulse.
- */
-void delaySo100PPS() {
-    delayFiveMilliSecond();
-}
 
 
 }
@@ -113,15 +92,30 @@ void StepperIndexer::restoreDriverToMotorStep() {
  * 2 mSec delay is 500 microsteps/sec, 250 detentstep/sec, 15k detent steps/min, 750 rpm
  * 3 mSec delay is 333 microsteps/sec, 166 detentstep/sec, 10k detent steps/min, 500 rpm
  */
-void StepperIndexer::delayAccordingToSpeed() {
-    //delayOneMilliSecond();
-    //delayOneMilliSecond();
-    //delayOneMilliSecond();
-    delaySo100PPS();
+void
+StepperIndexer::delayAccordingToSpeed() {
+    // TODO
+    delayFor100PPS();
+}
+
+/*
+ * Delay so motor turns at 100PPS (pulses per second).
+ * For 20 step motor, that is 5 steps a second, or 300 RPM.
+ *
+ * PPS is specified for whole steps.
+ * Delay appropriate for microsteps.
+ */
+void
+StepperIndexer::delayFor100PPS() {
+#if STEPPER_HARD_STEP_SIZE_FULL
+    Delay::tenMilliseconds();
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    delayFiveMilliSecond();
+#endif
 }
 
 
-void StepperIndexer::stepMicrostep() {
+void StepperIndexer::stepMicrostepAtSpeed() {
 
     // tell driver.  Driver has no explicit delays.
     DriverChipInterface::stepMicrostep();

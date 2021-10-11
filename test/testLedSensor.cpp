@@ -5,7 +5,7 @@
 
 #include "../src/LEDAndLightSensor/ledAndLightSensor.h"
 
-#include <cassert>
+#include "../src/assert/myAssert.h"
 
 
 /*
@@ -24,12 +24,12 @@ void testLEDSensor()
     // WAS Alarm::configureForAlarming();
     Alarm::configureAfterColdReset();
 
-    // assert ready for setAlarm()
-    // assert serial bus (Bridge) ready, was configured
+    // myAssert ready for setAlarm()
+    // myAssert serial bus (Bridge) ready, was configured
 
     Alarm::clearBothSidesOfSignal();
 
-    assert (Alarm::isRTCReady() );
+    myAssert (Alarm::isRTCReady() );
 
     // Configure
     LEDAndLightSensor::toOffFromUnconfigured();

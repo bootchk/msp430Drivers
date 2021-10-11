@@ -9,10 +9,11 @@
 // DriverLib
 #include <pmm.h>
 
-
+/*
 static void delayHalfSecond() {
     __delay_cycles(500000); // half second
 }
+*/
 
 
 
@@ -45,9 +46,7 @@ static void allWhiteThenAllBlack() {
 }
 
 
-static void toggleSegmentOne() {
 
-}
 
 /*
  * Test EInk driver.

@@ -1,6 +1,7 @@
 
 /*
- * Implementation of public methods
+ * Implementation of public methods.
+ * See ...Private.cpp for private methods.
  */
 
 
@@ -54,12 +55,13 @@ StepperIndexer::stepDetent() {
     // !!! Call to self, not to DriverChipInterface.  Self controls speed.
 #if STEPPER_HARD_STEP_SIZE_FULL
     // Each microstep is one full detentstep
-    stepMicrostep();
+    DriverChipInterface::stepMicrostep();
 #elif STEPPER_HARD_STEP_SIZE_HALF
     // Two microstep per detentstep
     stepMicrostep();
     stepMicrostep();
 #endif
+
     maintainShadowStep();
 }
 
@@ -72,13 +74,31 @@ StepperIndexer::stepManyDetents(unsigned int stepCount) {
         // TODO temporarily avoid call overhead
 #if STEPPER_HARD_STEP_SIZE_FULL
         // Each microstep is one full detentstep
-        stepMicrostep();
-
+        DriverChipInterface::stepMicrostep();
 #endif
     }
     // TODO maintain shadow
 }
 
+
+void
+StepperIndexer::stepDetentMaxSpeed() {
+    // !!! Call to self, not to DriverChipInterface.  Self controls speed.
+#if STEPPER_HARD_STEP_SIZE_FULL
+    // Each microstep is one full detentstep
+    DriverChipInterface::stepMicrostep();
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    // Two microstep per detentstep
+    stepMicrostep();
+    stepMicrostep();
+#else
+#warning "unhandled"
+#endif
+
+    maintainShadowStep();
+
+    delayForMaxSpeed();
+}
 
 
 /*
@@ -105,11 +125,21 @@ void StepperIndexer::wake() {
 }
 
 
-void StepperIndexer::sleep() {
+void
+StepperIndexer::sleep() {
 
     DriverChipInterface::disableCoilDrive();
     DriverChipInterface::sleep();
 
     rememberMotorStep();
+}
+
+
+
+
+void
+StepperIndexer::delayForMaxSpeed() {
+    // TODO for the defined max PPS
+    StepperIndexer::delayFor100PPS();
 }
 

@@ -2,7 +2,7 @@
 
 #include "../src/pinFunction/allPins.h"
 
-#include <cassert>
+#include "../src/assert/myAssert.h"
 
 // DriverLib
 #include <pmm.h>
@@ -28,7 +28,7 @@ void testAlarm2()
 
     // RTC chip is past its reset delay
     // TODO suspect since Alarm pins not configured
-    assert (Alarm::isRTCReady() );
+    myAssert (Alarm::isRTCReady() );
 
     while (true)
     {
@@ -36,8 +36,8 @@ void testAlarm2()
         // WAS Alarm::configureForAlarming();
         Alarm::configureAfterColdReset();
 
-        // assert ready for setAlarm()
-        // assert serial bus (Bridge) ready, was configured
+        // myAssert ready for setAlarm()
+        // myAssert serial bus (Bridge) ready, was configured
 
         Alarm::clearBothSidesOfSignal();
 
@@ -55,7 +55,7 @@ void testAlarm2()
         __no_operation();
 
         // The alarm ISR clears MCU side
-        assert (Alarm::isClearOnMCUSide());
+        myAssert (Alarm::isClearOnMCUSide());
 
         // Test whether delay affects crash on clearAlarm
         //__delay_cycles(1000);

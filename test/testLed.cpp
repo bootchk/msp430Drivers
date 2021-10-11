@@ -2,7 +2,7 @@
 
 #include "../src/LED/led.h"
 
-
+#include "../src/delay/delay.h"
 
 /*
  * Test LED will blink.
@@ -25,6 +25,6 @@ void testLED()
     while (true)
     {
         LED::toggle();
-        __delay_cycles(1000000);
+        Delay::oneSecond();
     }
 }

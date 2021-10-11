@@ -3,8 +3,8 @@
 
 // Declare the motor
 // Uncomment one
-#define MOTOR_SOYO_NIDEC 1
-// #define MOTOR_SYMBOL_TECH 1
+//#define MOTOR_SOYO_NIDEC 1
+ #define MOTOR_SYMBOL_TECH 1
 
 // Declare the driver chip and board
 #define DRIVER_POLOLU_TI8834 1

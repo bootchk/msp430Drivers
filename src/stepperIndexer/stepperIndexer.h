@@ -61,6 +61,7 @@ class StepperIndexer {
 private:
     static void maintainShadowStep();
 
+    static void delayFor100PPS();
     static void delayAccordingToSpeed();
 
     /*
@@ -90,7 +91,7 @@ private:
      * Does not enforce sleepable.
      * If you call it an odd count of times, then sleep, motor will twitch into a detent position.
      */
-    static void stepMicrostep();
+    static void stepMicrostepAtSpeed();
 
     /*
      * Step driver as fast as possible.
@@ -118,7 +119,20 @@ public:
 
     /*
      * Step microsteps equivalent to a whole step, one that will detent if sleep (coils deenergized.)
+     *
+     * !!! These are NOT speed controlled i.e. have no built-in delay.
+     * If called faster than the driver chip supports, they may fail to drive motor properly.
      */
     static void stepDetent();
     static void stepManyDetents(unsigned int detents);
+
+    /*
+     * Same as above, but with a built-in delay that ensures frequency of steps is:
+     * - less than the driver chip supports (e.g. 250 kHz or  4ms per step
+     * - AND also less than the max startup speed (PPS) of the motor.
+     */
+    static void stepDetentMaxSpeed();
+    static void stepManyDetentsMaxSpeed(unsigned int detents);
+
+    static void delayForMaxSpeed();
 };

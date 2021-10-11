@@ -2,7 +2,7 @@
 
 
 
-
+/*
 void testStepper();
 void testCompass();
 void testCompass2();
@@ -29,7 +29,8 @@ void testUVSensor();
 void testUVSensor2();
 void testEInk();
 void testPressureSensor();
-
+*/
+void testStepperDriver();
 
 
 

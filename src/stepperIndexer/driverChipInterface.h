@@ -66,4 +66,5 @@ public:
      * This does not have any delays to control speed.
      */
     static void stepMicrostep();
+    // inline TODO doesn't link when O3
 };

@@ -5,7 +5,7 @@
 #include "../../src/i2c/transport/i2cTransport.h"
 
 #include "../../src/assert/myAssert.h"
-
+#include "../../src/delay/delay.h"
 
 
 
@@ -47,7 +47,7 @@ waitForDataReady(void) {
     // TODO
 
     // Option 2 wait for 5 ms
-    __delay_cycles(  5000); // (unsigned long int)
+    Delay::fiveMilliseconds();
 
     // Option 3 wait for interrupt on a pin of the device
 }

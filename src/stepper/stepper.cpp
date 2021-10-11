@@ -6,7 +6,7 @@
 #include "stepperDriver.h"
 
 
-#include <cassert>
+#include "../assert/myAssert.h"
 
 
 #include "board.h"  // motor coil pins
@@ -187,7 +187,7 @@ void Stepper::energizeCoil(const MotorCoilEnd breakEnd, const MotorCoilEnd makeE
     {
         makeThenBreak(breakEnd.pin, makeEnd.pin);
     }
-    // assert makeEnd 1 high, breakEnd 0 low
+    // myAssert makeEnd 1 high, breakEnd 0 low
 }
 
 void Stepper::deenergizeCoil(const MotorCoilEnd coilEnd1, const MotorCoilEnd coilEnd2)
@@ -258,7 +258,7 @@ void Stepper::advanceStepFullPower(int nextStep)
         case 2: setABackward(); setBBackward(); break; //0101
         case 3: setAForward(); setBBackward(); break; //1001
         default:
-        assert(false);
+        myAssert(false);
     }
     // ensure both coils are driven in some direction
 }
@@ -278,7 +278,7 @@ void Stepper::advanceStepWave(int nextStep)
         case 2: setABackward(); __delay_cycles(500); setBBackward(); break;//0101
         case 3: setBBackward(); __delay_cycles(500); setAForward(); break;//1001
         default:
-        assert(false);
+        myAssert(false);
     }
     // ensure both coils are driven in some direction
 }
@@ -298,7 +298,7 @@ void Stepper::advanceStepHalfPower(int nextStep)
         case 2: setABackward(); setBOff(); break;  // 0100
         case 3: setAOff(); setBBackward(); break;  // 0001
         default:
-        assert(false);
+        myAssert(false);
     }
     // ensure at most one coil driven in some direction
 }

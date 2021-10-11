@@ -14,7 +14,6 @@
 
 #pragma RETAIN
 #pragma PERSISTENT
-static int foobar = 1;
 
 
 
@@ -26,7 +25,8 @@ static int foobar = 1;
  * Since C++ has no static constructors.
  * Thus we require a run-time call to configure()
  */
-#pragma DATA_SECTION( ".TI.persistent" )
+//#pragma DATA_SECTION( ".TI.persistent" )
+#pragma PERSISTENT
 Segment segTop;
 
 #pragma DATA_SECTION( ".TI.persistent" )

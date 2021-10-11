@@ -6,6 +6,7 @@
 #include "../logger/logger.h"
 
 #include <cassert>
+#include <msp430.h>
 
 #include "../config/driverConfig.h"
 

@@ -199,7 +199,8 @@ void DriverChipInterface::enableCoilDrive() {
  * Pulse high the "step" pin.
  * A microstep might not be a full step.
  */
-#pragma inline
+//#pragma FUNC_ALWAYS_INLINE
+//inline
 void
 DriverChipInterface::stepMicrostep() {
     /*

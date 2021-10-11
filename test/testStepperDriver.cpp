@@ -73,14 +73,11 @@ void delayOneMilliSecond() { __delay_cycles(1000); }
 
 
 /*
- * Default config of breakout board is 1/4 StepMode.
- * Motor is 200 steps.
- * 800 pulses per second would be rev per second, i.e. 60 rpm
  */
 void step360Jerky() {
     for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
-        StepperIndexer::stepDetent();
-        // No delay here.  stepDetent delays between microsteps appropriate to speed
+        StepperIndexer::stepDetentMaxSpeed();
+        // Delays between microsteps appropriate to speed
         // This may still be jerky and slow because of loop overhead.
     }
 }
@@ -122,9 +119,18 @@ void
 sleepAndDelayBetweenTests() {
     StepperIndexer::sleep();
     delayOneSecond();
+    delayOneSecond();
     StepperIndexer::wake();
     // Motor should not move on wake
 }
+
+void
+delayBetweenTests() {
+    delayOneSecond();
+    delayOneSecond();
+}
+
+
 
 
 
@@ -134,24 +140,23 @@ void testBackAndForth() {
      * expect flag to stop at same place every time.
      */
 
-    // Forward jerkily
+    delayBetweenTests();
     DriverChipInterface::setDirection(MotorDirection::Forward);
     step360Jerky();
-
-    sleepAndDelayBetweenTests();
-
-    // Backward smooth
     DriverChipInterface::setDirection(MotorDirection::Backward);
-    step360Smooth();
+    step360Jerky();
 
-    sleepAndDelayBetweenTests();
+    delayBetweenTests();
+    DriverChipInterface::setDirection(MotorDirection::Backward);
+    //step360Smooth();
 
-    // Forward slowly
+    delayBetweenTests();
     DriverChipInterface::setDirection(MotorDirection::Forward);
     step360Slowly();
+    DriverChipInterface::setDirection(MotorDirection::Backward);
+    step360Slowly();
 
-    // Delay
-    delayOneSecond();
+
 }
 
 
@@ -233,12 +238,16 @@ testStepperDriver() {
     //StepperIndexer::disableOutput();
 
     while(true) {
+
         testBackAndForth();
 
-        // never returns
-        //testWakeStep();
-        testHomeState();
+        delayBetweenTests();
+
+        //testHomeState();
+
+        delayBetweenTests();
 
         // TODO stepQuarterRev();
+        //testWakeStep();
     }
 }
