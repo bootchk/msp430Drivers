@@ -67,24 +67,7 @@ private:
     static void delayFor6000PPS();
     static void delayAccordingToSpeed();
 
-    /*
-     * Shadowing
-     */
 
-    static void rememberMotorStep();
-
-    /*
-     * When you call this, you assert that motor step is in sync with given step.
-     * Usually, you have wake() so that driver is on home step
-     * and you have called microstep() through at least one cycle.
-     */
-    static void setShadowMicrostepOfDriver(unsigned int);
-
-    /*
-     * Advance shadow state from home step to current step without energizing coils.
-     * This disables the driver outputs while stepping, to advance DriverChip internal state w/o moving motor.
-     */
-    static void restoreDriverToMotorStep();
 
 
 

@@ -63,12 +63,25 @@ void DriverChipInterface::wake() {
 
     // assert after wake, chip step table is in "home" state, say 2
     // assert motor is at remembered motor step, not necessarily 2
+    // assert driver chip is wake and reset
+    // !!! but not enable coil drive
+
+    // assert DriverChip in state 2
+    // assert motor is at remembered motor step
+
+    // TODO IndexerChipState::restoreDriverToMotorStep();
+    // assert DriverChip is at same step as motor
+    // assert coil drive enabled
 }
 
 void DriverChipInterface::sleep() {
+
     GPIO_setOutputLowOnPin(
             STEPPER_NSLEEP_PORT,
             STEPPER_NSLEEP_PIN);
+
+    // TODO toSleep()
+    IndexerChipState::rememberMotorStep();
 }
 
 

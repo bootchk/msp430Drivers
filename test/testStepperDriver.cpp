@@ -132,6 +132,7 @@ void
 testQuarterRevs() {
     while (true) {
         DriverChipInterface::setDirection(MotorDirection::Forward);
+        DriverChipInterface::enableCoilDrive();
         turnQuarterRev();
 
         // one mS is not enough
@@ -142,6 +143,7 @@ testQuarterRevs() {
 
         // assert is asleep?
         DriverChipInterface::setDirection(MotorDirection::Backward);
+        DriverChipInterface::enableCoilDrive();
         turnQuarterRev();
 
         Delay::oneSecond();

@@ -46,36 +46,6 @@ unsigned int shadowMicrostepOfMotor;
 
 
 
-void StepperIndexer::rememberMotorStep(){
-    shadowMicrostepOfMotor = shadowMicrostepOfDriver;
-}
-
-
-void StepperIndexer::setShadowMicrostepOfDriver(unsigned int aStep) {
-    shadowMicrostepOfDriver = aStep;
-}
-
-
-// quietly => non-energized
-void StepperIndexer::restoreDriverToMotorStep() {
-    // assert motor is on a detentStep
-    // assert driverchip is wake, in fact just waked from sleep and reset
-
-    // 2 is the state after reset when half step mode
-    StepperIndexer::setShadowMicrostepOfDriver(2);
-
-    // Prevent motor movement
-    DriverChipInterface::disableCoilDrive();
-
-    while ( not (shadowMicrostepOfDriver == shadowMicrostepOfMotor) ) {
-        /*
-         * Here we don't need a delay for speed, since motor is not turning, but we do need update shadow.
-         */
-        fastStepDetent();
-    }
-
-    DriverChipInterface::enableCoilDrive();
-}
 
 
 

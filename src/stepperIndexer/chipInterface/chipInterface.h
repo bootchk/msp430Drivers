@@ -40,6 +40,7 @@ public:
      * Change direction of motor.
      *
      * Disables coils (so the field starts to decay.)
+     * !!! Caller must enable coils before next step.
      *
      * Has a built-in delay.
      */

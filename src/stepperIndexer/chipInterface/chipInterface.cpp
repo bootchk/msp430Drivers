@@ -16,7 +16,13 @@ namespace {
 
 
 void delayForDirectionChange() {
-    //Delay::oneMillisecond();
+    /*
+     * This is experimentally determined,
+     * and depends on the motor and other parts of the system.
+     * 1 mS does not seem to be enough (results in motor skips)
+     * 10 mS seems to be enough for Symbol Tech 21-02485
+     */
+    // Delay::oneMillisecond();
     Delay::tenMilliseconds();
 }
 

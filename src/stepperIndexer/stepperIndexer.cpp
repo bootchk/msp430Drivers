@@ -42,7 +42,7 @@ void StepperIndexer::syncDriverWithMotor() {
     // assert driver chip in home state (microstep 2 for Half StepMode)
     // assert microstep is a DetentStep
 
-    StepperIndexer::setShadowMicrostepOfDriver(2);
+    IndexerChipState::setMicrostepState(2);
 }
 
 
@@ -69,8 +69,6 @@ StepperIndexer::stepDetent(unsigned int milliseconds) {
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
 #endif
-
-    maintainShadowStep();
 }
 
 
@@ -85,12 +83,14 @@ StepperIndexer::stepManyDetents(unsigned int stepCount) {
         DriverChipInterface::stepMicrostep();
 #endif
     }
-    // TODO maintain shadow
 }
 
 
 void
 StepperIndexer::stepDetentMaxSpeed() {
+    /*
+     * This is to move motor, require coils enabled.
+     */
     myAssert(IndexerChipState::isCoilsEnabled());
 
     /*
@@ -112,8 +112,6 @@ StepperIndexer::stepDetentMaxSpeed() {
 #else
 #warning "unhandled"
 #endif
-
-    maintainShadowStep();
 }
 
 

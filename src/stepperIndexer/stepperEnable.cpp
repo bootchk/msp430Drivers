@@ -15,8 +15,6 @@ StepperIndexer::sleep() {
 
     DriverChipInterface::disableCoilDrive();
     DriverChipInterface::sleep();
-
-    rememberMotorStep();
 }
 
 
@@ -26,15 +24,7 @@ void StepperIndexer::initialWake() {
 
 
 void StepperIndexer::wake() {
-    // assert coil drive is disabled
+    // GPIO for enable coil drive may still be ON and coils driven?
+
     DriverChipInterface::wake();
-    // assert driver chip is wake and reset
-    // !!! but not enable coil drive
-
-    // assert DriverChip in state 2
-    // assert motor is at remembered motor step
-
-    restoreDriverToMotorStep();
-    // assert DriverChip is at same step as motor
-    // assert coil drive enabled
 }
