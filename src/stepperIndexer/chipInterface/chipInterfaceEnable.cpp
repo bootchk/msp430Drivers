@@ -49,6 +49,8 @@ void delayForCommandChange() {
 
 /*
  * Toggle NotSleep pin.
+ * Low is sleep.
+ * High is wake (not sleep.)
  *
  * Low-level, not concerned with shadowing.
  */
@@ -59,7 +61,7 @@ void DriverChipInterface::wake() {
 
     delayForWakeChange();
 
-    // assert DriverChip in state 2
+    // assert after wake, chip step table is in "home" state, say 2
     // assert motor is at remembered motor step, not necessarily 2
 }
 

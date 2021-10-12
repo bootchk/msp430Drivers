@@ -72,7 +72,10 @@ public:
 
 
     /*
-     * Tell driver to step one microstep.
+     * Tell chip to step one microstep.
+     * Pulse high the "step" pin.
+     *
+     * A microstep might not be a full detent step.
      *
      * !!! This will not actually step motor if driver output is disabled.
      * This does not understand shadow step.

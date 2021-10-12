@@ -141,10 +141,7 @@ MotorDirection DriverChipInterface::getDirection() { return _direction; }
 
 
 
-/*
- * Pulse high the "step" pin.
- * A microstep might not be a full detent step.
- */
+
 //#pragma FUNC_ALWAYS_INLINE
 //inline
 void
