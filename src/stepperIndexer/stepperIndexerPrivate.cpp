@@ -176,7 +176,7 @@ void StepperIndexer::fastStepDetent() {
 // TODO other step modes
 void StepperIndexer::maintainShadowStep() {
     // assert we just microstepped twice (one detentStep)
-    switch(DriverChipInterface::getDirection()) {
+    switch(IndexerChipState::getDirection()) {
     case MotorDirection::Forward:
     //case MotorDirection::Backward:
         shadowMicrostepOfDriver += 2;

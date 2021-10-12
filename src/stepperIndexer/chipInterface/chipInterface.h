@@ -2,30 +2,11 @@
  * Low-level interface to driver chip TI DRV8835
  */
 
+#pragma once
 
 
-/*
- * Size of a microstep.
- * Value is microsteps per detent step.
- *
- * A detent is where the motor stops if not driven
- * Where the residual magnetism stops the rotation.
- *
- * Some driver chips and boards allow step size to be set at runtime.
- * Whether the board does  (whether hardwired to a specific step size)
- * is defined in board.h, conditional compilation.
- */
-enum class StepSizeMode {
-    Full = 1,
-    Half = 2,
-    Quarter = 4
-};
 
-
-enum class MotorDirection {
-    Forward,
-    Backward
-};
+#include "chipState.h"
 
 
 class DriverChipInterface {
@@ -57,6 +38,9 @@ public:
 
     /*
      * Change direction of motor.
+     *
+     * Disables coils (so the field starts to decay.)
+     *
      * Has a built-in delay.
      */
     static void setDirection(MotorDirection);

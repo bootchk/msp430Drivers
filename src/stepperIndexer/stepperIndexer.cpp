@@ -12,6 +12,8 @@
 #include "motor.h"
 
 #include "../../src/delay/delay.h"
+#include "../../src/assert/myAssert.h"
+
 
 
 
@@ -89,6 +91,8 @@ StepperIndexer::stepManyDetents(unsigned int stepCount) {
 
 void
 StepperIndexer::stepDetentMaxSpeed() {
+    myAssert(IndexerChipState::isCoilsEnabled());
+
     /*
      *  Call to  DriverChipInterface.
      *  Delay for each microstep to control speed.

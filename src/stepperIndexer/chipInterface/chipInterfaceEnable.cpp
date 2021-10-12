@@ -83,11 +83,13 @@ void DriverChipInterface::disableCoilDrive() {
     GPIO_setOutputHighOnPin(
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
+    IndexerChipState::enableCoils(false);
     delayForCommandChange();
 }
 void DriverChipInterface::enableCoilDrive() {
     GPIO_setOutputLowOnPin(
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
+    IndexerChipState::enableCoils(true);
     delayForCommandChange();
 }

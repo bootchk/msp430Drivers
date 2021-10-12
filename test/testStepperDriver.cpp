@@ -136,8 +136,9 @@ testQuarterRevs() {
 
         // one mS is not enough
         // ten mS
-        // Delay::hundredMilliseconds();
-        Delay::oneSecond();
+        Delay::tenMilliseconds();
+        //Delay::hundredMilliseconds();
+        // Delay::oneSecond();
 
         // assert is asleep?
         DriverChipInterface::setDirection(MotorDirection::Backward);

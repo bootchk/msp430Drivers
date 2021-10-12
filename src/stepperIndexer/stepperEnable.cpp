@@ -4,10 +4,10 @@
  * The part about sleep and enable outputs.
  */
 
-#include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "stepperIndexer.h"
 
 // Uses chip driver
+#include <src/stepperIndexer/chipInterface/chipInterface.h>
 
 
 void

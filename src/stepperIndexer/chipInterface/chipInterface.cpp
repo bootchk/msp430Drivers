@@ -1,5 +1,5 @@
 
-#include <src/stepperIndexer/chipInterface/chipInterface.h>
+#include "chipInterface.h"
 
 #include "motor.h"
 
@@ -12,35 +12,6 @@
 
 namespace {
 
-/*
- * When:
- * - M0 is connected to low
- * - M1 is unconnected and internally pulled down
- * => step mode is full
- */
-/*
- * Not persistent.
- * Currently code assumes Half (except stepsPerRev references it)
- * In many cases, the pins will be hardwired to a certain stepMode.
- */
-#if STEPPER_HARD_STEP_SIZE_FULL
-    StepSizeMode stepMode = StepSizeMode::Full;
-#elif STEPPER_HARD_STEP_SIZE_HALF
-    StepSizeMode stepMode = StepSizeMode::Half;
-#else
-error
-#endif
-
-/*
- * initially: DIR pin  low, direction is forward???
- */
-/*
- * Not persistent.
- * A sleep-then-wake will not alter the direction.
- * A LPM4.5 sleep of mcu would probably alter the pins controlling direction,
- * but I assume you will set direction explicitly before any stepping.
- */
-MotorDirection _direction = MotorDirection::Forward;
 
 
 
@@ -52,11 +23,13 @@ void delayForDirectionChange() {
 } // namespace
 
 
+
+
 /*
  * Depends on motor and stepping mode (full or micro-stepping)
  */
 unsigned int DriverChipInterface::microstepsPerRev() {
-    return MOTOR_STEPS_PER_REV * static_cast<int> (stepMode);
+    return MOTOR_STEPS_PER_REV * IndexerChipState::microStepsPerDetentStep();
 }
 
 unsigned int DriverChipInterface::detentstepsPerRev() {
@@ -120,6 +93,15 @@ error
 
 
 void DriverChipInterface::setDirection(MotorDirection direction) {
+    /*
+     * Disable coils in anticipation of next step in opposite direction.
+     * !!! If the next step is not soon, holding torque is reduced.
+     */
+    disableCoilDrive();
+
+    /*
+     * Tell the chip.
+     */
     switch(direction) {
     case MotorDirection::Forward:
         GPIO_setOutputHighOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
@@ -130,12 +112,14 @@ void DriverChipInterface::setDirection(MotorDirection direction) {
     default:
         myAssert(false);
     }
+
     delayForDirectionChange();
-    _direction = direction;
+
+    IndexerChipState::setDirection(direction);
 }
 
 
-MotorDirection DriverChipInterface::getDirection() { return _direction; }
+
 
 
 
@@ -146,6 +130,13 @@ MotorDirection DriverChipInterface::getDirection() { return _direction; }
 //inline
 void
 DriverChipInterface::stepMicrostep() {
+
+    /*
+     * Not require coils enabled.
+     * This may be called to simply step the chip in its internal table,
+     * without moving motor.
+     */
+
     /*
      * Chip spec requires > 1.7uSec pulse high and low.
      * We assume procedure call overhead is enough
