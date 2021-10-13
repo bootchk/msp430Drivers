@@ -28,15 +28,15 @@ void StepperIndexer::syncDriverWithMotor() {
 
     // enough steps for motor to catch.  Two complete cycles through whole steps
     // This is for a four whole step motor
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
 
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
-    StepperIndexer::stepDetent(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
+    StepperIndexer::stepDetentWithDelay(100);
 
     // assert motor in sync with microstep
     // assert driver chip in home state (microstep 2 for Half StepMode)
@@ -54,7 +54,7 @@ void StepperIndexer::syncDriverWithMotor() {
  */
 
 void
-StepperIndexer::stepDetent(unsigned int milliseconds) {
+StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
     /*
      * !!! Call DriverChipInterface.  Self controls speed.
      */
@@ -101,7 +101,7 @@ StepperIndexer::stepDetentMaxSpeed() {
 #if STEPPER_HARD_STEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
-    delayForMaxSpeed();
+    delayForSpeed(MotorSpeed::Max);
 
 #elif STEPPER_HARD_STEP_SIZE_HALF
     // Two microstep per detentstep
@@ -115,17 +115,95 @@ StepperIndexer::stepDetentMaxSpeed() {
 }
 
 
+void
+StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
+    /*
+     * This is to move motor, require coils enabled.
+     */
+    myAssert(IndexerChipState::isCoilsEnabled());
+
+    switch(speed) {
+        case MotorSpeed::Max:
+            stepDetentMaxSpeed();
+            break;
+        case MotorSpeed::Half:
+            stepDetentMaxSpeed();
+            stepDetentMaxSpeed();
+            break;
+        case MotorSpeed::Quarter:
+            stepDetentMaxSpeed();
+            stepDetentMaxSpeed();
+            stepDetentMaxSpeed();
+            stepDetentMaxSpeed();
+            break;
+        default:
+            myAssert(false);
+        }
+
+}
+
+#ifdef OLD
+    /*
+     *  Call to  DriverChipInterface.
+     *  Delay for each microstep to control speed.
+     *  If don't delay between microsteps, the second step is lost.
+     */
+#if STEPPER_HARD_STEP_SIZE_FULL
+    // Each microstep is one full detentstep
+    DriverChipInterface::stepMicrostep();
+    delayForSpeed(MotorSpeed::Half);
+
+#elif STEPPER_HARD_STEP_SIZE_HALF
+    // Two microstep per detentstep
+    DriverChipInterface::stepMicrostep();
+    delayForMaxSpeed();
+    DriverChipInterface::stepMicrostep();
+    delayForMaxSpeed();
+#else
+#warning "unhandled"
+#endif
+}
+#endif
 
 
 
 
 
+
+
+
+
+/*
+ * All delays are multiples of max delay,
+ * since all speeds are fractions of max speed.
+ */
+void
+StepperIndexer::delayForSpeed(MotorSpeed speed) {
+    switch(speed) {
+    case MotorSpeed::Max:
+        delayForMaxSpeed();
+        break;
+    case MotorSpeed::Half:
+        delayForMaxSpeed();
+        delayForMaxSpeed();
+        break;
+    case MotorSpeed::Quarter:
+        delayForMaxSpeed();
+        delayForMaxSpeed();
+        delayForMaxSpeed();
+        delayForMaxSpeed();
+        break;
+    default:
+        myAssert(false);
+    }
+}
 
 
 
 
 void
 StepperIndexer::delayForMaxSpeed() {
+
     // TODO for the defined max PPS instead of the motor
     /*
      * Might be 670 ???
@@ -147,4 +225,24 @@ StepperIndexer::delayForMaxSpeed() {
 #warning
 #endif
 }
+
+
+
+/*
+ TODO hard delays, or delays in terms of PPS???
+    // one mS is not enough
+    // ten mS
+    Delay::tenMilliseconds();
+    //Delay::hundredMilliseconds();
+    // Delay::oneSecond();
+     *
+     * OR?? Settling speed should depend on prior speed
+ */
+void
+StepperIndexer::delayForSettling() {
+    //
+    delayForSpeed(MotorSpeed::Half);
+}
+
+
 

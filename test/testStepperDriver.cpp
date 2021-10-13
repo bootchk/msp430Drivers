@@ -2,6 +2,8 @@
 // DriverLib
 #include <pmm.h>
 #include <gpio.h>
+
+#include "../src/stepperIndexer/stepperMotor.h"
 #include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "../src/stepperIndexer/stepperIndexer.h"
 #include "../src/delay/delay.h"
@@ -91,22 +93,16 @@ void step360Slowly() {
     for (unsigned int i = DriverChipInterface::detentstepsPerRev(); i>0; i--) {
 
         // Delay after each detent step, so it is jerky
-        StepperIndexer::stepDetent(100);
+        StepperIndexer::stepDetentWithDelay(100);
 
 
         // Delay::hundredMilliseconds();
     }
 }
 
-void turnQuarterRev() {
-    StepperIndexer::wake();
+void turnQuarterRev(MotorDirection direction) {
     // 5 steps @18degrees is 90 degrees
-    StepperIndexer::stepDetentMaxSpeed();
-    StepperIndexer::stepDetentMaxSpeed();
-    StepperIndexer::stepDetentMaxSpeed();
-    StepperIndexer::stepDetentMaxSpeed();
-    StepperIndexer::stepDetentMaxSpeed();
-    StepperIndexer::sleep();
+    StepperMotor::wakeTurnAndSleep(5, direction);
 }
 
 
@@ -131,20 +127,10 @@ delayBetweenTests() {
 void
 testQuarterRevs() {
     while (true) {
-        DriverChipInterface::setDirection(MotorDirection::Forward);
-        DriverChipInterface::enableCoilDrive();
-        turnQuarterRev();
+        turnQuarterRev(MotorDirection::Forward);
 
-        // one mS is not enough
-        // ten mS
-        Delay::tenMilliseconds();
-        //Delay::hundredMilliseconds();
-        // Delay::oneSecond();
-
-        // assert is asleep?
-        DriverChipInterface::setDirection(MotorDirection::Backward);
-        DriverChipInterface::enableCoilDrive();
-        turnQuarterRev();
+        // assert is sleep
+        turnQuarterRev(MotorDirection::Backward);
 
         Delay::oneSecond();
     }
@@ -188,8 +174,8 @@ void wakeStepSleep() {
             StepperIndexer::wake();
             // assert wake restored driver to motor step
 
-            // Step one detent
-            StepperIndexer::stepDetent(100);
+            // Step one detent with a fixed delay
+            StepperIndexer::stepDetentWithDelay(100);
 
             StepperIndexer::sleep();
 

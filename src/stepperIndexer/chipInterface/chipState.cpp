@@ -46,7 +46,36 @@ unsigned int  _microstepState = 2;
 
 } // namespace
 
+namespace {
+/*
+ * Step of the DriverChip.
+ * The DriverChip will not tell us what step it is on.
+ * We shadow it, i.e. keep track algorithmically.
+ *
+ * Not persistent and no initial value.
+ * wake() sets the initial value, advancing it to match the motor.
+ */
+unsigned int shadowMicrostepOfDriver;
 
+
+/*
+ * Step the motor is on.
+ *
+ * We don't know this until we sync the motor with the DriverChip.
+ * Then we assume the motor stays in sync (we don't keep it updated while stepping motor.)
+ * We remember this when we sleep.
+ * When we wake, resetting the DriverChip resets its internal state to its HomeStep,
+ * and we advance DriverChip state and shadowMicrostepOfDriver to match the remembered shadowMicrostepOfMotor.
+ */
+/*
+ * Persistent.
+ * Even if you unpower the mcu, we remember the step of the motor.
+ */
+#pragma PERSISTENT
+unsigned int shadowMicrostepOfMotor;
+
+
+}
 
 
 MotorDirection
@@ -122,5 +151,35 @@ IndexerChipState::restoreDriverToMotorStep() {
     }
 
     DriverChipInterface::enableCoilDrive();
+}
+*/
+
+
+/*
+ * Shadow the driver's microstep index.
+ *
+ * Modulo 8, for half step microstepping
+ */
+// TODO other step modes
+/*
+void StepperIndexer::maintainShadowStep() {
+    // assert we just microstepped twice (one detentStep)
+    switch(IndexerChipState::getDirection()) {
+    case MotorDirection::Forward:
+    //case MotorDirection::Backward:
+        shadowMicrostepOfDriver += 2;
+        if (shadowMicrostepOfDriver > 7)
+                shadowMicrostepOfDriver = 0;
+        break;
+    case MotorDirection::Backward:
+    //case MotorDirection::Forward:
+
+        if (shadowMicrostepOfDriver == 0)
+                shadowMicrostepOfDriver = 8;
+        shadowMicrostepOfDriver -= 2;
+        break;
+    }
+    // WAS assert shadowMicrostepOfDriver in [0..7]
+    // assert shadowMicrostepOfDriver in [0, 2, 4, 6]
 }
 */

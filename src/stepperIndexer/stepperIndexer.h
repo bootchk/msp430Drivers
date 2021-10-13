@@ -54,12 +54,16 @@
 
 
 
-
+enum class MotorSpeed {
+    Max,
+    Half,
+    Quarter,
+    Slow
+};
 
 
 class StepperIndexer {
 private:
-    static void maintainShadowStep();
 
     static void delayFor100PPS();
     static void delayFor250PPS();
@@ -109,16 +113,29 @@ public:
      * !!! These are NOT speed controlled i.e. have no built-in delay.
      * If called faster than the driver chip supports, they may fail to drive motor properly.
      */
-    static void stepDetent(unsigned int delayMillseconds);
+    static void stepDetentWithDelay(unsigned int delayMillseconds);
     static void stepManyDetents(unsigned int detents);
 
     /*
      * Same as above, but with a built-in delay that ensures frequency of steps is:
-     * - less than the driver chip supports (e.g. 250 kHz or  4ms per step
-     * - AND also less than the max startup speed (PPS) of the motor.
+     * - less than the driver chip supports (e.g. 250 kHz or 4ms per step
+     * !!! May be too fast to allow for acceleration.
      */
     static void stepDetentMaxSpeed();
-    static void stepManyDetentsMaxSpeed(unsigned int detents);
+    /*
+     * Stepping less than the max startup speed (PPS) of the motor.
+     * Should be called on the first step from stationary rotor condition.
+     */
+    static void stepDetentAtSpeed(MotorSpeed);
 
+    static void stepManyDetentsAtSpeed(unsigned int detents, MotorSpeed);
+
+    static void delayForSpeed(MotorSpeed);
     static void delayForMaxSpeed();
+    //static void delayForHalfSpeed();
+
+    /*
+     * Delay enough that a max speed rotation stops and settles to a detent.
+     */
+    static void delayForSettling();
 };
