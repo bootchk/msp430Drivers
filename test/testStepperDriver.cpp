@@ -125,6 +125,24 @@ delayBetweenTests() {
 
 
 void
+testPecking() {
+    while (true) {
+        // Forward to some contact
+        turnQuarterRev(MotorDirection::Forward);
+
+        // Peck
+        StepperMotor::wakeTurnAndSleep(1, MotorDirection::Backward);
+        StepperMotor::wakeTurnAndSleep(1, MotorDirection::Forward);
+
+        // assert is sleep
+        turnQuarterRev(MotorDirection::Backward);
+
+        Delay::oneSecond();
+    }
+}
+
+
+void
 testQuarterRevs() {
     while (true) {
         turnQuarterRev(MotorDirection::Forward);
@@ -235,11 +253,14 @@ testStepperDriver() {
     while(true) {
 
         delayBetweenTests();
+
+        // does not return
+        testPecking();
+
         // does not return
         testQuarterRevs();
 
         testBackAndForth();
-
 
         delayBetweenTests();
 
