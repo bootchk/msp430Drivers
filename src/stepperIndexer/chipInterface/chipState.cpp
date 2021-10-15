@@ -19,9 +19,9 @@ namespace {
  * Currently code assumes Half (except stepsPerRev references it)
  * In many cases, the pins will be hardwired to a certain stepMode.
  */
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     StepSizeMode stepMode = StepSizeMode::Full;
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     StepSizeMode stepMode = StepSizeMode::Half;
 #else
     error

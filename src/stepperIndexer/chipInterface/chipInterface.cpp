@@ -87,9 +87,9 @@ void DriverChipInterface::toQuarterStepSizeMode() {
 StepSizeMode
 DriverChipInterface::getStepSize() {
 
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     return StepSizeMode::Full;
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     return StepSizeMode::Half;
 #else
 error

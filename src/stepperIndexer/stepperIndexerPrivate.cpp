@@ -6,14 +6,7 @@
 #include "motor.h"
 
 #include "src/delay/delay.h"
-
-
-
-
-
-
-
-
+#include "src/assert/myAssert.h"
 
 
 
@@ -34,6 +27,7 @@
  */
 void
 StepperIndexer::delayAccordingToSpeed() {
+    myAssert(false); // Not implemented
     // TODO
     delayFor100PPS();
 }
@@ -47,11 +41,17 @@ StepperIndexer::delayAccordingToSpeed() {
  */
 void
 StepperIndexer::delayFor100PPS() {
-#if STEPPER_HARD_STEP_SIZE_FULL
     Delay::tenMilliseconds();
-#elif STEPPER_HARD_STEP_SIZE_HALF
-    Delay::fiveMilliseconds();
-#endif
+}
+
+void
+StepperIndexer::delayFor200PPS() {
+    // 5 mS
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
 }
 
 void
@@ -62,17 +62,13 @@ StepperIndexer::delayFor250PPS() {
 
 void
 StepperIndexer::delayFor500PPS() {
-#if STEPPER_HARD_STEP_SIZE_FULL
     Delay::oneMillisecond();
     Delay::oneMillisecond();
-#elif STEPPER_HARD_STEP_SIZE_HALF
-    Delay::oneMillisecond();
-#endif
 }
 
 void
 StepperIndexer::delayFor6000PPS() {
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     // At 200 or 300 uS, SOYO NEMA skips steps.
     // At 400 uS, SOYO NEMA works.  This might be the fastest it will spin.
     // At 1 mS, SOYO NEMA works, but slowly.
@@ -80,8 +76,10 @@ StepperIndexer::delayFor6000PPS() {
     Delay::hundredMicroseconds();
     Delay::hundredMicroseconds();
     Delay::hundredMicroseconds();
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     Delay::hundredMicroseconds();
+#else
+    error
 #endif
 }
 
@@ -92,14 +90,14 @@ void StepperIndexer::stepMicrostepAtSpeed() {
     DriverChipInterface::stepMicrostep();
 
     delayAccordingToSpeed();
-
-    // We don't maintainShadowStep() here
 }
 
 
-void StepperIndexer::fastStepDetent() {
-    // assert driver is disabled
 
+void StepperIndexer::fastStepDetent() {
+    myAssert(IndexerChipState::isCoilsEnabled() == false);
+
+    // TODO why only two microsteps??
     // tell driver, not self (no delay)
     DriverChipInterface::stepMicrostep();
     DriverChipInterface::stepMicrostep();

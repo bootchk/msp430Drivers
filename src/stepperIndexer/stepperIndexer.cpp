@@ -58,16 +58,18 @@ StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
     /*
      * !!! Call DriverChipInterface.  Self controls speed.
      */
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     // Two microstep per detentstep
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
+#else
+    error
 #endif
 }
 
@@ -78,7 +80,7 @@ StepperIndexer::stepManyDetents(unsigned int stepCount) {
         // TODO without calling this, we don't maintain shadowstep
         // stepDetent();
         // TODO temporarily avoid call overhead
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
         // Each microstep is one full detentstep
         DriverChipInterface::stepMicrostep();
 #endif
@@ -98,19 +100,19 @@ StepperIndexer::stepDetentMaxSpeed() {
      *  Delay for each microstep to control speed.
      *  If don't delay between microsteps, the second step is lost.
      */
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
-    delayForSpeed(MotorSpeed::Max);
+    delayMicrostepForMaxSpeed());
 
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     // Two microstep per detentstep
     DriverChipInterface::stepMicrostep();
-    delayForMaxSpeed();
+    delayMicrostepForMaxSpeed();
     DriverChipInterface::stepMicrostep();
-    delayForMaxSpeed();
+    delayMicrostepForMaxSpeed();
 #else
-#warning "unhandled"
+    error
 #endif
 }
 
@@ -123,51 +125,24 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
     myAssert(IndexerChipState::isCoilsEnabled());
 
     /*
-     * Each speed is a step detent at max speed (with one delay)
-     * followed by additional delays.
+     * Do appropriate count of microsteps each followed by appropriate delay.
      */
-    switch(speed) {
-        case MotorSpeed::Max:
-            stepDetentMaxSpeed();
-            break;
-        case MotorSpeed::Half:
-            stepDetentMaxSpeed();
-            delayForMaxSpeed();
-            break;
-        case MotorSpeed::Quarter:
-            stepDetentMaxSpeed();
-            delayForMaxSpeed();
-            delayForMaxSpeed();
-            delayForMaxSpeed();
-            break;
-        default:
-            myAssert(false);
-        }
 
-}
-
-#ifdef OLD
-    /*
-     *  Call to  DriverChipInterface.
-     *  Delay for each microstep to control speed.
-     *  If don't delay between microsteps, the second step is lost.
-     */
-#if STEPPER_HARD_STEP_SIZE_FULL
+#if STEPPER_MICROSTEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
-    delayForSpeed(MotorSpeed::Half);
+    delayMicrostepForSpeed(speed);
 
-#elif STEPPER_HARD_STEP_SIZE_HALF
+#elif STEPPER_MICROSTEP_SIZE_HALF
     // Two microstep per detentstep
     DriverChipInterface::stepMicrostep();
-    delayForMaxSpeed();
+    delayMicrostepForSpeed(speed);
     DriverChipInterface::stepMicrostep();
-    delayForMaxSpeed();
+    delayMicrostepForSpeed(speed);
 #else
-#warning "unhandled"
+    error
 #endif
 }
-#endif
 
 
 
@@ -182,20 +157,20 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
  * since all speeds are fractions of max speed.
  */
 void
-StepperIndexer::delayForSpeed(MotorSpeed speed) {
+StepperIndexer::delayMicrostepForSpeed(MotorSpeed speed) {
     switch(speed) {
     case MotorSpeed::Max:
-        delayForMaxSpeed();
+        delayMicrostepForMaxSpeed();
         break;
     case MotorSpeed::Half:
-        delayForMaxSpeed();
-        delayForMaxSpeed();
+        delayMicrostepForMaxSpeed();
+        delayMicrostepForMaxSpeed();
         break;
     case MotorSpeed::Quarter:
-        delayForMaxSpeed();
-        delayForMaxSpeed();
-        delayForMaxSpeed();
-        delayForMaxSpeed();
+        delayMicrostepForMaxSpeed();
+        delayMicrostepForMaxSpeed();
+        delayMicrostepForMaxSpeed();
+        delayMicrostepForMaxSpeed();
         break;
     default:
         myAssert(false);
@@ -206,32 +181,35 @@ StepperIndexer::delayForSpeed(MotorSpeed speed) {
 
 
 void
-StepperIndexer::delayForMaxSpeed() {
+StepperIndexer::delayMicrostepForMaxSpeed() {
 
-    // TODO for the defined max PPS instead of the motor
-    /*
-     * Might be 670 ???
-     * By experiment, 500 PPS loses track and 250PPS does not.
-     */
-#if MOTOR_SYMBOL_TECH
-#if STEPPER_HARD_STEP_SIZE_FULL
-    // 250 PPS is 22 RPS, 1200 RPM
+    // For the defined motor max PPS
+
+
+#if STEPPER_MICROSTEP_SIZE_FULL
+
+    //
     // StepperIndexer::delayFor250PPS();
     // 100 PPS is 5 RPS, 300 RPM
+#if MOTOR_MAX_PPS == 100
     StepperIndexer::delayFor100PPS();
+#else
+    error
+#endif
 
-#elif STEPPER_HARD_STEP_SIZE_HALF
-    StepperIndexer::delayFor500PPS();
+#elif STEPPER_MICROSTEP_SIZE_HALF
+
+#if MOTOR_MAX_PPS == 100
+    StepperIndexer::delayFor200PPS();
 #else
     error
 #endif
 
 
-#elif MOTOR_SOYO_NIDEC
-    StepperIndexer::delayFor6000PPS();
 #else
-#warning
+    error // microstep size not defined
 #endif
+
 }
 
 
@@ -248,8 +226,8 @@ StepperIndexer::delayForMaxSpeed() {
  */
 void
 StepperIndexer::delayForSettling() {
-    //
-    delayForSpeed(MotorSpeed::Half);
+    // TODO this is a hack
+    delayMicrostepForSpeed(MotorSpeed::Half);
 }
 
 

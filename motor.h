@@ -26,9 +26,21 @@
 #elif MOTOR_SYMBOL_TECH
 
 #define MOTOR_STEPS_PER_REV 20
-// for 2k RPM @20 steps/rev
-// Max PPS and RPM not known from datasheet which is not available
-#define MOTOR_MAX_PPS       670
+
+/*
+ * Max PPS and RPM not known from datasheet which is not available
+ *
+ * for 2k RPM @20 steps/rev is 40k steps/minute, or 666 steps/second.
+ *
+ * for 1.2k RPM @20 step/rev is 24k steps/minute, or 400 steps/second
+ *
+ * for 300 RPM @20 steps/rev is 6k steps/min or 100 steps/second
+ *
+ * for 200 RPM @20 steps/rev is 4k steps/min or 67 steps/second
+ *
+ * By experiment, 500 PPS loses track and 250PPS does not, for full step microstepping
+ */
+#define MOTOR_MAX_PPS       100
 
 #else
     error
@@ -76,10 +88,10 @@
 
 
 // The board hardwires step size to a full detent step, pin M0 is grounded
-#define STEPPER_HARD_STEP_SIZE_FULL 1
+//#define STEPPER_MICROSTEP_SIZE_FULL 1
 
 // The board hardwires step size to a half detent step, pin M0 is floating
-//#define STEPPER_HARD_STEP_SIZE_HALF 1
+#define STEPPER_MICROSTEP_SIZE_HALF 1
 
 
 

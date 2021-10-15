@@ -66,9 +66,14 @@ class StepperIndexer {
 private:
 
     static void delayFor100PPS();
+    static void delayFor200PPS();
     static void delayFor250PPS();
     static void delayFor500PPS();
     static void delayFor6000PPS();
+
+    /*
+     * Delay for a run-time settable speed.
+     */
     static void delayAccordingToSpeed();
 
 
@@ -84,10 +89,11 @@ private:
     static void stepMicrostepAtSpeed();
 
     /*
-     * Step driver as fast as possible.
-     * Driver should be disabled.
+     * Step driver one detent step (may be many microsteps) as fast as possible.
+     * Require coils disabled.
      * Motor does not move.
      */
+    // TODO what is the purpose?
     static void fastStepDetent();
 
 
@@ -122,17 +128,25 @@ public:
      * !!! May be too fast to allow for acceleration.
      */
     static void stepDetentMaxSpeed();
+
     /*
-     * Stepping less than the max startup speed (PPS) of the motor.
-     * Should be called on the first step from stationary rotor condition.
+     * Step a full step (to detent)
+     * at a runtime settable speed less than the max startup speed (PPS) of the motor.
+     * Might be called on the first step from stationary rotor condition.
      */
     static void stepDetentAtSpeed(MotorSpeed);
 
     static void stepManyDetentsAtSpeed(unsigned int detents, MotorSpeed);
 
-    static void delayForSpeed(MotorSpeed);
-    static void delayForMaxSpeed();
-    //static void delayForHalfSpeed();
+    /*
+     * Delay a microstep for given speed.
+     */
+    static void delayMicrostepForSpeed(MotorSpeed);
+
+    /*
+     * Delay a microstep for a compile time max motor speed.
+     */
+    static void delayMicrostepForMaxSpeed();
 
     /*
      * Delay enough that a max speed rotation stops and settles to a detent.
