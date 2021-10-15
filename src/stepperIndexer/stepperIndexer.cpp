@@ -122,19 +122,23 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
      */
     myAssert(IndexerChipState::isCoilsEnabled());
 
+    /*
+     * Each speed is a step detent at max speed (with one delay)
+     * followed by additional delays.
+     */
     switch(speed) {
         case MotorSpeed::Max:
             stepDetentMaxSpeed();
             break;
         case MotorSpeed::Half:
             stepDetentMaxSpeed();
-            stepDetentMaxSpeed();
+            delayForMaxSpeed();
             break;
         case MotorSpeed::Quarter:
             stepDetentMaxSpeed();
-            stepDetentMaxSpeed();
-            stepDetentMaxSpeed();
-            stepDetentMaxSpeed();
+            delayForMaxSpeed();
+            delayForMaxSpeed();
+            delayForMaxSpeed();
             break;
         default:
             myAssert(false);
@@ -211,7 +215,11 @@ StepperIndexer::delayForMaxSpeed() {
      */
 #if MOTOR_SYMBOL_TECH
 #if STEPPER_HARD_STEP_SIZE_FULL
-    StepperIndexer::delayFor250PPS();
+    // 250 PPS is 22 RPS, 1200 RPM
+    // StepperIndexer::delayFor250PPS();
+    // 100 PPS is 5 RPS, 300 RPM
+    StepperIndexer::delayFor100PPS();
+
 #elif STEPPER_HARD_STEP_SIZE_HALF
     StepperIndexer::delayFor500PPS();
 #else

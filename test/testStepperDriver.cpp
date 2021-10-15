@@ -105,6 +105,12 @@ void turnQuarterRev(MotorDirection direction) {
     StepperMotor::wakeTurnAndSleep(5, direction);
 }
 
+#ifdef OLD
+void turnAcceleratedQuarterRev(MotorDirection direction) {
+    // 5 steps @18degrees is 90 degrees
+    StepperMotor::wakeTurnAndSleep(5, direction);
+}
+#endif
 
 
 void
@@ -124,18 +130,21 @@ delayBetweenTests() {
 
 
 
+// test pecking with holding torque
 void
 testPecking() {
     while (true) {
-        // Forward to some contact
-        turnQuarterRev(MotorDirection::Forward);
+        // Forward and hold
+        StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Forward);
+
+        // Forward and sleep
+        //StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection::Forward);
 
         // Peck
-        StepperMotor::wakeTurnAndSleep(1, MotorDirection::Backward);
-        StepperMotor::wakeTurnAndSleep(1, MotorDirection::Forward);
+        StepperMotor::turnAndHold(1, MotorDirection::Backward);
+        StepperMotor::turnAndHold(1, MotorDirection::Forward);
 
-        // assert is sleep
-        turnQuarterRev(MotorDirection::Backward);
+        StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Backward);
 
         Delay::oneSecond();
     }

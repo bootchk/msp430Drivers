@@ -19,4 +19,23 @@ public:
      * When done, motor rotor is stopped at a detent and motor deenergized.
      */
     static void wakeTurnAndSleep(unsigned int steps, MotorDirection direction);
+
+    /*
+     * Turn at maximum speed after one half speed step.
+     * End with holding torque.
+     */
+    static void turnAndHold(unsigned int steps, MotorDirection direction);
+
+    /*
+     * Turn quarter rev with accel and decel.
+     * End condition is sleep i.e. no holding torque.
+     */
+    static void wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction);
+
+    /*
+     * Turn quarter rev with accel and decel.
+     * End condition is holding torque.
+     */
+    static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
+
 };
