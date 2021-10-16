@@ -153,3 +153,28 @@ DriverChipInterface::stepMicrostep() {
     GPIO_setOutputLowOnPin (STEPPER_STEP_PORT, STEPPER_STEP_PIN);
     // assert 2 uSec have passed
 }
+
+
+/*
+ * The notFault pin resets itself when the condition clears.
+ * So polling it is not sufficient (unless the condition is long duration.)
+ * This should be an interrupt.
+ */
+bool
+DriverChipInterface::isFault() {
+    GPIO_setAsInputPin(STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
+    // pin is notFault
+    return ! GPIO_getInputPinValue(STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
+}
+
+void
+DriverChipInterface::enableInterruptOnFault() {
+
+    // Require enable general interrupts
+
+    // Enable interrupt on fault pin
+    GPIO_clearInterrupt     (STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
+    GPIO_setAsInputPin      (STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
+    GPIO_selectInterruptEdge(STEPPER_FAULT_PORT, STEPPER_FAULT_PIN, GPIO_HIGH_TO_LOW_TRANSITION);
+    GPIO_enableInterrupt    (STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
+}

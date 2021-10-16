@@ -38,4 +38,7 @@ public:
      */
     static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
 
+
+    static bool isFault();
+
 };

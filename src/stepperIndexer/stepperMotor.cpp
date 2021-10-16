@@ -4,6 +4,8 @@
 #include "stepperIndexer.h"
 #include "chipInterface/chipInterface.h"
 
+#include "../assert/myAssert.h"
+#include "../SoC/SoC.h"
 
 
 void
@@ -49,6 +51,11 @@ StepperMotor::turnAndHold(
         StepperIndexer::stepDetentMaxSpeed();
     }
 
+    // TODO temp test
+    SoC::enableGlobalInterrupts();
+    if (StepperIndexer::isFault())
+        myAssert(false);
+
     StepperIndexer::delayForSettling();
 }
 
@@ -79,4 +86,10 @@ StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection direction) {
     StepperIndexer::stepDetentAtSpeed(MotorSpeed::Quarter);
 
     StepperIndexer::delayForSettling();
+}
+
+
+bool
+StepperMotor::isFault() {
+    return StepperIndexer::isFault();
 }

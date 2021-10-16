@@ -255,6 +255,8 @@ testStepperDriver() {
 
     StepperIndexer::syncDriverWithMotor();
 
+    DriverChipInterface::enableInterruptOnFault();
+
 
     // Uncomment to test disabling
     //StepperIndexer::disableOutput();

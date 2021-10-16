@@ -56,12 +56,14 @@ StepperIndexer::delayFor200PPS() {
 
 void
 StepperIndexer::delayFor250PPS() {
+    // 4 mS
     delayFor500PPS();
     delayFor500PPS();
 }
 
 void
 StepperIndexer::delayFor500PPS() {
+    // 2 mS
     Delay::oneMillisecond();
     Delay::oneMillisecond();
 }

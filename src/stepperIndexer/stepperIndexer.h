@@ -152,4 +152,7 @@ public:
      * Delay enough that a max speed rotation stops and settles to a detent.
      */
     static void delayForSettling();
+
+
+    static bool isFault();
 };

@@ -69,4 +69,7 @@ public:
      */
     static void stepMicrostep();
     // inline TODO doesn't link when O3
+
+    static bool isFault();
+    static void enableInterruptOnFault();
 };

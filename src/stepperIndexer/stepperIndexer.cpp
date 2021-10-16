@@ -142,6 +142,9 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
 #else
     error
 #endif
+    // TODO temp test
+    if (StepperIndexer::isFault())
+        myAssert(false);
 }
 
 
@@ -200,7 +203,11 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
 #elif STEPPER_MICROSTEP_SIZE_HALF
 
 #if MOTOR_MAX_PPS == 100
+    // For half stepping, pulse frequency is double
     StepperIndexer::delayFor200PPS();
+
+    // PPS of 100 halves the max speed
+    // StepperIndexer::delayFor100PPS();
 #else
     error
 #endif
@@ -227,8 +234,14 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
 void
 StepperIndexer::delayForSettling() {
     // TODO this is a hack
-    delayMicrostepForSpeed(MotorSpeed::Half);
+    // delayMicrostepForSpeed(MotorSpeed::Half);
+    delayMicrostepForSpeed(MotorSpeed::Quarter);
 }
 
+
+bool
+StepperIndexer::isFault() {
+    return DriverChipInterface::isFault();
+}
 
 
