@@ -81,7 +81,7 @@ void step360Jerky() {
 void step360Smooth() {
 
     unsigned int stepsPerRev = DriverChipInterface::detentstepsPerRev();
-    StepperIndexer::stepManyDetents(stepsPerRev);
+    StepperIndexer::stepManyDetentsAtSpeed(stepsPerRev, MotorSpeed::Max);
 }
 
 
@@ -250,10 +250,10 @@ testStepperDriver() {
     // Not runtime configurable for some boards
     // DriverChipInterface::toHalfStepSizeMode();
 
-    // assert is FullStepSize
     DriverChipInterface::getStepSize();
 
-    StepperIndexer::syncDriverWithMotor();
+    // StepperIndexer::syncDriverWithMotor();
+    StepperIndexer::findPhysicalStop(MotorDirection::Backward);
 
     DriverChipInterface::enableInterruptOnFault();
 

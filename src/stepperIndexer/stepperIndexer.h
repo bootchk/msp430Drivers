@@ -53,6 +53,7 @@
  */
 
 
+#include "chipInterface/chipState.h"  // MotorDirection
 
 enum class MotorSpeed {
     Max,
@@ -101,12 +102,26 @@ private:
 public:
 
     /*
+     * ??? Not sure this is valid design???
+     *
      * During this call, the motor will turn somewhat unpredictably.
      * Will sleep(reset) and wake
      *
      * Ensures driver is wake.
      */
     static void syncDriverWithMotor();
+
+    /*
+     * Rotate the motor enough to find a physical stop,
+     * then reset the chip so at the home state.
+     * Leaves:
+     * - chip awake
+     * - motor stationary at the hard stop.
+     * - coils not energized
+     * The arm must rest by gravity on the physical stop else since coils not energized, arm might move.
+     */
+    static void findPhysicalStop(MotorDirection);
+
 
     static void initialWake();
     static void wake();
@@ -120,7 +135,6 @@ public:
      * If called faster than the driver chip supports, they may fail to drive motor properly.
      */
     static void stepDetentWithDelay(unsigned int delayMillseconds);
-    static void stepManyDetents(unsigned int detents);
 
     /*
      * Same as above, but with a built-in delay that ensures frequency of steps is:

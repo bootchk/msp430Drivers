@@ -51,10 +51,15 @@ StepperMotor::turnAndHold(
         StepperIndexer::stepDetentMaxSpeed();
     }
 
-    // TODO temp test
+#ifdef TODO
+    Failed to get a fault on locked rotor.
+    Maybe the current limit can't be set to accomodate.
+    When the current limit is low, the motor fails to turn.
+
     SoC::enableGlobalInterrupts();
     if (StepperIndexer::isFault())
         myAssert(false);
+#endif
 
     StepperIndexer::delayForSettling();
 }

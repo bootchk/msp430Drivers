@@ -39,6 +39,9 @@ public:
     static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
 
 
+    /*
+     * Poll the fault bit.  Not useful on some driver chips because the fault resets itself.
+     */
     static bool isFault();
 
 };
