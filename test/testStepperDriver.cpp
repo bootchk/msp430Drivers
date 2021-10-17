@@ -3,7 +3,7 @@
 #include <pmm.h>
 #include <gpio.h>
 
-#include "../src/stepperIndexer/stepperMotor.h"
+#include "../src/stepperMotor/stepperMotor.h"
 #include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "../src/stepperIndexer/stepperIndexer.h"
 #include "../src/delay/delay.h"
@@ -235,6 +235,38 @@ testHomeState() {
 }
 
 
+
+void
+testPicking() {
+    StepperIndexer::findPhysicalStop(MotorDirection::Backward);
+    // arm is against stop
+
+    // For 20 step motor, 18 degrees per step, turn 54 degrees
+    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+    // arm is upright
+
+    while (true) {
+            StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Backward);
+            // arm is in bin
+
+            // Peck
+            StepperMotor::turnAndHold(1, MotorDirection::Forward);
+            StepperMotor::turnAndHold(1, MotorDirection::Backward);
+            // arm is in bin again
+
+            StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+            // arm is upright
+
+            Delay::oneSecond();
+        }
+
+
+
+}
+
+
+
+
 void
 testStepperDriver() {
 
@@ -253,7 +285,7 @@ testStepperDriver() {
     DriverChipInterface::getStepSize();
 
     // StepperIndexer::syncDriverWithMotor();
-    StepperIndexer::findPhysicalStop(MotorDirection::Backward);
+    //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
 
     DriverChipInterface::enableInterruptOnFault();
 
@@ -261,15 +293,21 @@ testStepperDriver() {
     // Uncomment to test disabling
     //StepperIndexer::disableOutput();
 
+
+    // does not return
+    testPicking();
+
+    // does not return
+    testPecking();
+
+    // does not return
+    testQuarterRevs();
+
     while(true) {
 
         delayBetweenTests();
 
-        // does not return
-        testPecking();
 
-        // does not return
-        testQuarterRevs();
 
         testBackAndForth();
 

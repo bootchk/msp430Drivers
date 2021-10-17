@@ -1,8 +1,8 @@
 
 #include "stepperMotor.h"
 
-#include "stepperIndexer.h"
-#include "chipInterface/chipInterface.h"
+#include "../stepperIndexer/stepperIndexer.h"
+#include "../stepperIndexer/chipInterface/chipInterface.h"
 
 #include "../assert/myAssert.h"
 #include "../SoC/SoC.h"
@@ -89,6 +89,31 @@ StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection direction) {
     StepperIndexer::stepDetentAtSpeed(MotorSpeed::Max);
     StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
     StepperIndexer::stepDetentAtSpeed(MotorSpeed::Quarter);
+
+    StepperIndexer::delayForSettling();
+}
+
+
+void
+StepperMotor::turnAcceleratedStepsAndHold(
+        unsigned int   stepCount,
+        MotorDirection direction) {
+
+    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::enableCoilDrive();
+
+    // Steps accelerate and decelerate
+
+    // First step at half speed
+    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
+
+    for (unsigned int i=stepCount-2; i>0; i--) {
+        // steps 2, n-1 at full speed
+        StepperIndexer::stepDetentAtSpeed(MotorSpeed::Max);
+    }
+
+    if (stepCount > 1)
+        StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
 
     StepperIndexer::delayForSettling();
 }

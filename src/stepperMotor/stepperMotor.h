@@ -7,7 +7,8 @@
  *
  */
 
-#include "chipInterface/chipState.h"
+// implemented using stepper indexer drive chip
+#include "../stepperIndexer/chipInterface/chipState.h"
 
 class StepperMotor {
 public:
@@ -37,6 +38,11 @@ public:
      * End condition is holding torque.
      */
     static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
+
+    /*
+     * Turn the given steps, direction, then hold.
+     */
+    static void turnAcceleratedStepsAndHold(unsigned int stepCount, MotorDirection direction);
 
 
     /*
