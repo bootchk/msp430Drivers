@@ -48,30 +48,6 @@ void StepperIndexer::syncDriverWithMotor() {
 
 
 
-void StepperIndexer::findPhysicalStop(MotorDirection direction) {
-
-
-    DriverChipInterface::wake();
-    DriverChipInterface::setDirection(direction);
-    DriverChipInterface::enableCoilDrive();
-
-    /*
-     * Turn one revolution (enough to encounter the physical stop.)
-     */
-    stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, MotorSpeed::Quarter);
-
-    DriverChipInterface::disableCoilDrive();
-
-    // reset driver chip
-    DriverChipInterface::sleep();
-    DriverChipInterface::wake();
-
-    // assert motor in sync with microstep
-    // assert driver chip in home state (microstep 2 for Half StepMode)
-    // assert microstep is a DetentStep
-
-    IndexerChipState::setMicrostepState(2);
-}
 
 
 

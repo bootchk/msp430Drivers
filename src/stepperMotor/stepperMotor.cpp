@@ -3,6 +3,7 @@
 
 #include "../stepperIndexer/stepperIndexer.h"
 #include "../stepperIndexer/chipInterface/chipInterface.h"
+#include "../../motor.h"
 
 #include "../assert/myAssert.h"
 #include "../SoC/SoC.h"
@@ -123,3 +124,30 @@ bool
 StepperMotor::isFault() {
     return StepperIndexer::isFault();
 }
+
+
+void StepperMotor::findPhysicalStop(MotorDirection direction) {
+
+
+    DriverChipInterface::wake();
+    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::enableCoilDrive();
+
+    /*
+     * Turn one revolution (enough to encounter the physical stop.)
+     */
+    StepperIndexer::stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, MotorSpeed::Quarter);
+
+    DriverChipInterface::disableCoilDrive();
+
+    // reset driver chip
+    DriverChipInterface::sleep();
+    DriverChipInterface::wake();
+
+    // assert motor in sync with microstep
+    // assert driver chip in home state (microstep 2 for Half StepMode)
+    // assert microstep is a DetentStep
+
+    IndexerChipState::setMicrostepState(2);
+}
+

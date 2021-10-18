@@ -238,7 +238,7 @@ testHomeState() {
 
 void
 testPicking() {
-    StepperIndexer::findPhysicalStop(MotorDirection::Backward);
+    StepperMotor::findPhysicalStop(MotorDirection::Backward);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees

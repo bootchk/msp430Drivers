@@ -50,4 +50,15 @@ public:
      */
     static bool isFault();
 
+    /*
+     * Rotate the motor enough to find a physical stop,
+     * then reset the chip so at the home state.
+     * Leaves:
+     * - chip awake
+     * - motor stationary at the hard stop.
+     * - coils not energized
+     * The arm must rest by gravity on the physical stop else since coils not energized, arm might move.
+     */
+    static void findPhysicalStop(MotorDirection);
+
 };

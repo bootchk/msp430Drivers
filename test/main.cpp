@@ -30,10 +30,10 @@ void testUVSensor2();
 void testEInk();
 void testPressureSensor();
 void testStepperDriver();
+void testLoadSwitch();
 */
 
-void testLoadSwitch();
-
+void testPicker();
 
 
 int main(void)
@@ -76,5 +76,6 @@ int main(void)
 	//testEInk();
 
 	//testPressureSensor();
-	testLoadSwitch();
+	//testLoadSwitch();
+	testPicker();
 }
