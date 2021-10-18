@@ -20,6 +20,8 @@
 
 // stepper
 #include "../src/stepperMotor/stepperMotor.h"
+// MPRLS pressure sensor on I2C bus
+#include "../src/pressureSensor/MPRLS.h"
 
 
 
@@ -81,7 +83,7 @@ testPicker() {
     LowSideSwitch::configure();
 
     // Pressure sensor
-    // TODO
+    MPRLS::begin(MPRLS_DEFAULT_ADDR);
 
 
     // Arm to home position.
@@ -93,7 +95,9 @@ testPicker() {
     // arm is upright
 
 
-    // Vacuum is always on
+    // Vacuum pump is always on
+
+    // Pneumo valve is usually closed.
 
     // TODO test that pneumo valve is closed and vacuum exists
 

@@ -1,9 +1,7 @@
 
 #include "../src/LED/led.h"
-#include "../src/PressureSensor/MPRLS.h"
-
-// TI DriverLib
 #include <pmm.h>    // PMM_unlockLPM5
+#include <src/pressureSensor/MPRLS.h>
 
 
 /*
@@ -42,20 +40,18 @@ void testPressureSensor()
 {
     PMM_unlockLPM5();
 
-    MPRLS mprls = MPRLS();
-
     LED::configureLED1();
 
-    mprls.begin();
+    MPRLS::begin();
 
     // Ensure enough time elapsed for device to be ready
 
     while (true)
     {
-        // uint8_t status = mprls.readStatus();
-        data = mprls.readRawPressure();
+        // uint8_t status = MPRLS::readStatus();
+        data = MPRLS::readRawPressure();
 
-        pressure = mprls.readPressure();
+        pressure = MPRLS::readPressure();
 
         LED::toggle();
         __delay_cycles(1000000);

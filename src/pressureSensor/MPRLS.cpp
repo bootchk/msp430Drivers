@@ -1,7 +1,5 @@
 
-#include "MPRLS.h"
-
-// Use transport layer interface to I2C
+#include <src/pressureSensor/MPRLS.h>
 #include "../../src/i2c/transport/i2cTransport.h"
 
 #include "../../src/assert/myAssert.h"

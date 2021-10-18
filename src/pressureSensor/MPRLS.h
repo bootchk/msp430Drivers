@@ -35,32 +35,40 @@ public:
   */
     /*
     setup and initialize communication with the hardware
-    No built-in delay, but one is required before reading.
-    */
-    void       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);
 
-    uint8_t    readStatus(void);
+    No built-in delay, but one is required before reading.
+    1 mS is required.
+
+    This initializes the I2C bus as defined by board.h
+    If there are many devices on the I2C bus,
+    this should be modified so that the bus is not initialized twice.
+    */
+    static void       begin(uint8_t i2c_addr = MPRLS_DEFAULT_ADDR);
+
+    static uint8_t    readStatus(void);
 
 
     /*
      Read pressure in units of PSI.
      Gage: relative to an open on the backside.
      Ambient pressure which is about 14 PSI
+
+     This has built-in delays of 5mS.
      */
-    float      readPressure(void);
+    static float      readPressure(void);
 
     /*
      Read 24 bits of raw pressure data.
      Returned in 32 bits, upper byte is zero if successful.
      On error, returns -1 ( all bits one)
      */
-    uint32_t   readRawPressure(void);
+    static uint32_t   readRawPressure(void);
 
 
 private:
 
   // read 3 bytes of raw measurement data.
   // Returns -1 on error
-  uint32_t readData(void);
+  static uint32_t readData(void);
 
 };
