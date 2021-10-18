@@ -12,6 +12,8 @@
 #include <gpio.h>
 
 #include "../src/delay/delay.h"
+#include "../src/lowSideSwitch/lowSideSwitch.h"
+
 
 
 // Proto has:
@@ -74,6 +76,14 @@ testPicker() {
     configureGPIOLowPower3();
     PMM_unlockLPM5();
 
+
+    // Pneumo valve
+    LowSideSwitch::configure();
+
+    // Pressure sensor
+    // TODO
+
+
     // Arm to home position.
     StepperMotor::findPhysicalStop(MotorDirection::Backward);
     // arm is against stop
@@ -90,13 +100,24 @@ testPicker() {
 
     while(true) {
 
+        // Vacuum on
+        LowSideSwitch::turnOff();
 
+        // lower arm into bin
+        // TODO
 
-        GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN2);
-        delayBetweenTests3();
+        // If not suction, peck
+        // TODO
 
+        // raise arm
+        // TODO
 
-        GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_PIN2);
+        // vacuum off
+        // Expect picked object to drop
+        LowSideSwitch::turnOn();
+
+        // Wait for loss of vacuum (pressure is ambient)
+
         delayBetweenTests3();
     }
 }

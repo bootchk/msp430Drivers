@@ -371,3 +371,13 @@
 #define StepperDrivePowerSwitchPort   GPIO_PORT_P1
 #define StepperDrivePowerSwitchPin   GPIO_PIN7
 
+
+
+/*
+ * Low side switch
+ */
+
+#define LOW_SIDE_SWITCH_PORT  GPIO_PORT_P1
+#define LOW_SIDE_SWITCH_PIN   GPIO_PIN7
+
+
