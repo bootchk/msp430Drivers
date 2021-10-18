@@ -29,8 +29,10 @@ void testUVSensor();
 void testUVSensor2();
 void testEInk();
 void testPressureSensor();
-*/
 void testStepperDriver();
+*/
+
+void testLoadSwitch();
 
 
 
@@ -39,7 +41,7 @@ int main(void)
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
 	//testStepper();
-	testStepperDriver();
+	//testStepperDriver();
 
 	//testCompass();
 	//testCompass2();
@@ -74,4 +76,5 @@ int main(void)
 	//testEInk();
 
 	//testPressureSensor();
+	testLoadSwitch();
 }
