@@ -230,18 +230,27 @@ testPicker() {
     // Pneumo valve is usually closed, giving mild vacuum to the pickup
 
 
-    if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM) )
-        // vacuum pump failed
-        myAssert(false);
+
 
 
     while(true) {
 
-        // Vacuum on
+        // Vacuum applied to pickup tube
         LowSideSwitch::turnOff();
 
-        // Ensure seed is not still attached by mechanical stiction
-        // TODO
+        if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM) )
+                // vacuum pump or valve failed
+                myAssert(false);
+
+        /*
+         * Ensure pickup tube is not blocked.
+         * Although we think we dropped an object,
+         * another object could have been picked up, or dust accumulated.
+         */
+        if ( ! waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM) )
+            // Pickup tube is blocked
+            myAssert(false);
+
 
         lowerArmIntoBin();
 

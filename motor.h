@@ -90,10 +90,12 @@
 // The board hardwires step size to a full detent step, pin M0 is grounded
 //#define STEPPER_MICROSTEP_SIZE_FULL 1
 
-// The board hardwires step size to a half detent step, pin M0 is floating
+// The board hardwires step size to a half detent step, pin M0 is high
 #define STEPPER_MICROSTEP_SIZE_HALF 1
 
 
+// Whether the fault detect pin is connected to a GPIO
+#define STEPPER_FAULT_DETECT_USED 0
 
 
 // Declare pinout for DIR pin
@@ -112,8 +114,10 @@
 #define STEPPER_ENABLE_COILS_PORT GPIO_PORT_P1
 #define STEPPER_ENABLE_COILS_PIN  GPIO_PIN6
 
+#if STEPPER_FAULT_DETECT_USED
 #define STEPPER_FAULT_PORT GPIO_PORT_P1
 #define STEPPER_FAULT_PIN  GPIO_PIN7
+#endif
 
 
 #endif

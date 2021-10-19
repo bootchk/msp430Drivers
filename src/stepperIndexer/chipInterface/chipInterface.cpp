@@ -155,6 +155,7 @@ DriverChipInterface::stepMicrostep() {
 }
 
 
+#if STEPPER_FAULT_DETECT_USED
 /*
  * The notFault pin resets itself when the condition clears.
  * So polling it is not sufficient (unless the condition is long duration.)
@@ -178,3 +179,5 @@ DriverChipInterface::enableInterruptOnFault() {
     GPIO_selectInterruptEdge(STEPPER_FAULT_PORT, STEPPER_FAULT_PIN, GPIO_HIGH_TO_LOW_TRANSITION);
     GPIO_enableInterrupt    (STEPPER_FAULT_PORT, STEPPER_FAULT_PIN);
 }
+
+#endif // STEPPER_FAULT_DETECT_USED

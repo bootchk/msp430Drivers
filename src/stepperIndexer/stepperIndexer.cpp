@@ -140,9 +140,6 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
 #else
     error
 #endif
-    // TODO temp test
-    if (StepperIndexer::isFault())
-        myAssert(false);
 }
 
 
@@ -236,10 +233,11 @@ StepperIndexer::delayForSettling() {
     delayMicrostepForSpeed(MotorSpeed::Quarter);
 }
 
-
+#if STEPPER_FAULT_DETECT_USED
 bool
 StepperIndexer::isFault() {
     return DriverChipInterface::isFault();
 }
+#endif
 
 
