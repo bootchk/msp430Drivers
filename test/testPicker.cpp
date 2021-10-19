@@ -12,7 +12,8 @@
 #include <gpio.h>
 
 #include "../src/delay/delay.h"
-#include "../src/lowSideSwitch/lowSideSwitch.h"
+
+#include "../src/assert/myAssert.h"
 
 
 
@@ -22,6 +23,8 @@
 #include "../src/stepperMotor/stepperMotor.h"
 // MPRLS pressure sensor on I2C bus
 #include "../src/pressureSensor/MPRLS.h"
+// switch to a pneumo valve
+#include "../src/lowSideSwitch/lowSideSwitch.h"
 
 
 
@@ -69,10 +72,145 @@ delayBetweenTests3() {
 }
 
 
+/*
+ * Arm
+ */
+
+void initArm() {
+    // Arm to home position.
+    StepperMotor::findPhysicalStop(MotorDirection::Backward);
+    // arm is against stop
+
+    // For 20 step motor, 18 degrees per step, turn 54 degrees
+    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+    // arm is upright
+}
+
+void lowerArmIntoBin() {
+    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Backward);
+}
+
+void peckArm() {
+    StepperMotor::turnAndHold(1, MotorDirection::Forward);
+    StepperMotor::turnAndHold(1, MotorDirection::Backward);
+}
+
+void raiseArm() {
+    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+}
+
+
+
+
+/*
+ * Vacuum detection
+ */
+
+// with vacuum pump off, is 14.6
+#define PRESSURE_THRESHOLD_LOW_VACUUM 14.55
+// with vacumm pump on and open pickup tube, 14.5
+#define PRESSURE_THRESHOLD_HIGH_VACUUM 14
+// with vacuum pump on and object picked, blocking pickup tube < 14
+
+
+
+bool
+waitForPressureAbove(float threshold) {
+    int   count;
+   float pressure;
+
+   count = 20; // gives a wait of > 100mX
+   pressure = MPRLS::readPressure();
+   while (pressure < threshold ) {
+       // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
+       count--;
+       if (count <0)
+           return false;
+       pressure = MPRLS::readPressure();
+   }
+
+   // pressure is above threshold
+   return true;
+}
+
+bool
+waitForPressureBelow(float threshold) {
+   int   count;
+   float pressure;
+
+   count = 20; // gives a wait of > 100mX
+   pressure = MPRLS::readPressure();
+   while (pressure > threshold ) {
+       // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
+       count--;
+       if (count <0)
+           return false;
+       pressure = MPRLS::readPressure();
+   }
+
+   // pressure is below threshold
+   return true;
+}
+
+
+bool
+performActionUntilPressureBelow(float threshold, void func(void) ) {
+    int   count;
+    float pressure;
+
+    count = 20; // gives a wait of > 100mX
+    pressure = MPRLS::readPressure();
+
+
+    while (pressure >threshold) {
+        count--;
+        if (count <0 )
+            return false;
+
+        // Pressure at pickup is just a soft vacuum (14.0)
+        func();
+        // Reread pressure
+        pressure = MPRLS::readPressure();
+        }
+    return true;
+}
+
+#ifdef OLD
+/*
+ * Wait for vacuum less than ambient and more than picked.
+ */
+bool
+waitForUnpickedVacuum() {
+    if ( ! waitForPressureAbove( MAX_UNPICKED_PRESSURE ) {
+            return false;
+    }
+
+    // TODO check is not too low
+
+    return true;
+}
+
+
+/*
+ * Wait for vacuum more than picked.
+ *
+ * Not require reach ambient,
+ * Require enough pressure to think that picking tube is not blocked by picked object or foreign object.
+ */
+bool
+waitForUnpickedPressure() {
+    while (pressure < RISING_UNPICKED_PRESSURE) {
+        // Vacuum has not dropped
+        pressure = MPRLS::readPressure();
+        // assert 5mS has passed
+    }
+}
+#endif
 
 
 void
 testPicker() {
+    float pressure;
 
     setAllOutputsLow3();
     configureGPIOLowPower3();
@@ -85,21 +223,16 @@ testPicker() {
     // Pressure sensor
     MPRLS::begin(MPRLS_DEFAULT_ADDR);
 
-
-    // Arm to home position.
-    StepperMotor::findPhysicalStop(MotorDirection::Backward);
-    // arm is against stop
-
-    // For 20 step motor, 18 degrees per step, turn 54 degrees
-    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
-    // arm is upright
-
+    initArm();
 
     // Vacuum pump is always on
 
-    // Pneumo valve is usually closed.
+    // Pneumo valve is usually closed, giving mild vacuum to the pickup
 
-    // TODO test that pneumo valve is closed and vacuum exists
+
+    if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM) )
+        // vacuum pump failed
+        myAssert(false);
 
 
     while(true) {
@@ -107,20 +240,26 @@ testPicker() {
         // Vacuum on
         LowSideSwitch::turnOff();
 
-        // lower arm into bin
+        // Ensure seed is not still attached by mechanical stiction
         // TODO
 
-        // If not suction, peck
-        // TODO
+        lowerArmIntoBin();
 
-        // raise arm
-        // TODO
+        // While not suction because seed is attached, peck
+        if ( ! performActionUntilPressureBelow(PRESSURE_THRESHOLD_HIGH_VACUUM, peckArm) ) {
+            // Failed to pick object
+            myAssert(false);
+        }
+
+        raiseArm();
 
         // vacuum off
         // Expect picked object to drop
         LowSideSwitch::turnOn();
 
-        // Wait for loss of vacuum (pressure is ambient)
+        if ( ! waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM) )
+            // Failed to drop object
+            myAssert(false);
 
         delayBetweenTests3();
     }
