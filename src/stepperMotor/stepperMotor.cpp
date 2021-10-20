@@ -9,6 +9,13 @@
 #include "../SoC/SoC.h"
 
 
+
+void
+StepperMotor::delayUntilDriverChipAwake() {
+    DriverChipInterface::delayForWake();
+}
+
+
 void
 StepperMotor::wakeTurnAndSleep(
         unsigned int   steps,
@@ -129,7 +136,7 @@ StepperMotor::isFault() {
 void StepperMotor::findPhysicalStop(MotorDirection direction) {
 
 
-    DriverChipInterface::wake();
+    StepperIndexer::wake();
     DriverChipInterface::setDirection(direction);
     DriverChipInterface::enableCoilDrive();
 
@@ -141,8 +148,8 @@ void StepperMotor::findPhysicalStop(MotorDirection direction) {
     DriverChipInterface::disableCoilDrive();
 
     // reset driver chip
-    DriverChipInterface::sleep();
-    DriverChipInterface::wake();
+    StepperIndexer::sleep();
+    StepperIndexer::wake();
 
     // assert motor in sync with microstep
     // assert driver chip in home state (microstep 2 for Half StepMode)

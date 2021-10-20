@@ -9,7 +9,7 @@
 // Uses chip driver
 #include <src/stepperIndexer/chipInterface/chipInterface.h>
 
-
+#if STEPPER_SLEEP_USED
 void
 StepperIndexer::sleep() {
 
@@ -18,13 +18,14 @@ StepperIndexer::sleep() {
 }
 
 
-void StepperIndexer::initialWake() {
-    DriverChipInterface::wake();
-}
-
-
 void StepperIndexer::wake() {
     // GPIO for enable coil drive may still be ON and coils driven?
 
     DriverChipInterface::wake();
 }
+
+#else
+    // chip is always enabled by HW and these are no ops
+void StepperIndexer::sleep() {}
+void StepperIndexer::wake() {}
+#endif

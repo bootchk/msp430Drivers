@@ -4,6 +4,9 @@
 
 /*
 void testStepper();
+void testStepperIndexer();
+void testPicker();
+
 void testCompass();
 void testCompass2();
 void testRTC();
@@ -21,7 +24,7 @@ void testLEDSensor();
 void testLED();
 void testLEDSensor2();
 void testLEDSensor3();
-void testStepperDriver();
+
 void testLogging();
 void testI2C();
 void testI2CTransport();
@@ -37,12 +40,15 @@ void testPressureSensor();
 void testPicker();
 
 
+
 int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
 	//testStepper();
-	//testStepperDriver();
+	//testStepperIndexer();
+	testPicker();
+
 
 	//testCompass();
 	//testCompass2();
@@ -78,5 +84,4 @@ int main(void)
 
 	//testPressureSensor();
 	//testLoadSwitch();
-	testPicker();
 }

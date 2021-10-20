@@ -29,8 +29,8 @@
 
 
 
-// configure all GPIO out to ensure low power
-void configureGPIOLowPower3() {
+// configure all GPIO out (to ensure low power)
+void configureAllGPIOOut() {
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN1);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN2);
@@ -77,6 +77,13 @@ delayBetweenTests3() {
  */
 
 void initArm() {
+    /*
+     * require is awake.
+     * Either always awake and 1mS since power on,
+     * or signaled awake and 1mS since signaled.
+     */
+
+
     // Arm to home position.
     StepperMotor::findPhysicalStop(MotorDirection::Backward);
     // arm is against stop
@@ -212,8 +219,9 @@ void
 testPicker() {
     float pressure;
 
+    configureAllGPIOOut();
     setAllOutputsLow3();
-    configureGPIOLowPower3();
+
     PMM_unlockLPM5();
 
 
@@ -222,6 +230,8 @@ testPicker() {
 
     // Pressure sensor
     MPRLS::begin(MPRLS_DEFAULT_ADDR);
+
+    StepperMotor::delayUntilDriverChipAwake();
 
     initArm();
 

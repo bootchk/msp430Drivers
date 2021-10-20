@@ -112,8 +112,14 @@ public:
     static void syncDriverWithMotor();
 
 
-    static void initialWake();
+    /*
+     * Wake chip from sleep.
+     * Built-in SW delay of 1mS (per chip datasheet.)
+     */
     static void wake();
+    /*
+     * Sleep the chip.  Chip enters its low power mode.
+     */
     static void sleep();
 
 

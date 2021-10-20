@@ -94,8 +94,10 @@
 #define STEPPER_MICROSTEP_SIZE_HALF 1
 
 
-// Whether the fault detect pin is connected to a GPIO
+// Whether the driver chip's fault detect pin is connected to a GPIO
 #define STEPPER_FAULT_DETECT_USED 0
+// Whether the driver chip's sleep pin is connected to a GPIO
+#define STEPPER_SLEEP_USED 1
 
 
 // Declare pinout for DIR pin
@@ -106,9 +108,12 @@
 #define STEPPER_STEP_PORT GPIO_PORT_P1
 #define STEPPER_STEP_PIN  GPIO_PIN2
 
+#if STEPPER_SLEEP_USED
 // Declare pinout for notSLEEP pin
 #define STEPPER_NSLEEP_PORT GPIO_PORT_P1
 #define STEPPER_NSLEEP_PIN  GPIO_PIN5
+#endif
+
 
 // Declare pinout for pin that enables motor coil outputs
 #define STEPPER_ENABLE_COILS_PORT GPIO_PORT_P1

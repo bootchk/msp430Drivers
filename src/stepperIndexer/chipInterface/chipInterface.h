@@ -11,7 +11,13 @@
 
 class DriverChipInterface {
 public:
+    /*
+     * Chip spec requires delay after any wake before chip is active.
+     * Ensure 1 milliSec before any subsequent operations.
+     */
+    static void delayForWake();
 
+    // getters
     static unsigned int microstepsPerRev();
     static unsigned int detentstepsPerRev();
 
@@ -32,6 +38,7 @@ public:
      *
      * Built-in delay for wake.
      */
+    // Defined, but optionally conditionally compiled out
     static void wake();
     static void sleep();
 
@@ -70,6 +77,8 @@ public:
     static void stepMicrostep();
     // inline TODO doesn't link when O3
 
+
+    // Defined, but optionally conditionally compiled out
     static bool isFault();
     static void enableInterruptOnFault();
 };

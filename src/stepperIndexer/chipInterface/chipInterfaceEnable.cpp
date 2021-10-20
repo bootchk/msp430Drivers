@@ -17,15 +17,6 @@
 
 namespace {
 
-/*
- * Chip spec requires delay after any wake before chip is active.
- * Ensure 1 milliSec before any subsequent step.
- *
- * TODO interrupt driven
- */
-void delayForWakeChange() {
-    Delay::oneMillisecond();
-}
 
 /*
  * Delay for any command (other than wake) till next step
@@ -45,8 +36,19 @@ void delayForCommandChange() {
 
 
 
+// TODO interrupt driven
+void
+DriverChipInterface::delayForWake() {
+    Delay::oneMillisecond();
+}
 
 
+
+/*
+ * Sleep functions optional at compile time.
+ */
+
+#if STEPPER_SLEEP_USED
 /*
  * Toggle NotSleep pin.
  * Low is sleep.
@@ -54,12 +56,13 @@ void delayForCommandChange() {
  *
  * Low-level, not concerned with shadowing.
  */
-void DriverChipInterface::wake() {
+void
+DriverChipInterface::wake() {
     GPIO_setOutputHighOnPin(
             STEPPER_NSLEEP_PORT,
             STEPPER_NSLEEP_PIN);
 
-    delayForWakeChange();
+    delayForWake();
 
     // assert after wake, chip step table is in "home" state, say 2
     // assert motor is at remembered motor step, not necessarily 2
@@ -83,7 +86,7 @@ void DriverChipInterface::sleep() {
     // TODO toSleep()
     IndexerChipState::rememberMotorStep();
 }
-
+#endif
 
 
 

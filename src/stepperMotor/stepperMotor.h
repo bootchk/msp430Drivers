@@ -13,6 +13,15 @@
 class StepperMotor {
 public:
     /*
+     * Delay a time that ensures the driver chip is awake.
+     *
+     * Can be used at power up to ensure driver chip is awake,
+     * when hardwired awake and wake() is not called.
+     */
+
+    static void delayUntilDriverChipAwake();
+
+    /*
      * Turns at maximum rate, ending in coils deenergized and sleep.
      *
      * Includes all delays for accelleration, speed, and decelleration.

@@ -19,10 +19,10 @@
 
 void StepperIndexer::syncDriverWithMotor() {
     // reset driver chip
-    DriverChipInterface::sleep();
+    StepperIndexer::sleep();
 
     // wake without maintaining shadows
-    DriverChipInterface::wake();
+    StepperIndexer::wake();
     // assert DriverChip in home state (microstep 2 for Half StepMode)
     // assert motor is on unknown step, but shadowStepOfMotor is also HomeStep == 2
 
@@ -233,11 +233,12 @@ StepperIndexer::delayForSettling() {
     delayMicrostepForSpeed(MotorSpeed::Quarter);
 }
 
-#if STEPPER_FAULT_DETECT_USED
+
+// If not STEPPER_FAULT_DETECT_USED, this will have link errors if used
 bool
 StepperIndexer::isFault() {
     return DriverChipInterface::isFault();
 }
-#endif
+
 
 

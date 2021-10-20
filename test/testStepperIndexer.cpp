@@ -268,7 +268,7 @@ testPicking() {
 
 
 void
-testStepperDriver() {
+testStepperIndexer() {
 
     //launchpadLEDOff();
     setAllOutputsLow();
@@ -276,7 +276,7 @@ testStepperDriver() {
 
     PMM_unlockLPM5();
 
-    StepperIndexer::initialWake();
+    StepperIndexer::wake();
     // assert in home state
 
     // Not runtime configurable for some boards
@@ -286,9 +286,6 @@ testStepperDriver() {
 
     // StepperIndexer::syncDriverWithMotor();
     //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
-
-    DriverChipInterface::enableInterruptOnFault();
-
 
     // Uncomment to test disabling
     //StepperIndexer::disableOutput();
