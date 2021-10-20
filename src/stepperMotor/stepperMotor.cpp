@@ -9,6 +9,11 @@
 #include "../SoC/SoC.h"
 
 
+void
+StepperMotor::wake() {
+    StepperIndexer::wake();
+}
+
 
 void
 StepperMotor::delayUntilDriverChipAwake() {

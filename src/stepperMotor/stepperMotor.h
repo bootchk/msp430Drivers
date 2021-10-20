@@ -12,6 +12,13 @@
 
 class StepperMotor {
 public:
+
+    /*
+     * Wake driver chip,
+     * when driver chip can sleep under MCU control.
+     */
+    static void wake();
+
     /*
      * Delay a time that ensures the driver chip is awake.
      *

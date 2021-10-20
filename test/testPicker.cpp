@@ -219,8 +219,8 @@ void
 testPicker() {
     float pressure;
 
-    configureAllGPIOOut();
     setAllOutputsLow3();
+    configureAllGPIOOut();
 
     PMM_unlockLPM5();
 
@@ -231,6 +231,7 @@ testPicker() {
     // Pressure sensor
     MPRLS::begin(MPRLS_DEFAULT_ADDR);
 
+    StepperMotor::wake();
     StepperMotor::delayUntilDriverChipAwake();
 
     initArm();
