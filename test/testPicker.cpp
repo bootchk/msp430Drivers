@@ -12,8 +12,10 @@
 #include <gpio.h>
 
 #include "../src/delay/delay.h"
-
 #include "../src/assert/myAssert.h"
+#include "../src/LED/led.h"
+
+
 
 
 
@@ -27,6 +29,8 @@
 #include "../src/lowSideSwitch/lowSideSwitch.h"
 
 
+// To exam using debugger
+static float failedPressure;
 
 
 // configure all GPIO out (to ensure low power)
@@ -99,7 +103,9 @@ void lowerArmIntoBin() {
 
 void peckArm() {
     StepperMotor::turnAndHold(1, MotorDirection::Forward);
+    // arm slightly lifted
     StepperMotor::turnAndHold(1, MotorDirection::Backward);
+    // arm back in bin
 }
 
 void raiseArm() {
@@ -121,6 +127,8 @@ void raiseArm() {
 
 
 
+
+
 bool
 waitForPressureAbove(float threshold) {
     int   count;
@@ -131,8 +139,10 @@ waitForPressureAbove(float threshold) {
    while (pressure < threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
        count--;
-       if (count <0)
+       if (count <0) {
+           failedPressure = pressure;
            return false;
+       }
        pressure = MPRLS::readPressure();
    }
 
@@ -150,8 +160,10 @@ waitForPressureBelow(float threshold) {
    while (pressure > threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
        count--;
-       if (count <0)
+       if (count <0) {
+           failedPressure = pressure;
            return false;
+       }
        pressure = MPRLS::readPressure();
    }
 
@@ -168,11 +180,12 @@ performActionUntilPressureBelow(float threshold, void func(void) ) {
     count = 20; // gives a wait of > 100mX
     pressure = MPRLS::readPressure();
 
-
     while (pressure >threshold) {
         count--;
-        if (count <0 )
+        if (count <0 ) {
+            failedPressure = pressure;
             return false;
+        }
 
         // Pressure at pickup is just a soft vacuum (14.0)
         func();
@@ -215,43 +228,125 @@ waitForUnpickedPressure() {
 #endif
 
 
+
+/*
+ * Pneumo valve ops.
+ */
+
+void
+pneumoValveConfigure() {
+    LowSideSwitch::configure();
+}
+void
+pneumoValveVacuumToCommon() {
+    LowSideSwitch::turnOn();
+}
+void
+pneumoValveAmbientToCommon() {
+    LowSideSwitch::turnOff();
+}
+
+
+
+/*
+ * Evemts and faults.
+ */
+
+void
+configureFaultIndicators() {
+    LED::configureLED1();
+    LED::configureLED2();
+}
+
+void
+faultVacuum() {
+    /*
+     * No vacuum on pickup.
+     * vacuum pump or valve failed
+     */
+    // TODO sound alarm
+    myAssert(false);
+}
+
+void
+faultDropping() {
+    /*
+     * Object not dropped
+     * or pickup tube is blocked
+     */
+    LED::turnOnLED1();
+
+    // TODO if count exceeded, stop
+    myAssert(false);
+}
+
+void
+clearFaultDropping() {
+    // TODO LED off
+    // TODO reset count
+}
+
+void
+faultPicking() {
+    // Failed to pick object
+    // TODO set LED
+    // check count
+    myAssert(false);
+}
+
+void clearFaultPicking() {
+    // TODO
+}
+
+
+
+
+
+
+static void
+testPecking() {
+    lowerArmIntoBin();
+    while(true) {
+        peckArm();
+    }
+}
+
+
 void
 testPicker() {
-    float pressure;
 
     setAllOutputsLow3();
     configureAllGPIOOut();
 
+    configureFaultIndicators();
+
     PMM_unlockLPM5();
 
-
-    // Pneumo valve
-    LowSideSwitch::configure();
+    pneumoValveConfigure();
 
     // Pressure sensor
     MPRLS::begin(MPRLS_DEFAULT_ADDR);
 
-    StepperMotor::wake();
+    // HW should be keeping stepper driver chip awake
     StepperMotor::delayUntilDriverChipAwake();
 
     initArm();
+    // Expect arm to move and find stop
 
     // Vacuum pump is always on
 
     // Pneumo valve is usually closed, giving mild vacuum to the pickup
 
-
-
-
+    //testPecking();
 
     while(true) {
 
-        // Vacuum applied to pickup tube
-        LowSideSwitch::turnOff();
+        // Vacuum applied to sensor and pickup tube
+        pneumoValveVacuumToCommon();
 
         if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM) )
-                // vacuum pump or valve failed
-                myAssert(false);
+            // Does not return
+            faultVacuum();
 
         /*
          * Ensure pickup tube is not blocked.
@@ -259,27 +354,32 @@ testPicker() {
          * another object could have been picked up, or dust accumulated.
          */
         if ( ! waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM) )
-            // Pickup tube is blocked
-            myAssert(false);
-
+            // Might not return
+            faultDropping();
+        else
+            clearFaultDropping();
 
         lowerArmIntoBin();
 
         // While not suction because seed is attached, peck
-        if ( ! performActionUntilPressureBelow(PRESSURE_THRESHOLD_HIGH_VACUUM, peckArm) ) {
-            // Failed to pick object
-            myAssert(false);
-        }
+        if ( ! performActionUntilPressureBelow(PRESSURE_THRESHOLD_HIGH_VACUUM, peckArm) )
+            // Might not return
+            faultPicking();
+        else
+            clearFaultPicking();
 
         raiseArm();
 
-        // vacuum off
+        // Stop sucking, ambient pressure to pickup
         // Expect picked object to drop
-        LowSideSwitch::turnOn();
+        pneumoValveAmbientToCommon();
 
-        if ( ! waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM) )
-            // Failed to drop object
-            myAssert(false);
+        /*
+         * We don't here waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM).
+         * Since we will soon check at the top of the loop.
+         *
+         * That is, we don't here check that the object dropped.
+         */
 
         delayBetweenTests3();
     }

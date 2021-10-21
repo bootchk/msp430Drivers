@@ -1,5 +1,7 @@
 /*
  *  Define attributes and pins of stepper driver chip and motor
+ *
+ *  !!! See also board.h.  There must be no conflicts.
  */
 
 
@@ -97,21 +99,21 @@
 // Whether the driver chip's fault detect pin is connected to a GPIO
 #define STEPPER_FAULT_DETECT_USED 0
 // Whether the driver chip's sleep pin is connected to a GPIO
-#define STEPPER_SLEEP_USED 1
+#define STEPPER_SLEEP_USED 0
 
 
 // Declare pinout for DIR pin
 #define STEPPER_DIR_PORT GPIO_PORT_P1
-#define STEPPER_DIR_PIN  GPIO_PIN3
+#define STEPPER_DIR_PIN  GPIO_PIN5
 
 // Declare pinout for STEP pin
 #define STEPPER_STEP_PORT GPIO_PORT_P1
-#define STEPPER_STEP_PIN  GPIO_PIN2
+#define STEPPER_STEP_PIN  GPIO_PIN4
 
 #if STEPPER_SLEEP_USED
 // Declare pinout for notSLEEP pin
 #define STEPPER_NSLEEP_PORT GPIO_PORT_P1
-#define STEPPER_NSLEEP_PIN  GPIO_PIN5
+#define STEPPER_NSLEEP_PIN  GPIO_PINX
 #endif
 
 

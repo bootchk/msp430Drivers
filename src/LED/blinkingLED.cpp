@@ -27,9 +27,9 @@ void BlinkingLED::blinkSecond() {
 #include "../timer/timer.h"
 
 void BlinkingLED::blinkFirst() {
-    LED::turnOn();
+    LED::turnOnLED1();
     LowPowerTimer::delayTenMilliSeconds();
-    LED::turnOff();
+    LED::turnOffLED1();
 }
 
 void BlinkingLED::blinkSecond() {

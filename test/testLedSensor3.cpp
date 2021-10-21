@@ -81,7 +81,7 @@ void testLEDSensor3()
     {
         delayHalfSecond();
 
-        LED::toggle();  // red
+        LED::toggleLED1();  // red
 
         sample = LEDAndLightSensor::measureLight();
 

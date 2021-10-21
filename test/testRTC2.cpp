@@ -89,7 +89,7 @@ void testRTC2()
     {
         delayHalfSecond();
 
-        LED::toggle();
+        LED::toggleLED1();
 
         now = RTC::timeNowOrReset();
 

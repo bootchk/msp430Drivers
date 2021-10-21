@@ -92,9 +92,9 @@ void testAlarmLPM45()
 
 #ifdef BLINK_RED_LED
         LED::configureLED1();
-        LED::turnOn();
+        LED::turnOnLED1();
         __delay_cycles(50000);
-        LED::turnOff();
+        LED::turnOffLED1();
 
         //BlinkingLED::blinkFirst();
 #endif

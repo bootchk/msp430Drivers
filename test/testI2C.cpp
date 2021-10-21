@@ -77,7 +77,7 @@ void testI2C()
         delayHalfSecond2();
 
 #ifdef USE_LED
-        LED::toggle();
+        LED::toggleLED1();
 #endif
 
         // Test reading the time

@@ -56,7 +56,7 @@ void testRTCAlarmPoll()
     {
         delayHalfSecond();
 
-        LED::toggle();
+        LED::toggleLED1();
 
         RTC::clearAlarmFlag();
 

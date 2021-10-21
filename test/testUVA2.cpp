@@ -65,7 +65,7 @@ void testUVSensor2()
     {
         delayHalfSecond();
 
-        LED::toggle();
+        LED::toggleLED1();
 
         centivolts = ADC::measureExternalPinProportionToVcc();
 

@@ -17,11 +17,9 @@ public:
 	/*
 	 * LED1
 	 */
-	static void turnOn();
-	static void turnOff();
-
-
-    static void toggle();
+	static void turnOnLED1();
+	static void turnOffLED1();
+    static void toggleLED1();
 
     /*
      * LED2

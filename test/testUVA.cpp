@@ -80,7 +80,7 @@ void testUVSensor()
     {
         delayHalfSecond();
 
-        LED::toggle();
+        LED::toggleLED1();
 
         unsigned int didFail = UVSensor::readSingleUVA(&uvaArray[index]);
         myAssert( not didFail );

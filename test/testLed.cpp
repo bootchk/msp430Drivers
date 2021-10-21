@@ -24,7 +24,7 @@ void testLED()
 
     while (true)
     {
-        LED::toggle();
+        LED::toggleLED1();
         Delay::oneSecond();
     }
 }

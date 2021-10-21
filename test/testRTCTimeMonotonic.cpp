@@ -62,7 +62,7 @@ void testRTCTimeMonotonic()
         delayHalfSecond();
         delayHalfSecond();
 
-        LED::toggle();
+        LED::toggleLED1();
 
         now = RTC::timeNowOrReset();
         // >>>>> Monotonic

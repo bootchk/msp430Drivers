@@ -106,7 +106,7 @@ void testI2CTransport()
         delayHalfSecond3();
 
 #ifdef USE_LED
-        LED::toggle();
+        LED::toggleLED1();
 #endif
 
         // Test reading ID

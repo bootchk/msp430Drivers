@@ -53,7 +53,7 @@ void testPressureSensor()
 
         pressure = MPRLS::readPressure();
 
-        LED::toggle();
+        LED::toggleLED1();
         __delay_cycles(1000000);
     }
 }
