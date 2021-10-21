@@ -32,6 +32,20 @@
 // To exam using debugger
 static float failedPressure;
 
+static unsigned int consecutiveCountFaultDropping = 0;
+static unsigned int consecutiveCountFaultPicking = 0;
+
+/*
+ *  Count times to read pressure before declaring fault.
+ *
+ *  Also the count of actions i.e. retries to achieve pressure
+ *
+ *  5mS per read, so the delay is about 15mS
+ */
+#define PressureReadsPerFault 3
+
+
+
 
 // configure all GPIO out (to ensure low power)
 void configureAllGPIOOut() {
@@ -134,7 +148,7 @@ waitForPressureAbove(float threshold) {
     int   count;
    float pressure;
 
-   count = 20; // gives a wait of > 100mX
+   count = PressureReadsPerFault;
    pressure = MPRLS::readPressure();
    while (pressure < threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
@@ -155,7 +169,7 @@ waitForPressureBelow(float threshold) {
    int   count;
    float pressure;
 
-   count = 20; // gives a wait of > 100mX
+   count = PressureReadsPerFault;
    pressure = MPRLS::readPressure();
    while (pressure > threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
@@ -177,7 +191,7 @@ performActionUntilPressureBelow(float threshold, void func(void) ) {
     int   count;
     float pressure;
 
-    count = 20; // gives a wait of > 100mX
+    count = PressureReadsPerFault;
     pressure = MPRLS::readPressure();
 
     while (pressure >threshold) {
@@ -276,26 +290,32 @@ faultDropping() {
      */
     LED::turnOnLED1();
 
-    // TODO if count exceeded, stop
-    myAssert(false);
+    consecutiveCountFaultDropping += 1;
+    if (consecutiveCountFaultDropping > 3) {
+        myAssert(false);
+    }
 }
 
 void
 clearFaultDropping() {
-    // TODO LED off
-    // TODO reset count
+    LED::turnOffLED1();
+    consecutiveCountFaultDropping = 0;
 }
 
 void
 faultPicking() {
     // Failed to pick object
-    // TODO set LED
-    // check count
-    myAssert(false);
+    LED::turnOnLED2();
+
+    consecutiveCountFaultPicking += 1;
+    if (consecutiveCountFaultPicking > 3) {
+        myAssert(false);
+    }
 }
 
 void clearFaultPicking() {
-    // TODO
+    LED::turnOffLED2();
+    consecutiveCountFaultPicking = 0;
 }
 
 
@@ -344,7 +364,7 @@ testPicker() {
         // Vacuum applied to sensor and pickup tube
         pneumoValveVacuumToCommon();
 
-        if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM) )
+        if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM ) )
             // Does not return
             faultVacuum();
 
@@ -378,7 +398,7 @@ testPicker() {
          * We don't here waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM).
          * Since we will soon check at the top of the loop.
          *
-         * That is, we don't here check that the object dropped.
+         * That is, we don't here check that the object dropped, we check a little later.
          */
 
         delayBetweenTests3();
