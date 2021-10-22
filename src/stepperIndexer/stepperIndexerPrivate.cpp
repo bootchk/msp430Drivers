@@ -62,6 +62,14 @@ StepperIndexer::delayFor250PPS() {
 }
 
 void
+StepperIndexer::delayFor400PPS() {
+    // 2.5 mS
+    Delay::oneMillisecond();
+    Delay::oneMillisecond();
+    Delay::halfMillisecond();
+}
+
+void
 StepperIndexer::delayFor500PPS() {
     // 2 mS
     Delay::oneMillisecond();
@@ -80,6 +88,8 @@ StepperIndexer::delayFor6000PPS() {
     Delay::hundredMicroseconds();
 #elif STEPPER_MICROSTEP_SIZE_HALF
     Delay::hundredMicroseconds();
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    Delay::fiftyMicroseconds();
 #else
     error
 #endif

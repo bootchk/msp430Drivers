@@ -23,6 +23,8 @@ namespace {
     StepSizeMode stepMode = StepSizeMode::Full;
 #elif STEPPER_MICROSTEP_SIZE_HALF
     StepSizeMode stepMode = StepSizeMode::Half;
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    StepSizeMode stepMode = StepSizeMode::Quarter;
 #else
     error
 #endif

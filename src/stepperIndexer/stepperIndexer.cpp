@@ -70,6 +70,15 @@ StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
     Delay::inMilliseconds(milliseconds);
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    DriverChipInterface::stepMicrostep();
+    Delay::inMilliseconds(milliseconds);
+    DriverChipInterface::stepMicrostep();
+    Delay::inMilliseconds(milliseconds);
+    DriverChipInterface::stepMicrostep();
+    Delay::inMilliseconds(milliseconds);
+    DriverChipInterface::stepMicrostep();
+    Delay::inMilliseconds(milliseconds);
 #else
     error
 #endif
@@ -109,6 +118,15 @@ StepperIndexer::stepDetentMaxSpeed() {
     delayMicrostepForMaxSpeed();
     DriverChipInterface::stepMicrostep();
     delayMicrostepForMaxSpeed();
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForMaxSpeed();
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForMaxSpeed();
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForMaxSpeed();
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForMaxSpeed();
 #else
     error
 #endif
@@ -133,6 +151,16 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
 
 #elif STEPPER_MICROSTEP_SIZE_HALF
     // Two microstep per detentstep
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForSpeed(speed);
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForSpeed(speed);
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    // Four microstep per detentstep
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForSpeed(speed);
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForSpeed(speed);
     DriverChipInterface::stepMicrostep();
     delayMicrostepForSpeed(speed);
     DriverChipInterface::stepMicrostep();
@@ -200,13 +228,18 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
 #if MOTOR_MAX_PPS == 100
     // For half stepping, pulse frequency is double
     StepperIndexer::delayFor200PPS();
-
-    // PPS of 100 halves the max speed
-    // StepperIndexer::delayFor100PPS();
 #else
     error
 #endif
 
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+
+#if MOTOR_MAX_PPS == 100
+    // For quarter stepping, pulse frequency is quadruple
+    StepperIndexer::delayFor400PPS();
+#else
+    error
+#endif
 
 #else
     error // microstep size not defined

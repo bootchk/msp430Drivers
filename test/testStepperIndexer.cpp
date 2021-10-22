@@ -77,11 +77,11 @@ void step360Jerky() {
 }
 
 
-// Turn one rev as fast as SW and HW allow
-void step360Smooth() {
+// Turn one rev at speed
+void step360Smooth(MotorSpeed speed) {
 
     unsigned int stepsPerRev = DriverChipInterface::detentstepsPerRev();
-    StepperIndexer::stepManyDetentsAtSpeed(stepsPerRev, MotorSpeed::Max);
+    StepperIndexer::stepManyDetentsAtSpeed(stepsPerRev, speed);
 }
 
 
@@ -292,19 +292,20 @@ testStepperIndexer() {
 
 
     // does not return
-    testPicking();
+    //testPicking();
 
     // does not return
-    testPecking();
+    //testPecking();
 
     // does not return
-    testQuarterRevs();
+    //testQuarterRevs();
+
+    DriverChipInterface::enableCoilDrive();
+    while(true) step360Smooth(MotorSpeed::Half);
 
     while(true) {
 
         delayBetweenTests();
-
-
 
         testBackAndForth();
 

@@ -69,6 +69,7 @@ private:
     static void delayFor100PPS();
     static void delayFor200PPS();
     static void delayFor250PPS();
+    static void delayFor400PPS();
     static void delayFor500PPS();
     static void delayFor6000PPS();
 

@@ -12,6 +12,7 @@
 
 void Delay::oneMicrosecond()     { __delay_cycles(1);}
 void Delay::hundredMicroseconds(){ __delay_cycles(100);}
+void Delay::halfMillisecond()    { __delay_cycles(500);}
 
 void Delay::oneMillisecond()     { __delay_cycles(1000);}
 void Delay::fiveMilliseconds()   { __delay_cycles(50000);}

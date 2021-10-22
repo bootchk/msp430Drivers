@@ -12,9 +12,6 @@
 
 namespace {
 
-
-
-
 void delayForDirectionChange() {
     /*
      * This is experimentally determined,
@@ -91,6 +88,8 @@ DriverChipInterface::getStepSize() {
     return StepSizeMode::Full;
 #elif STEPPER_MICROSTEP_SIZE_HALF
     return StepSizeMode::Half;
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    return StepSizeMode::Quarter;
 #else
 error
 #endif
