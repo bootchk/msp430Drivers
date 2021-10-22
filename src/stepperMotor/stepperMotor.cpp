@@ -27,7 +27,7 @@ StepperMotor::wakeTurnAndSleep(
         MotorDirection direction) {
 
     StepperIndexer::wake();
-    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
     // assert each step has delay to ensure motion to next step
@@ -52,7 +52,7 @@ StepperMotor::turnAndHold(
         unsigned int   steps,
         MotorDirection direction) {
 
-    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
     // assert each step has delay to ensure motion to next step
@@ -78,6 +78,24 @@ StepperMotor::turnAndHold(
 }
 
 
+void
+StepperMotor::turnAndHoldMicrosteps(
+        unsigned int   microsteps,
+        MotorDirection direction) {
+
+    DriverChipInterface::setDirectionAndHold(direction);
+    // assert little delay occurred and coils enabled
+
+    // assert each microstep has delay to ensure motion to next step
+
+    for (int i = microsteps-1; i>0; i--) {
+        StepperIndexer::stepMicrostepMaxSpeed();
+    }
+
+    StepperIndexer::delayForSettling();
+}
+
+
 // TODO hardcoded for 20 step motor
 void
 StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction) {
@@ -93,7 +111,7 @@ StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction) {
 void
 StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection direction) {
 
-    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
     // Steps accelerate and decellerate
@@ -112,7 +130,7 @@ StepperMotor::turnAcceleratedStepsAndHold(
         unsigned int   stepCount,
         MotorDirection direction) {
 
-    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
     // Steps accelerate and decelerate
@@ -138,11 +156,12 @@ StepperMotor::isFault() {
 }
 
 
-void StepperMotor::findPhysicalStop(MotorDirection direction) {
+void
+StepperMotor::findPhysicalStop(MotorDirection direction) {
 
 
     StepperIndexer::wake();
-    DriverChipInterface::setDirection(direction);
+    DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
     /*
@@ -163,3 +182,16 @@ void StepperMotor::findPhysicalStop(MotorDirection direction) {
     IndexerChipState::setMicrostepState(2);
 }
 
+
+void
+StepperMotor::jiggle() {
+    /*
+     * TODO
+     * This assumes current direction is
+     * TODO
+     * This is for quarter microstep
+     * TODO this may jerk since it sets direction with disabling coils
+     */
+    StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Forward);
+    StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Backward);
+}

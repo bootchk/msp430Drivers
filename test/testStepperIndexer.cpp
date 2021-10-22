@@ -172,20 +172,20 @@ void testBackAndForth() {
      */
 
     delayBetweenTests();
-    DriverChipInterface::setDirection(MotorDirection::Forward);
+    DriverChipInterface::setDirectionAndRelease(MotorDirection::Forward);
     step360Jerky();
     delayBetweenTests();
-    DriverChipInterface::setDirection(MotorDirection::Backward);
+    DriverChipInterface::setDirectionAndRelease(MotorDirection::Backward);
     step360Jerky();
 
     delayBetweenTests();
-    DriverChipInterface::setDirection(MotorDirection::Backward);
+    DriverChipInterface::setDirectionAndRelease(MotorDirection::Backward);
     //step360Smooth();
 
     delayBetweenTests();
-    DriverChipInterface::setDirection(MotorDirection::Forward);
+    DriverChipInterface::setDirectionAndRelease(MotorDirection::Forward);
     step360Slowly();
-    DriverChipInterface::setDirection(MotorDirection::Backward);
+    DriverChipInterface::setDirectionAndRelease(MotorDirection::Backward);
     step360Slowly();
 }
 
@@ -226,9 +226,9 @@ testHomeState() {
     // assert is wake
 
     for (unsigned int i = 20; i>0; i--) {
-        DriverChipInterface::setDirection(MotorDirection::Forward);
+        DriverChipInterface::setDirectionAndRelease(MotorDirection::Forward);
         wakeStepSleep();
-        DriverChipInterface::setDirection(MotorDirection::Backward);
+        DriverChipInterface::setDirectionAndRelease(MotorDirection::Backward);
         // undo forward
         wakeStepSleep();
     }
@@ -259,9 +259,23 @@ testPicking() {
 
             Delay::oneSecond();
         }
+}
 
 
 
+void
+testJiggling() {
+    DriverChipInterface::enableCoilDrive();
+   while(true) {
+       step360Smooth(MotorSpeed::Quarter);
+       delayBetweenTests();
+       // five jiggles
+       StepperMotor::jiggle();
+       StepperMotor::jiggle();
+       StepperMotor::jiggle();
+       StepperMotor::jiggle();
+       delayBetweenTests();
+   }
 }
 
 
@@ -300,8 +314,8 @@ testStepperIndexer() {
     // does not return
     //testQuarterRevs();
 
-    DriverChipInterface::enableCoilDrive();
-    while(true) step360Smooth(MotorSpeed::Half);
+    // does not return
+    testJiggling();
 
     while(true) {
 

@@ -134,6 +134,13 @@ StepperIndexer::stepDetentMaxSpeed() {
 
 
 void
+StepperIndexer::stepMicrostepMaxSpeed() {
+    DriverChipInterface::stepMicrostep();
+    delayMicrostepForMaxSpeed();
+}
+
+
+void
 StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
     /*
      * This is to move motor, require coils enabled.

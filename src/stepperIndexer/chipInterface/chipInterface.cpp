@@ -12,7 +12,7 @@
 
 namespace {
 
-void delayForDirectionChange() {
+void delayForDirectionChangeInertia() {
     /*
      * This is experimentally determined,
      * and depends on the motor and other parts of the system.
@@ -97,7 +97,7 @@ error
 
 
 
-void DriverChipInterface::setDirection(MotorDirection direction) {
+void DriverChipInterface::setDirectionAndRelease(MotorDirection direction) {
     /*
      * Disable coils in anticipation of next step in opposite direction.
      * !!! If the next step is not soon, holding torque is reduced.
@@ -118,12 +118,37 @@ void DriverChipInterface::setDirection(MotorDirection direction) {
         myAssert(false);
     }
 
-    delayForDirectionChange();
+    delayForDirectionChangeInertia();
 
     IndexerChipState::setDirection(direction);
 }
 
 
+void DriverChipInterface::setDirectionAndHold(MotorDirection direction) {
+    /*
+     * Not disable coils in anticipation of next step in opposite direction.
+     * If motor has inertia, next step might be ineffective
+     */
+
+    switch(direction) {
+    case MotorDirection::Forward:
+        GPIO_setOutputHighOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
+        break;
+    case MotorDirection::Backward:
+        GPIO_setOutputLowOnPin(STEPPER_DIR_PORT, STEPPER_DIR_PIN);
+        break;
+    default:
+        myAssert(false);
+    }
+
+    /*
+     * Delay for command but not for motor inertia.
+     */
+    delayForCommand();
+
+    // Remember SW state
+    IndexerChipState::setDirection(direction);
+}
 
 
 

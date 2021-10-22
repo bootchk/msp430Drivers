@@ -11,6 +11,20 @@
 
 class DriverChipInterface {
 public:
+
+
+    /*
+     * Delay for any command (other than wake) till next step
+     *
+     * Commands are GPIO changes to the chip:
+     * - direction change
+     * - enable outputs
+     * - microstep mode (usually hardwired, not runtime)
+     *
+     * Chip spec says 1 uS
+     */
+    static void delayForCommand();
+
     /*
      * Chip spec requires delay after any wake before chip is active.
      * Ensure 1 milliSec before any subsequent operations.
@@ -43,6 +57,8 @@ public:
     static void sleep();
 
 
+    static MotorDirection getDirection();
+
     /*
      * Change direction of motor.
      *
@@ -51,8 +67,18 @@ public:
      *
      * Has a built-in delay.
      */
-    static void setDirection(MotorDirection);
-    static MotorDirection getDirection();
+    static void setDirectionAndRelease(MotorDirection);
+
+    /*
+     * Change direction of motor.
+     *
+     * Coils remain enabled (holding torque.)
+     *
+     * Has NO built-in delay.
+     */
+    static void setDirectionAndHold(MotorDirection);
+
+
 
     /*
      * Disabled allows advancing current step in driver without moving motor.

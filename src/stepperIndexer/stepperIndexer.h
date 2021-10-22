@@ -83,7 +83,9 @@ private:
 
 
     /*
-     * Speed controlled microstep: built in delay.
+     * Not implemented
+     *
+     * Speed controlled microstep: built in delay for modal speed.
      *
      * Does not enforce sleepable.
      * If you call it an odd count of times, then sleep, motor will twitch into a detent position.
@@ -138,6 +140,8 @@ public:
      * !!! May be too fast to allow for acceleration.
      */
     static void stepDetentMaxSpeed();
+
+    static void stepMicrostepMaxSpeed();
 
     /*
      * Step a full step (to detent)

@@ -15,26 +15,11 @@
 
 
 
-namespace {
 
-
-/*
- * Delay for any command (other than wake) till next step
- *
- * ??? Not sure what commands are
- * Commands are:
- * - direction change
- * - enable outputs
- * - microstep mode (usually hardwired, not runtime)
- *
- */
-void delayForCommandChange() {
+void
+DriverChipInterface::delayForCommand() {
     Delay::oneMicrosecond();
 }
-
-} // namespace
-
-
 
 // TODO interrupt driven
 void
@@ -100,12 +85,12 @@ void DriverChipInterface::disableCoilDrive() {
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
     IndexerChipState::enableCoils(false);
-    delayForCommandChange();
+    delayForCommand();
 }
 void DriverChipInterface::enableCoilDrive() {
     GPIO_setOutputLowOnPin(
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
     IndexerChipState::enableCoils(true);
-    delayForCommandChange();
+    delayForCommand();
 }

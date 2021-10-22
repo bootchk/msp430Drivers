@@ -38,10 +38,17 @@ public:
     static void wakeTurnAndSleep(unsigned int steps, MotorDirection direction);
 
     /*
-     * Turn at maximum speed after one half speed step.
+     * Turn full steps at maximum speed.
+     * If steps >, first step is at half speed.
      * End with holding torque.
      */
     static void turnAndHold(unsigned int steps, MotorDirection direction);
+
+    /*
+     * Turn micro steps at maximum speed.
+     * End with holding torque.
+     */
+    static void turnAndHoldMicrosteps(unsigned int steps, MotorDirection direction);
 
     /*
      * Turn quarter rev with accel and decel.
@@ -76,5 +83,14 @@ public:
      * The arm must rest by gravity on the physical stop else since coils not energized, arm might move.
      */
     static void findPhysicalStop(MotorDirection);
+
+    /*
+     * Reverse direction, step half a detent step (typically 9 degrees),
+     * reverse direction, step half a detent step (typically 9 degrees).
+     * Ends in same position as started, in same direction.
+     *
+     * All with coils enabled (holding torque.)
+     */
+    static void jiggle();
 
 };
