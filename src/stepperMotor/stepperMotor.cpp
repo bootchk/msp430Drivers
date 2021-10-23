@@ -47,6 +47,7 @@ StepperMotor::wakeTurnAndSleep(
     StepperIndexer::sleep();
 }
 
+
 void
 StepperMotor::turnAndHold(
         unsigned int   steps,
@@ -88,7 +89,7 @@ StepperMotor::turnAndHoldMicrosteps(
 
     // assert each microstep has delay to ensure motion to next step
 
-    for (int i = microsteps-1; i>0; i--) {
+    for (int i = microsteps; i>0; i--) {
         StepperIndexer::stepMicrostepMaxSpeed();
     }
 
@@ -157,19 +158,29 @@ StepperMotor::isFault() {
 
 
 void
-StepperMotor::findPhysicalStop(MotorDirection direction) {
+StepperMotor::findPhysicalStopAndHold(MotorDirection direction) {
 
 
     StepperIndexer::wake();
     DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
 
-    /*
-     * Turn one revolution (enough to encounter the physical stop.)
-     */
+    // Turn one revolution (enough to encounter the physical stop.)
     StepperIndexer::stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, MotorSpeed::Quarter);
+}
 
+void
+StepperMotor::syncMotorWithModel() {
+
+    // The datasheet is not clear that sleep will disable coil drive.
     DriverChipInterface::disableCoilDrive();
+    /*
+     * The stop should be such that no other forces drive the motor off the stop.
+     * Otherwise, disableCoilDrive() will let those other forces move the motor off the stop.
+     *
+     * We disableCoilDrive() so the motor assumes the nearest undriven detent position.
+     * But we don't want the motor to move past that.
+     */
 
     // reset driver chip
     StepperIndexer::sleep();
@@ -190,7 +201,6 @@ StepperMotor::jiggle() {
      * This assumes current direction is
      * TODO
      * This is for quarter microstep
-     * TODO this may jerk since it sets direction with disabling coils
      */
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Forward);
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Backward);

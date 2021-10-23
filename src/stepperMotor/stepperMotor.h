@@ -75,19 +75,42 @@ public:
 
     /*
      * Rotate the motor enough to find a physical stop,
-     * then reset the chip so at the home state.
+     * Hold torque.
+     *
+     * When the physical stop is not aligned with a detent step,
+     * or if there are external forces,
+     * if you subsequently release torque the motor rotor may move away from the stop.
+     */
+    static void findPhysicalStopAndHold(MotorDirection);
+
+    /*
+     * Reset the chip so at the home state.
      * Leaves:
      * - chip awake
-     * - motor stationary at the hard stop.
      * - coils not energized
-     * The arm must rest by gravity on the physical stop else since coils not energized, arm might move.
+     * - SW model of the step state at "home"
+     *
+     * - motor stationary at the hard stop.
+     *
+     * When:
+     * - the arm rests by gravity on the physical stop
+     * - the physical stop is at a detent step
+     * Then the SW model of the step state (at "home")
+     * will be accurate to the actual state of the motor rotor.
+     *
+     * When those conditions are not true (re the physical stop)
+     * since coils not energized, the motor rotor might move,
+     * and then the SW model of the step state is NOT accurate
+     * to the actual state of the motor rotor.
      */
-    static void findPhysicalStop(MotorDirection);
+    static void syncMotorWithModel();
+
 
     /*
      * Reverse direction, step half a detent step (typically 9 degrees),
      * reverse direction, step half a detent step (typically 9 degrees).
-     * Ends in same position as started, in same direction.
+     * Ends in same position as started, in same direction as started.
+     * Usually the starting position was a detent step.
      *
      * All with coils enabled (holding torque.)
      */

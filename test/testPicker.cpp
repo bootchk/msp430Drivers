@@ -94,7 +94,7 @@ delayBetweenTests3() {
  * Arm
  */
 
-void initArm() {
+void initArmToClockwiseStop() {
     /*
      * require is awake.
      * Either always awake and 1mS since power on,
@@ -102,12 +102,22 @@ void initArm() {
      */
 
 
-    // Arm to home position.
-    StepperMotor::findPhysicalStop(MotorDirection::Backward);
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees
     StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+    // arm is upright
+}
+
+
+void initArmToCounterClockwiseStop() {
+    // Forward is CCW
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward);
+    // arm is against stop
+
+    // For 20 step motor, 18 degrees per step, turn 18 degrees CW
+    StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
     // arm is upright
 }
 
@@ -116,10 +126,13 @@ void lowerArmIntoBin() {
 }
 
 void peckArm() {
+#ifdef OLD
     StepperMotor::turnAndHold(1, MotorDirection::Forward);
     // arm slightly lifted
     StepperMotor::turnAndHold(1, MotorDirection::Backward);
     // arm back in bin
+#endif
+    StepperMotor::jiggle();
 }
 
 void raiseArm() {
@@ -350,7 +363,7 @@ testPicker() {
     // HW should be keeping stepper driver chip awake
     StepperMotor::delayUntilDriverChipAwake();
 
-    initArm();
+    initArmToCounterClockwiseStop();
     // Expect arm to move and find stop
 
     // Vacuum pump is always on

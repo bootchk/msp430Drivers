@@ -87,6 +87,7 @@ public:
      */
     static void disableCoilDrive();
     static void enableCoilDrive();
+    static bool isEnabledCoilDrive();
 
 
     /*

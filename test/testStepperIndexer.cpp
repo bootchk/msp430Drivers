@@ -238,7 +238,7 @@ testHomeState() {
 
 void
 testPicking() {
-    StepperMotor::findPhysicalStop(MotorDirection::Backward);
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees
@@ -269,11 +269,12 @@ testJiggling() {
    while(true) {
        step360Smooth(MotorSpeed::Quarter);
        delayBetweenTests();
-       // five jiggles
+       myAssert(DriverChipInterface::isEnabledCoilDrive());
+
        StepperMotor::jiggle();
-       StepperMotor::jiggle();
-       StepperMotor::jiggle();
-       StepperMotor::jiggle();
+       //StepperMotor::jiggle();
+       //StepperMotor::jiggle();
+       //StepperMotor::jiggle();
        delayBetweenTests();
    }
 }

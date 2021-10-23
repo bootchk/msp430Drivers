@@ -80,17 +80,25 @@ void DriverChipInterface::sleep() {
  *
  * DriverChip has internal pulldown i.e. unconnected pin is in "enable" state
  */
-void DriverChipInterface::disableCoilDrive() {
+void
+DriverChipInterface::disableCoilDrive() {
     GPIO_setOutputHighOnPin(
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
     IndexerChipState::enableCoils(false);
     delayForCommand();
 }
-void DriverChipInterface::enableCoilDrive() {
+void
+DriverChipInterface::enableCoilDrive() {
     GPIO_setOutputLowOnPin(
             STEPPER_ENABLE_COILS_PORT,
             STEPPER_ENABLE_COILS_PIN);
     IndexerChipState::enableCoils(true);
     delayForCommand();
 }
+bool
+DriverChipInterface::isEnabledCoilDrive() {
+    return IndexerChipState::isCoilsEnabled();
+}
+
+
