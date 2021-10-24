@@ -92,7 +92,7 @@
 // The board hardwires step size to a full detent step, pin M0 is grounded
 //#define STEPPER_MICROSTEP_SIZE_FULL 1
 // The board hardwires step size to a half detent step, pin M0 is high
-// #define STEPPER_MICROSTEP_SIZE_HALF 1
+//#define STEPPER_MICROSTEP_SIZE_HALF 1
 // The board hardwires step size to a quarter detent step, pin M0 is floating
 #define STEPPER_MICROSTEP_SIZE_QUARTER 1
 

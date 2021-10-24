@@ -28,6 +28,11 @@ public:
 
     static void delayUntilDriverChipAwake();
 
+
+    /*
+     * Turns bracketed with wake and sleep.
+     */
+
     /*
      * Turns at maximum rate, ending in coils deenergized and sleep.
      *
@@ -38,6 +43,15 @@ public:
     static void wakeTurnAndSleep(unsigned int steps, MotorDirection direction);
 
     /*
+     * Turn quarter rev with accel and decel.
+     * End condition is sleep i.e. no holding torque.
+     */
+    static void wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction);
+
+
+
+
+    /*
      * Turn full steps at maximum speed.
      * If steps >1, first step is at half speed.
      * End with holding torque.
@@ -46,21 +60,18 @@ public:
 
     /*
      * Turn full steps at given speed.
+     * Requires coils energized.
      * End with holding torque.
      */
     static void turnAndHoldAtSpeed(unsigned int steps, MotorDirection direction, MotorSpeed speed);
 
     /*
      * Turn micro steps at maximum speed.
+     * Requires coils energized.
      * End with holding torque.
      */
     static void turnAndHoldMicrosteps(unsigned int steps, MotorDirection direction);
 
-    /*
-     * Turn quarter rev with accel and decel.
-     * End condition is sleep i.e. no holding torque.
-     */
-    static void wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction);
 
     /*
      * Turn quarter rev with accel and decel.
@@ -69,7 +80,10 @@ public:
     static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
 
     /*
-     * Turn the given steps, direction, then hold.
+     * Turn the given steps, direction.
+     * Steps accelerate and decelerate if more than one.
+     * Requires coils energized.
+     * End with holding torque.
      */
     static void turnAcceleratedStepsAndHold(unsigned int stepCount, MotorDirection direction);
 
@@ -87,7 +101,7 @@ public:
      * or if there are external forces,
      * if you subsequently release torque the motor rotor may move away from the stop.
      */
-    static void findPhysicalStopAndHold(MotorDirection);
+    static void findPhysicalStopAndHold(MotorDirection, MotorSpeed);
 
     /*
      * Reset the chip so at the home state.

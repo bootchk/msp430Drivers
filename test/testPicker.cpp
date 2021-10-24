@@ -102,7 +102,7 @@ void initArmToClockwiseStop() {
      */
 
 
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward);
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Max);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees
@@ -113,7 +113,7 @@ void initArmToClockwiseStop() {
 
 void initArmToCounterClockwiseStop() {
     // Forward is CCW
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward);
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Max);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 18 degrees CW

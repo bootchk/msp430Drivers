@@ -195,18 +195,18 @@ void testBackAndForth() {
  * Expect: motor move one step (say 1/20 rev i.e. 18 degrees)
  */
 void wakeStepSleep() {
-           //StepperIndexer::sleep();
+   //StepperIndexer::sleep();
 
-            StepperIndexer::wake();
-            // assert wake restored driver to motor step
+    StepperIndexer::wake();
+    // assert wake restored driver to motor step
 
-            // Step one detent with a fixed delay
-            StepperIndexer::stepDetentWithDelay(100);
+    // Step one detent with a fixed delay
+    StepperIndexer::stepDetentWithDelay(100);
 
-            StepperIndexer::sleep();
+    StepperIndexer::sleep();
 
-            Delay::hundredMilliseconds();
-            Delay::hundredMilliseconds();
+    Delay::hundredMilliseconds();
+    Delay::hundredMilliseconds();
 }
 
 
@@ -234,10 +234,13 @@ testHomeState() {
 }
 
 
-
+/*
+ * Old design.
+ * Where we find stop CW, start from the stop, then turn 54 degrees
+ */
 void
 testPicking() {
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward);
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Max);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees
@@ -261,6 +264,49 @@ testPicking() {
 }
 
 
+/*
+ * New design where we start 18 degrees from the stop
+ */
+void
+testPicking2() {
+    // Find stop CW
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Half);  // Max
+    delayBetweenTests();
+
+    // Forward is CCW
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Half);
+    // arm is against stop
+    delayBetweenTests();
+
+    //StepperMotor::turnAndHoldAtSpeed(1, MotorDirection::Backward, MotorSpeed::Quarter);
+    // ??? not work
+    StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
+    // arm is upright
+    delayBetweenTests();
+
+    while (true) {
+            StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Backward);
+            // arm is in bin
+            delayBetweenTests();
+
+            // Peck
+            StepperMotor::jiggle();
+            StepperMotor::jiggle();
+            StepperMotor::jiggle();
+            StepperMotor::jiggle();
+            StepperMotor::jiggle();
+            // arm is in bin again
+            delayBetweenTests();
+
+            StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+            // arm is upright
+
+            delayBetweenTests();
+            delayBetweenTests();
+        }
+}
+
+
 
 void
 testJiggling() {
@@ -279,6 +325,16 @@ testJiggling() {
 }
 
 
+void
+testSimpleHold() {
+    // Test energized coils.
+    // Grab the arm and see how many degrees to the next strong hold
+    DriverChipInterface::enableCoilDrive();
+    // ??? does not seem to be holding torque yet
+    turnQuarterRevAndHold(MotorDirection::Forward);
+    // hold torque forever
+    while (true)  ;
+}
 
 
 void
@@ -301,19 +357,15 @@ testStepperIndexer() {
     // StepperIndexer::syncDriverWithMotor();
     //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
 
-
     // does not return
     //testPicking();
+    testPicking2();
 
     // does not return
     //testPecking();
 
-    // See what energized coils hold
-    DriverChipInterface::enableCoilDrive();
-    // ??? does not seem to be holding torque yet
-    turnQuarterRevAndHold(MotorDirection::Forward);
-    while (true)  ;
-
+    // does not return
+    testSimpleHold();
 
     // does not return
     testQuarterRevs();

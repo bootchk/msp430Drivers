@@ -86,8 +86,8 @@ StepperMotor::turnAndHoldAtSpeed(
         )
 {
 
-    // Ensure coil driven, because otherwise step are ineffective
-    DriverChipInterface::enableCoilDrive();
+    // Require coil energized, otherwise step are ineffective
+    myAssert(IndexerChipState::isCoilsEnabled());
 
     DriverChipInterface::setDirectionAndHold(direction);
 
@@ -104,6 +104,8 @@ void
 StepperMotor::turnAndHoldMicrosteps(
         unsigned int   microsteps,
         MotorDirection direction) {
+
+    myAssert(IndexerChipState::isCoilsEnabled());
 
     DriverChipInterface::setDirectionAndHold(direction);
     // assert little delay occurred and coils enabled
@@ -152,15 +154,16 @@ StepperMotor::turnAcceleratedStepsAndHold(
         unsigned int   stepCount,
         MotorDirection direction) {
 
-    DriverChipInterface::setDirectionAndRelease(direction);
-    DriverChipInterface::enableCoilDrive();
+    myAssert(IndexerChipState::isCoilsEnabled());
+
+    DriverChipInterface::setDirectionAndHold(direction);
 
     // Steps accelerate and decelerate
 
     // First step at half speed
     StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
 
-    for (unsigned int i=stepCount-2; i>0; i--) {
+    for (int i=stepCount-2; i>0; i--) {
         // steps 2, n-1 at full speed
         StepperIndexer::stepDetentAtSpeed(MotorSpeed::Max);
     }
@@ -179,16 +182,28 @@ StepperMotor::isFault() {
 
 
 void
-StepperMotor::findPhysicalStopAndHold(MotorDirection direction) {
-
-
+StepperMotor::findPhysicalStopAndHold(
+        MotorDirection direction,
+        MotorSpeed     speed )
+{
     StepperIndexer::wake();
+
+#ifdef OLD
     DriverChipInterface::setDirectionAndRelease(direction);
     DriverChipInterface::enableCoilDrive();
+#else
+    DriverChipInterface::enableCoilDrive();
+    DriverChipInterface::setDirectionAndHold(direction);
+#endif
 
+#ifdef OLD
     // Turn one revolution (enough to encounter the physical stop.)
-    StepperIndexer::stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, MotorSpeed::Quarter);
+    StepperIndexer::stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, speed);
+#else
+    turnAcceleratedStepsAndHold(MOTOR_STEPS_PER_REV, direction);
+#endif
 }
+
 
 void
 StepperMotor::syncMotorWithModel() {
