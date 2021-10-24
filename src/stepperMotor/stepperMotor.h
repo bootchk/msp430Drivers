@@ -31,7 +31,7 @@ public:
     /*
      * Turns at maximum rate, ending in coils deenergized and sleep.
      *
-     * Includes all delays for accelleration, speed, and decelleration.
+     * Includes all delays for acceleration, speed, and deceleration.
      *
      * When done, motor rotor is stopped at a detent and motor deenergized.
      */
@@ -39,10 +39,16 @@ public:
 
     /*
      * Turn full steps at maximum speed.
-     * If steps >, first step is at half speed.
+     * If steps >1, first step is at half speed.
      * End with holding torque.
      */
-    static void turnAndHold(unsigned int steps, MotorDirection direction);
+    static void turnAndHoldAccelerated(unsigned int steps, MotorDirection direction);
+
+    /*
+     * Turn full steps at given speed.
+     * End with holding torque.
+     */
+    static void turnAndHoldAtSpeed(unsigned int steps, MotorDirection direction, MotorSpeed speed);
 
     /*
      * Turn micro steps at maximum speed.

@@ -88,7 +88,8 @@ StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
 void
 StepperIndexer::stepManyDetentsAtSpeed(
         unsigned int stepCount,
-        MotorSpeed speed) {
+        MotorSpeed speed)
+{
     for (unsigned int i = stepCount; i>0; i--) {
         stepDetentAtSpeed(speed);
     }

@@ -100,9 +100,9 @@ void step360Slowly() {
     }
 }
 
-void turnQuarterRev(MotorDirection direction) {
+void turnQuarterRevAndHold(MotorDirection direction) {
     // 5 steps @18degrees is 90 degrees
-    StepperMotor::wakeTurnAndSleep(5, direction);
+    StepperMotor::turnAndHoldAtSpeed(5, direction, MotorSpeed::Quarter);
 }
 
 #ifdef OLD
@@ -141,8 +141,8 @@ testPecking() {
         //StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection::Forward);
 
         // Peck
-        StepperMotor::turnAndHold(1, MotorDirection::Backward);
-        StepperMotor::turnAndHold(1, MotorDirection::Forward);
+        StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Backward);
+        StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Forward);
 
         StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Backward);
 
@@ -154,11 +154,10 @@ testPecking() {
 void
 testQuarterRevs() {
     while (true) {
-        turnQuarterRev(MotorDirection::Forward);
-
-        // assert is sleep
-        turnQuarterRev(MotorDirection::Backward);
-
+        turnQuarterRevAndHold(MotorDirection::Forward);
+        myAssert(DriverChipInterface::isEnabledCoilDrive());
+        Delay::oneSecond();
+        turnQuarterRevAndHold(MotorDirection::Backward);
         Delay::oneSecond();
     }
 }
@@ -250,8 +249,8 @@ testPicking() {
             // arm is in bin
 
             // Peck
-            StepperMotor::turnAndHold(1, MotorDirection::Forward);
-            StepperMotor::turnAndHold(1, MotorDirection::Backward);
+            StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Forward);
+            StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Backward);
             // arm is in bin again
 
             StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
@@ -302,9 +301,6 @@ testStepperIndexer() {
     // StepperIndexer::syncDriverWithMotor();
     //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
 
-    // Uncomment to test disabling
-    //StepperIndexer::disableOutput();
-
 
     // does not return
     //testPicking();
@@ -312,8 +308,15 @@ testStepperIndexer() {
     // does not return
     //testPecking();
 
+    // See what energized coils hold
+    DriverChipInterface::enableCoilDrive();
+    // ??? does not seem to be holding torque yet
+    turnQuarterRevAndHold(MotorDirection::Forward);
+    while (true)  ;
+
+
     // does not return
-    //testQuarterRevs();
+    testQuarterRevs();
 
     // does not return
     testJiggling();

@@ -35,6 +35,13 @@ enum class MotorDirection {
     Backward
 };
 
+enum class MotorSpeed {
+    Max,
+    Half,
+    Quarter,
+    Slow
+};
+
 
 
 class IndexerChipState {

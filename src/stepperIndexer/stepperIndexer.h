@@ -53,14 +53,9 @@
  */
 
 
-#include "chipInterface/chipState.h"  // MotorDirection
+#include "chipInterface/chipState.h"  // MotorDirection, MotorSpeed
 
-enum class MotorSpeed {
-    Max,
-    Half,
-    Quarter,
-    Slow
-};
+
 
 
 class StepperIndexer {

@@ -49,7 +49,7 @@ StepperMotor::wakeTurnAndSleep(
 
 
 void
-StepperMotor::turnAndHold(
+StepperMotor::turnAndHoldAccelerated(
         unsigned int   steps,
         MotorDirection direction) {
 
@@ -74,6 +74,27 @@ StepperMotor::turnAndHold(
     if (StepperIndexer::isFault())
         myAssert(false);
 #endif
+
+    StepperIndexer::delayForSettling();
+}
+
+void
+StepperMotor::turnAndHoldAtSpeed(
+        unsigned int   steps,
+        MotorDirection direction,
+        MotorSpeed     speed
+        )
+{
+
+    // Ensure coil driven, because otherwise step are ineffective
+    DriverChipInterface::enableCoilDrive();
+
+    DriverChipInterface::setDirectionAndHold(direction);
+
+    // assert each step has delay to ensure motion to next step
+    for (int i = steps; i>0; i--) {
+        StepperIndexer::stepDetentAtSpeed(speed);
+    }
 
     StepperIndexer::delayForSettling();
 }

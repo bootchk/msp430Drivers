@@ -96,6 +96,7 @@ DriverChipInterface::enableCoilDrive() {
     IndexerChipState::enableCoils(true);
     delayForCommand();
 }
+
 bool
 DriverChipInterface::isEnabledCoilDrive() {
     return IndexerChipState::isCoilsEnabled();
