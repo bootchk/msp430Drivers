@@ -59,11 +59,11 @@ public:
     static void turnAndHoldAccelerated(unsigned int steps, MotorDirection direction);
 
     /*
-     * Turn full steps at given speed.
+     * Turn full steps in given direction at given speed.
      * Requires coils energized.
      * End with holding torque.
      */
-    static void turnAndHoldAtSpeed(unsigned int steps, MotorDirection direction, MotorSpeed speed);
+    static void turnStepsDirectionSpeedAndHold(unsigned int steps, MotorDirection direction, MotorSpeed speed);
 
     /*
      * Turn micro steps at maximum speed.
@@ -135,5 +135,10 @@ public:
      * All with coils enabled (holding torque.)
      */
     static void jiggle();
+
+    /*
+     * Same as above but in the opposite rotation.
+     */
+    static void reverseJiggle();
 
 };

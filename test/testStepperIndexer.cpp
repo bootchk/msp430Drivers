@@ -102,7 +102,7 @@ void step360Slowly() {
 
 void turnQuarterRevAndHold(MotorDirection direction) {
     // 5 steps @18degrees is 90 degrees
-    StepperMotor::turnAndHoldAtSpeed(5, direction, MotorSpeed::Quarter);
+    StepperMotor::turnStepsDirectionSpeedAndHold(5, direction, MotorSpeed::Quarter);
 }
 
 #ifdef OLD

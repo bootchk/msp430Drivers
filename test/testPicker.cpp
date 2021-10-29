@@ -1,10 +1,6 @@
 
 /*
  * Test prototype picker.
- *
- * pneumo valve,
- *
- *
  */
 
 // DriverLib
@@ -32,19 +28,57 @@
 // To exam using debugger
 static float failedPressure;
 
+/*
+ * Calculated once at startup.
+ * Constant for duration of session.
+ */
+static float AmbientPressure;
+static float PressureThresholdLowVacuum;
+static float PressureThresholdHighVacuum;
+
+
+
 static unsigned int consecutiveCountFaultDropping = 0;
 static unsigned int consecutiveCountFaultPicking = 0;
 
 /*
- *  Count times to read pressure before declaring fault.
+ *  Count times to read pressure before declaring unrecoverable fault.
  *
- *  Also the count of actions i.e. retries to achieve pressure
- *
- *  5mS per read, so the delay is about 15mS
+ *  5mS per read, so the delay is about 50mS
  */
-#define PressureReadsPerFault 3
+#define PressureReadsPerUnrecoverableFault 10
+
+/*
+ * Count times to read pressure before declaring recoverable fault.
+ *
+ * Operation continues.
+ * May result in a skipped pick.
+ */
+#define PressureReadsPerRecoverableFault 10
 
 
+/*
+ * How many recoverable faults, consecutively,
+ * justify operator intervention.
+ */
+#define ConsecutiveRecoverableFaultsPerAbort 3
+
+
+/*
+ * How many full steps in a dip and raise of the arm.
+ *
+ * 3 * 18 degrees == 54 degrees
+ * 4 * 18 degrees == 72 degrees
+ */
+#define StepsPerArmDip  4
+
+#define MicrostepsLoweringIntoSeeds 4   // Quarter microsteps
+
+
+/*
+ * From CCW stop to home (upright)
+ */
+#define StepsToHomeFromCCWStop 1
 
 
 // configure all GPIO out (to ensure low power)
@@ -83,18 +117,35 @@ void setAllOutputsLow3() {
 
 
 
-void
-delayBetweenTests3() {
-    Delay::oneSecond();
-    Delay::oneSecond();
-}
+
 
 
 /*
  * Arm
  */
 
-void initArmToClockwiseStop() {
+void
+initArmToHome() {
+    // We don't need to find stop CW
+    //StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Half);
+    //Delay::oneSecond();
+
+    // Forward is CCW
+    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Half);
+    // arm is against stop, which is 18 degrees CCW of upright.
+    Delay::oneSecond();
+
+    StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
+    // arm is upright
+    Delay::oneSecond();
+}
+
+
+/*
+ * Used to find home when the bin is the clockwise stop.
+ */
+void
+initArmToClockwiseStop() {
     /*
      * require is awake.
      * Either always awake and 1mS since power on,
@@ -106,24 +157,39 @@ void initArmToClockwiseStop() {
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 54 degrees
-    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
+    StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Forward);
     // arm is upright
 }
 
-
+/*
+ * Used to find home at 18 degrees from counter clockwise stop.
+ */
 void initArmToCounterClockwiseStop() {
     // Forward is CCW
     StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Max);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 18 degrees CW
-    StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
+    StepperMotor::turnAcceleratedStepsAndHold(StepsToHomeFromCCWStop, MotorDirection::Backward);
     // arm is upright
 }
 
 void lowerArmIntoBin() {
-    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Backward);
+    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Backward, MotorSpeed::Sixteenth);
+    //StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Backward);
 }
+
+void raiseArm() {
+    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Forward, MotorSpeed::Sixteenth);
+    // StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Forward);
+}
+
+// Lower but not into the bin, 18 degrees short
+void
+lowerArmToAboveBin() {
+    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip -1, MotorDirection::Backward, MotorSpeed::Sixteenth);
+}
+
 
 void peckArm() {
 #ifdef OLD
@@ -132,12 +198,13 @@ void peckArm() {
     StepperMotor::turnAndHold(1, MotorDirection::Backward);
     // arm back in bin
 #endif
-    StepperMotor::jiggle();
+    myAssert(false);    // unimplemented
 }
 
-void raiseArm() {
-    StepperMotor::turnAcceleratedStepsAndHold(3, MotorDirection::Forward);
-}
+void jiggleArm() { StepperMotor::jiggle(); }
+void reverseJiggleArm() { StepperMotor::reverseJiggle(); }
+
+
 
 
 
@@ -146,27 +213,49 @@ void raiseArm() {
  * Vacuum detection
  */
 
-// with vacuum pump off, is 14.6
-#define PRESSURE_THRESHOLD_LOW_VACUUM 14.55
-// with vacumm pump on and open pickup tube, 14.5
-#define PRESSURE_THRESHOLD_HIGH_VACUUM 14
-// with vacuum pump on and object picked, blocking pickup tube < 14
+/*
+ * With vacuum pump off, average ambient is about 14.6
+ *
+ * At sea level, barometric pressure range is [29,31] Hg (inches of mercury
+ * which is [14.24, 15.22] psi
+ *
+ * We defined thresholds relative to ambient
+ */
+/*
+ * With pump on and unblocked pickup tube, vacuum drops more than 0.2 from ambient
+ */
+#define PRESSURE_DIFFERENTIAL_LOW_VACUUM 0.2
+
+/*
+ * with vacuum pump on and blocked pickup tube, vacuum drops more than 0.6 from ambient
+ */
+#define PRESSURE_DIFFERENTIAL_HIGH_VACUUM 0.6
 
 
+void calculatePressureThresholds() {
 
+    // assert vacuum pump is off
+    AmbientPressure = MPRLS::readPressure();
+
+    PressureThresholdLowVacuum  = AmbientPressure - PRESSURE_DIFFERENTIAL_LOW_VACUUM;
+    PressureThresholdHighVacuum = AmbientPressure - PRESSURE_DIFFERENTIAL_HIGH_VACUUM;
+}
 
 
 bool
-waitForPressureAbove(float threshold) {
-    int   count;
-   float pressure;
+waitForPressureAbove(
+        unsigned int maxAttempts,
+        float        threshold)
+{
+   unsigned int   countAttempts;
+   float          pressure;
 
-   count = PressureReadsPerFault;
+   countAttempts = maxAttempts;
    pressure = MPRLS::readPressure();
    while (pressure < threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
-       count--;
-       if (count <0) {
+       countAttempts--;
+       if (countAttempts == 0) {
            failedPressure = pressure;
            return false;
        }
@@ -178,16 +267,19 @@ waitForPressureAbove(float threshold) {
 }
 
 bool
-waitForPressureBelow(float threshold) {
-   int   count;
-   float pressure;
+waitForPressureBelow(
+        unsigned int maxAttempts,
+        float threshold)
+{
+    unsigned int   countAttempts;
+    float          pressure;
 
-   count = PressureReadsPerFault;
+   countAttempts = maxAttempts;
    pressure = MPRLS::readPressure();
    while (pressure > threshold ) {
        // Pressure at pickup is just ambient (14.6), no vacuum (14.0)
-       count--;
-       if (count <0) {
+       countAttempts--;
+       if (countAttempts == 0) {
            failedPressure = pressure;
            return false;
        }
@@ -200,16 +292,48 @@ waitForPressureBelow(float threshold) {
 
 
 bool
-performActionUntilPressureBelow(float threshold, void func(void) ) {
-    int   count;
+performActionUntilPressureBelow(
+        unsigned int maxAttempts,
+        float        threshold,
+        void         func(void) )
+{
+    int   countAttempts;
     float pressure;
 
-    count = PressureReadsPerFault;
+    countAttempts = maxAttempts;
     pressure = MPRLS::readPressure();
 
-    while (pressure >threshold) {
-        count--;
-        if (count <0 ) {
+    while (pressure > threshold) {
+        countAttempts--;
+        if (countAttempts == 0 ) {
+            failedPressure = pressure;
+            return false;
+        }
+
+        // Pressure at pickup is just a soft vacuum (14.0)
+        func();
+        // Reread pressure
+        pressure = MPRLS::readPressure();
+        }
+    return true;
+}
+
+
+bool
+performActionUntilPressureAbove(
+        unsigned int maxAttempts,
+        float        threshold,
+        void         func(void) )
+{
+    int   countAttempts;
+    float pressure;
+
+    countAttempts = maxAttempts;
+    pressure = MPRLS::readPressure();
+
+    while (pressure < threshold) {
+        countAttempts--;
+        if (countAttempts == 0 ) {
             failedPressure = pressure;
             return false;
         }
@@ -275,8 +399,11 @@ pneumoValveAmbientToCommon() {
 
 
 
+
+
+
 /*
- * Evemts and faults.
+ * Events and faults.
  */
 
 void
@@ -292,6 +419,10 @@ faultVacuum() {
      * vacuum pump or valve failed
      */
     // TODO sound alarm
+
+    // both LEDs
+    LED::turnOnLED1();
+    LED::turnOnLED2();
     myAssert(false);
 }
 
@@ -301,10 +432,11 @@ faultDropping() {
      * Object not dropped
      * or pickup tube is blocked
      */
+    // Red
     LED::turnOnLED1();
 
     consecutiveCountFaultDropping += 1;
-    if (consecutiveCountFaultDropping > 3) {
+    if (consecutiveCountFaultDropping > ConsecutiveRecoverableFaultsPerAbort) {
         myAssert(false);
     }
 }
@@ -318,10 +450,11 @@ clearFaultDropping() {
 void
 faultPicking() {
     // Failed to pick object
+    // green LED on launchpad
     LED::turnOnLED2();
 
     consecutiveCountFaultPicking += 1;
-    if (consecutiveCountFaultPicking > 3) {
+    if (consecutiveCountFaultPicking > ConsecutiveRecoverableFaultsPerAbort) {
         myAssert(false);
     }
 }
@@ -335,6 +468,65 @@ void clearFaultPicking() {
 
 
 
+/*
+ * Phases of action.
+ *
+ * Side effects on faults
+ */
+void
+jiggleWhileNotSeedAttached() {
+    if ( ! performActionUntilPressureBelow(
+            PressureReadsPerRecoverableFault,
+            PressureThresholdHighVacuum,
+            jiggleArm) )
+        // Might not return
+        faultPicking();
+    else
+        clearFaultPicking();
+}
+
+void
+ensurePickupTubeNotBlocked() {
+
+    if ( ! performActionUntilPressureAbove(
+                    PressureReadsPerRecoverableFault,
+                    PressureThresholdHighVacuum,
+                    reverseJiggleArm) )
+        // Might not return
+        faultDropping();
+        /*
+         * We proceed to pick.  It may dislodge the stuck object and pick up a new one,
+         * or it may think the stuck object is a successful pick.
+         *
+         * If it persists, we will abort.
+         */
+    else
+        clearFaultDropping();
+}
+
+
+/*
+ * Lower by microsteps 18 degrees while checking for vacuum.
+ */
+
+void microstepInto() {
+    StepperMotor::turnAndHoldMicrosteps(1, MotorDirection::Backward);
+}
+
+bool
+lowerArmLastStepIntoBin() {
+    bool result;
+    result = performActionUntilPressureBelow(
+                        MicrostepsLoweringIntoSeeds,
+                        PressureThresholdHighVacuum,
+                        microstepInto);
+    // Might be deep in the seeds if no seed attached yet
+    // Result: is seed attached?
+    return result;
+}
+
+
+//Partial test.
 
 static void
 testPecking() {
@@ -345,6 +537,7 @@ testPecking() {
 }
 
 
+// Full test
 void
 testPicker() {
 
@@ -363,10 +556,23 @@ testPicker() {
     // HW should be keeping stepper driver chip awake
     StepperMotor::delayUntilDriverChipAwake();
 
-    initArmToCounterClockwiseStop();
-    // Expect arm to move and find stop
+    calculatePressureThresholds();
 
-    // Vacuum pump is always on
+    initArmToHome();
+    // Expect arm to move to home position: upright
+
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+
+    // TODO turn vacuum pump on
 
     // Pneumo valve is usually closed, giving mild vacuum to the pickup
 
@@ -377,31 +583,32 @@ testPicker() {
         // Vacuum applied to sensor and pickup tube
         pneumoValveVacuumToCommon();
 
-        if ( !waitForPressureBelow(PRESSURE_THRESHOLD_LOW_VACUUM ) )
-            // Does not return
+        if ( !waitForPressureBelow(
+                PressureReadsPerUnrecoverableFault,
+                PressureThresholdLowVacuum ) )
+            /*
+             * Unrecoverable, requires operator intervention.
+             * Does not return
+             */
             faultVacuum();
 
         /*
-         * Ensure pickup tube is not blocked.
          * Although we think we dropped an object,
          * another object could have been picked up, or dust accumulated.
          */
-        if ( ! waitForPressureAbove(PRESSURE_THRESHOLD_HIGH_VACUUM) )
-            // Might not return
-            faultDropping();
-        else
-            clearFaultDropping();
+        ensurePickupTubeNotBlocked();
 
-        lowerArmIntoBin();
+        //lowerArmIntoBin();
 
-        // While not suction because seed is attached, peck
-        if ( ! performActionUntilPressureBelow(PRESSURE_THRESHOLD_HIGH_VACUUM, peckArm) )
-            // Might not return
-            faultPicking();
-        else
-            clearFaultPicking();
+        lowerArmToAboveBin();
+        if ( ! lowerArmLastStepIntoBin() )
+            jiggleWhileNotSeedAttached();
+
+        // Seed attached, or fault
 
         raiseArm();
+
+        Delay::oneSecond();
 
         // Stop sucking, ambient pressure to pickup
         // Expect picked object to drop
@@ -414,6 +621,10 @@ testPicker() {
          * That is, we don't here check that the object dropped, we check a little later.
          */
 
-        delayBetweenTests3();
+        Delay::oneSecond();
+        Delay::oneSecond();
+        Delay::oneSecond();
     }
 }
+
+// TODO fault go back to home position, restart

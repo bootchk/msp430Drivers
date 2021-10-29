@@ -148,9 +148,7 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
      */
     myAssert(IndexerChipState::isCoilsEnabled());
 
-    /*
-     * Do appropriate count of microsteps each followed by appropriate delay.
-     */
+    // Appropriate count of microsteps each followed by appropriate delay.
 
 #if STEPPER_MICROSTEP_SIZE_FULL
     // Each microstep is one full detentstep
@@ -205,6 +203,13 @@ StepperIndexer::delayMicrostepForSpeed(MotorSpeed speed) {
         delayMicrostepForMaxSpeed();
         delayMicrostepForMaxSpeed();
         delayMicrostepForMaxSpeed();
+        break;
+    case MotorSpeed::Sixteenth:
+        // Recurse
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
         break;
     default:
         myAssert(false);

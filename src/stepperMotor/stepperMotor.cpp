@@ -79,7 +79,7 @@ StepperMotor::turnAndHoldAccelerated(
 }
 
 void
-StepperMotor::turnAndHoldAtSpeed(
+StepperMotor::turnStepsDirectionSpeedAndHold(
         unsigned int   steps,
         MotorDirection direction,
         MotorSpeed     speed
@@ -200,7 +200,10 @@ StepperMotor::findPhysicalStopAndHold(
     // Turn one revolution (enough to encounter the physical stop.)
     StepperIndexer::stepManyDetentsAtSpeed(MOTOR_STEPS_PER_REV, speed);
 #else
-    turnAcceleratedStepsAndHold(MOTOR_STEPS_PER_REV, direction);
+    turnStepsDirectionSpeedAndHold(MOTOR_STEPS_PER_REV, direction, MotorSpeed::Quarter);
+
+    // Not accelerated, seems to hang.
+    //turnAcceleratedStepsAndHold(MOTOR_STEPS_PER_REV, direction);
 #endif
 }
 
@@ -229,15 +232,20 @@ StepperMotor::syncMotorWithModel() {
     IndexerChipState::setMicrostepState(2);
 }
 
-
+/*
+ * TODO
+ * This assumes current direction is
+ * TODO
+ * This is for quarter microstep
+ */
 void
 StepperMotor::jiggle() {
-    /*
-     * TODO
-     * This assumes current direction is
-     * TODO
-     * This is for quarter microstep
-     */
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Forward);
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Backward);
+}
+
+void
+StepperMotor::reverseJiggle() {
+    StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Backward);
+    StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Forward);
 }
