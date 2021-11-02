@@ -111,7 +111,7 @@ StepperIndexer::stepDetentMaxSpeed() {
 #if STEPPER_MICROSTEP_SIZE_FULL
     // Each microstep is one full detentstep
     DriverChipInterface::stepMicrostep();
-    delayMicrostepForMaxSpeed());
+    delayMicrostepForMaxSpeed();
 
 #elif STEPPER_MICROSTEP_SIZE_HALF
     // Two microstep per detentstep
@@ -232,6 +232,8 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
     // 100 PPS is 5 RPS, 300 RPM
 #if MOTOR_MAX_PPS == 100
     StepperIndexer::delayFor100PPS();
+#elif MOTOR_MAX_PPS == 6500
+    StepperIndexer::delayFor6000PPS();
 #else
     error
 #endif

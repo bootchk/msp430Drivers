@@ -18,7 +18,7 @@
 // Proto has:
 
 // stepper
-#include "../src/stepperMotor/stepperMotor.h"
+#include "../src/stepperMotor/degreeStepperMotor.h"
 // MPRLS pressure sensor on I2C bus
 #include "../src/pressureSensor/MPRLS.h"
 // switch to a pneumo valve
@@ -70,7 +70,13 @@ static unsigned int consecutiveCountFaultPicking = 0;
  * 3 * 18 degrees == 54 degrees
  * 4 * 18 degrees == 72 degrees
  */
-#define StepsPerArmDip  4
+#define StepsPerArmDip   4
+#define DegreesPerArmDip 54
+
+
+#define DegreesUprightToAboveBin  54
+
+#define JiggleDegrees             18
 
 #define MicrostepsLoweringIntoSeeds 4   // Quarter microsteps
 
@@ -78,7 +84,8 @@ static unsigned int consecutiveCountFaultPicking = 0;
 /*
  * From CCW stop to home (upright)
  */
-#define StepsToHomeFromCCWStop 1
+#define StepsToHomeFromCCWStop    1
+#define DegreesToHomeFromCCWStop  18
 
 
 // configure all GPIO out (to ensure low power)
@@ -127,15 +134,17 @@ void setAllOutputsLow3() {
 void
 initArmToHome() {
     // We don't need to find stop CW
-    //StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Half);
+    //DegreeStepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Half);
     //Delay::oneSecond();
 
     // Forward is CCW
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Half);
-    // arm is against stop, which is 18 degrees CCW of upright.
+    DegreeStepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Half);
+    // arm is against stop, which is certain degrees CCW of upright.
     Delay::oneSecond();
 
-    StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
+    // StepperMotor::turnAcceleratedStepsAndHold(1, MotorDirection::Backward);
+    // TODO define constant
+    DegreeStepperMotor::turnAndHoldDegrees(18, MotorDirection::Backward, MotorSpeed::Half);
     // arm is upright
     Delay::oneSecond();
 }
@@ -153,56 +162,75 @@ initArmToClockwiseStop() {
      */
 
 
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Max);
+    DegreeStepperMotor::findPhysicalStopAndHold(MotorDirection::Backward, MotorSpeed::Max);
     // arm is against stop
 
-    // For 20 step motor, 18 degrees per step, turn 54 degrees
-    StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Forward);
+    // StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Forward);
+    DegreeStepperMotor::turnAndHoldDegrees(DegreesPerArmDip, MotorDirection::Forward, MotorSpeed::Quarter);
     // arm is upright
 }
 
 /*
- * Used to find home at 18 degrees from counter clockwise stop.
+ * Used to find home at certain degrees from counter clockwise stop.
  */
 void initArmToCounterClockwiseStop() {
     // Forward is CCW
-    StepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Max);
+    DegreeStepperMotor::findPhysicalStopAndHold(MotorDirection::Forward, MotorSpeed::Max);
     // arm is against stop
 
     // For 20 step motor, 18 degrees per step, turn 18 degrees CW
-    StepperMotor::turnAcceleratedStepsAndHold(StepsToHomeFromCCWStop, MotorDirection::Backward);
+    // StepperMotor::turnAcceleratedStepsAndHold(StepsToHomeFromCCWStop, MotorDirection::Backward);
+    DegreeStepperMotor::turnAndHoldDegrees(DegreesToHomeFromCCWStop, MotorDirection::Backward, MotorSpeed::Quarter);
     // arm is upright
 }
 
 void lowerArmIntoBin() {
-    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Backward, MotorSpeed::Sixteenth);
+    DegreeStepperMotor::turnAndHoldDegrees(DegreesPerArmDip, MotorDirection::Backward, MotorSpeed::Quarter);
+    //StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Backward, MotorSpeed::Sixteenth);
     //StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Backward);
 }
 
 void raiseArm() {
-    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Forward, MotorSpeed::Sixteenth);
+    DegreeStepperMotor::turnAndHoldDegrees(DegreesPerArmDip, MotorDirection::Forward, MotorSpeed::Quarter);
+    // StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip, MotorDirection::Forward, MotorSpeed::Sixteenth);
     // StepperMotor::turnAcceleratedStepsAndHold(StepsPerArmDip, MotorDirection::Forward);
 }
 
-// Lower but not into the bin, 18 degrees short
+// Lower but not into the bin, certain degrees short
 void
 lowerArmToAboveBin() {
-    StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip -1, MotorDirection::Backward, MotorSpeed::Sixteenth);
+    DegreeStepperMotor::turnAndHoldDegrees(DegreesUprightToAboveBin, MotorDirection::Backward, MotorSpeed::Quarter);
+    // StepperMotor::turnStepsDirectionSpeedAndHold(StepsPerArmDip -1, MotorDirection::Backward, MotorSpeed::Sixteenth);
 }
 
 
 void peckArm() {
 #ifdef OLD
-    StepperMotor::turnAndHold(1, MotorDirection::Forward);
+    DegreeStepperMotor::turnAndHold(1, MotorDirection::Forward);
     // arm slightly lifted
-    StepperMotor::turnAndHold(1, MotorDirection::Backward);
+    DegreeStepperMotor::turnAndHold(1, MotorDirection::Backward);
     // arm back in bin
 #endif
     myAssert(false);    // unimplemented
 }
 
-void jiggleArm() { StepperMotor::jiggle(); }
-void reverseJiggleArm() { StepperMotor::reverseJiggle(); }
+
+
+/*
+ * A jiggle is 18 degrees in opposite directions
+ */
+void jiggleArm() {
+    //StepperMotor::jiggle();
+    DegreeStepperMotor::turnAndHoldDegrees(JiggleDegrees, MotorDirection::Forward, MotorSpeed::Quarter);
+    DegreeStepperMotor::turnAndHoldDegrees(JiggleDegrees, MotorDirection::Backward, MotorSpeed::Quarter);
+}
+
+void reverseJiggleArm() {
+    // StepperMotor::reverseJiggle();
+    DegreeStepperMotor::turnAndHoldDegrees(JiggleDegrees, MotorDirection::Backward, MotorSpeed::Quarter);
+    DegreeStepperMotor::turnAndHoldDegrees(JiggleDegrees, MotorDirection::Forward, MotorSpeed::Quarter);
+}
+
 
 
 
@@ -505,21 +533,31 @@ ensurePickupTubeNotBlocked() {
 }
 
 
+
 /*
- * Lower by microsteps 18 degrees while checking for vacuum.
+ * Partial parameterization so signature of an action.
  */
+#ifdef TODO
 
 void microstepInto() {
     StepperMotor::turnAndHoldMicrosteps(1, MotorDirection::Backward);
 }
+#endif
 
+void stepInto() {
+    DegreeStepperMotor::turnAndHoldMinDegrees(MotorDirection::Backward, MotorSpeed::Quarter);
+}
+
+/*
+ * Lower by  18 degrees while checking for vacuum.
+ */
 bool
 lowerArmLastStepIntoBin() {
     bool result;
     result = performActionUntilPressureBelow(
                         MicrostepsLoweringIntoSeeds,
                         PressureThresholdHighVacuum,
-                        microstepInto);
+                        stepInto);
     // Might be deep in the seeds if no seed attached yet
     // Result: is seed attached?
     return result;
@@ -554,7 +592,7 @@ testPicker() {
     MPRLS::begin(MPRLS_DEFAULT_ADDR);
 
     // HW should be keeping stepper driver chip awake
-    StepperMotor::delayUntilDriverChipAwake();
+    DegreeStepperMotor::delayUntilDriverChipAwake();
 
     calculatePressureThresholds();
 

@@ -4,6 +4,7 @@
 #include <gpio.h>
 
 #include "../src/stepperMotor/stepperMotor.h"
+#include "../src/stepperMotor/degreeStepperMotor.h"
 #include <src/stepperIndexer/chipInterface/chipInterface.h>
 #include "../src/stepperIndexer/stepperIndexer.h"
 #include "../src/delay/delay.h"
@@ -102,7 +103,8 @@ void step360Slowly() {
 
 void turnQuarterRevAndHold(MotorDirection direction) {
     // 5 steps @18degrees is 90 degrees
-    StepperMotor::turnStepsDirectionSpeedAndHold(5, direction, MotorSpeed::Quarter);
+    // StepperMotor::turnStepsDirectionSpeedAndHold(5, direction, MotorSpeed::Quarter);
+    DegreeStepperMotor::turnAndHoldDegrees(90, direction, MotorSpeed::Quarter);
 }
 
 #ifdef OLD
@@ -135,7 +137,7 @@ void
 testPecking() {
     while (true) {
         // Forward and hold
-        StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Forward);
+        DegreeStepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Forward);
 
         // Forward and sleep
         //StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection::Forward);
@@ -144,7 +146,7 @@ testPecking() {
         StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Backward);
         StepperMotor::turnAndHoldAccelerated(1, MotorDirection::Forward);
 
-        StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Backward);
+        DegreeStepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection::Backward);
 
         Delay::oneSecond();
     }
@@ -359,16 +361,17 @@ testStepperIndexer() {
 
     // does not return
     //testPicking();
-    testPicking2();
+    //testPicking2();
 
     // does not return
-    //testPecking();
+    testPecking();
 
     // does not return
     testSimpleHold();
 
     // does not return
-    testQuarterRevs();
+    DriverChipInterface::enableCoilDrive();
+    //testQuarterRevs();
 
     // does not return
     testJiggling();

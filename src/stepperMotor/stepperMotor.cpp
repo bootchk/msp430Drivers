@@ -120,34 +120,6 @@ StepperMotor::turnAndHoldMicrosteps(
 }
 
 
-// TODO hardcoded for 20 step motor
-void
-StepperMotor::wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction) {
-    StepperIndexer::wake();
-
-    turnAcceleratedQuarterRevAndHold(direction);
-
-    DriverChipInterface::disableCoilDrive();
-    StepperIndexer::sleep();
-}
-
-
-void
-StepperMotor::turnAcceleratedQuarterRevAndHold(MotorDirection direction) {
-
-    DriverChipInterface::setDirectionAndRelease(direction);
-    DriverChipInterface::enableCoilDrive();
-
-    // Steps accelerate and decellerate
-    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Quarter);
-    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
-    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Max);
-    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Half);
-    StepperIndexer::stepDetentAtSpeed(MotorSpeed::Quarter);
-
-    StepperIndexer::delayForSettling();
-}
-
 
 void
 StepperMotor::turnAcceleratedStepsAndHold(
@@ -249,3 +221,8 @@ StepperMotor::reverseJiggle() {
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Backward);
     StepperMotor::turnAndHoldMicrosteps(2, MotorDirection::Forward);
 }
+
+
+
+
+

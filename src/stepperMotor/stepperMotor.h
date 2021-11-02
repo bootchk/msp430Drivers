@@ -1,14 +1,16 @@
 /*
- * Highest level API for stepper.
+ * High level API for stepper.
  *
  * It understands:
  * - wake/sleep
  * - acceleration and deceleration
- *
+ * - steps, not degrees!!!
  */
 
 // implemented using stepper indexer drive chip
 #include "../stepperIndexer/chipInterface/chipState.h"
+
+
 
 class StepperMotor {
 public:
@@ -28,10 +30,14 @@ public:
 
     static void delayUntilDriverChipAwake();
 
-
     /*
-     * Turns bracketed with wake and sleep.
+     * Poll the fault bit.  Not useful on some driver chips because the fault resets itself.
      */
+    static bool isFault();
+
+
+
+
 
     /*
      * Turns at maximum rate, ending in coils deenergized and sleep.
@@ -42,11 +48,6 @@ public:
      */
     static void wakeTurnAndSleep(unsigned int steps, MotorDirection direction);
 
-    /*
-     * Turn quarter rev with accel and decel.
-     * End condition is sleep i.e. no holding torque.
-     */
-    static void wakeTurnAcceleratedQuarterRevAndSleep(MotorDirection direction);
 
 
 
@@ -74,12 +75,6 @@ public:
 
 
     /*
-     * Turn quarter rev with accel and decel.
-     * End condition is holding torque.
-     */
-    static void turnAcceleratedQuarterRevAndHold(MotorDirection direction);
-
-    /*
      * Turn the given steps, direction.
      * Steps accelerate and decelerate if more than one.
      * Requires coils energized.
@@ -88,10 +83,7 @@ public:
     static void turnAcceleratedStepsAndHold(unsigned int stepCount, MotorDirection direction);
 
 
-    /*
-     * Poll the fault bit.  Not useful on some driver chips because the fault resets itself.
-     */
-    static bool isFault();
+
 
     /*
      * Rotate the motor enough to find a physical stop,
