@@ -101,11 +101,7 @@ void step360Slowly() {
     }
 }
 
-void turnQuarterRevAndHold(MotorDirection direction) {
-    // 5 steps @18degrees is 90 degrees
-    // StepperMotor::turnStepsDirectionSpeedAndHold(5, direction, MotorSpeed::Quarter);
-    DegreeStepperMotor::turnAndHoldDegrees(90, direction, MotorSpeed::Quarter);
-}
+
 
 #ifdef OLD
 void turnAcceleratedQuarterRev(MotorDirection direction) {
@@ -153,15 +149,39 @@ testPecking() {
 }
 
 
+void turnQuarterRevAndHold(MotorDirection direction, MotorSpeed speed) {
+    // 5 steps @18degrees is 90 degrees
+    // StepperMotor::turnStepsDirectionSpeedAndHold(5, direction, MotorSpeed::Quarter);
+    DegreeStepperMotor::turnAndHoldDegrees(90, direction, speed);
+}
+
+
+void
+quarterRevBackAndForth(MotorSpeed speed)
+{
+    turnQuarterRevAndHold(MotorDirection::Forward, speed);
+    // Delay so we can see that 90 degrees is reached.
+    // When no delay, it seems to not move 90 degrees
+    delayBetweenTests();
+    turnQuarterRevAndHold(MotorDirection::Backward, speed);
+}
+
 void
 testQuarterRevs() {
     while (true) {
-        turnQuarterRevAndHold(MotorDirection::Forward);
+        turnQuarterRevAndHold(MotorDirection::Forward, MotorSpeed::Quarter);
         myAssert(DriverChipInterface::isEnabledCoilDrive());
         Delay::oneSecond();
-        turnQuarterRevAndHold(MotorDirection::Backward);
+        turnQuarterRevAndHold(MotorDirection::Backward, MotorSpeed::Quarter);
         Delay::oneSecond();
     }
+}
+
+void
+testQuarterRevsBackAndForth(MotorSpeed speed) {
+    turnQuarterRevAndHold(MotorDirection::Forward, speed);
+    delayBetweenTests();
+    turnQuarterRevAndHold(MotorDirection::Backward, speed);
 }
 
 
@@ -333,11 +353,30 @@ testSimpleHold() {
     // Grab the arm and see how many degrees to the next strong hold
     DriverChipInterface::enableCoilDrive();
     // ??? does not seem to be holding torque yet
-    turnQuarterRevAndHold(MotorDirection::Forward);
+    turnQuarterRevAndHold(MotorDirection::Forward, MotorSpeed::Quarter);
     // hold torque forever
     while (true)  ;
 }
 
+
+void
+testMotions()
+{
+    // Turn quarter revs at increasing speed
+    quarterRevBackAndForth(MotorSpeed::Sixteenth);
+    delayBetweenTests();
+    quarterRevBackAndForth(MotorSpeed::Eighth);
+    delayBetweenTests();
+    // SOYO NEMA fails some of these, skips, when current limit is low?
+    // This is about 1200 RPM ???
+    quarterRevBackAndForth(MotorSpeed::Quarter);
+    delayBetweenTests();
+    // SOYO NEMA fails these, skips, when current limit is low?
+    quarterRevBackAndForth(MotorSpeed::Half);
+    delayBetweenTests();
+    quarterRevBackAndForth(MotorSpeed::Max);
+    delayBetweenTests();
+}
 
 void
 testStepperIndexer() {
@@ -359,18 +398,28 @@ testStepperIndexer() {
     // StepperIndexer::syncDriverWithMotor();
     //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
 
+    DriverChipInterface::enableCoilDrive();
+
+    // Test just quarter revs
+    while (false) {
+        testQuarterRevsBackAndForth(MotorSpeed::Sixteenth);
+        delayBetweenTests();
+    }
+
+    while (true)
+        testMotions();
+
     // does not return
     //testPicking();
-    //testPicking2();
+    testPicking2();
 
     // does not return
-    testPecking();
+    //testPecking();
 
     // does not return
-    testSimpleHold();
+    //testSimpleHold();
 
     // does not return
-    DriverChipInterface::enableCoilDrive();
     //testQuarterRevs();
 
     // does not return
@@ -382,11 +431,11 @@ testStepperIndexer() {
 
         testBackAndForth();
 
-        delayBetweenTests();
+        //delayBetweenTests();
 
         //testHomeState();
 
-        delayBetweenTests();
+        //delayBetweenTests();
 
         // TODO stepQuarterRev();
         //testWakeStep();

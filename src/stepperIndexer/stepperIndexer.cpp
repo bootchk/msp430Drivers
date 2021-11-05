@@ -191,25 +191,27 @@ StepperIndexer::stepDetentAtSpeed(MotorSpeed speed) {
 void
 StepperIndexer::delayMicrostepForSpeed(MotorSpeed speed) {
     switch(speed) {
+    // Max calls another function
     case MotorSpeed::Max:
         delayMicrostepForMaxSpeed();
         break;
+
+    // All other speeds recurse
     case MotorSpeed::Half:
-        delayMicrostepForMaxSpeed();
-        delayMicrostepForMaxSpeed();
+        delayMicrostepForSpeed(MotorSpeed::Max);
+        delayMicrostepForSpeed(MotorSpeed::Max);
         break;
     case MotorSpeed::Quarter:
-        delayMicrostepForMaxSpeed();
-        delayMicrostepForMaxSpeed();
-        delayMicrostepForMaxSpeed();
-        delayMicrostepForMaxSpeed();
+        delayMicrostepForSpeed(MotorSpeed::Half);
+        delayMicrostepForSpeed(MotorSpeed::Half);
+        break;
+    case MotorSpeed::Eighth:
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
+        delayMicrostepForSpeed(MotorSpeed::Quarter);
         break;
     case MotorSpeed::Sixteenth:
-        // Recurse
-        delayMicrostepForSpeed(MotorSpeed::Quarter);
-        delayMicrostepForSpeed(MotorSpeed::Quarter);
-        delayMicrostepForSpeed(MotorSpeed::Quarter);
-        delayMicrostepForSpeed(MotorSpeed::Quarter);
+        delayMicrostepForSpeed(MotorSpeed::Eighth);
+        delayMicrostepForSpeed(MotorSpeed::Eighth);
         break;
     default:
         myAssert(false);
@@ -243,6 +245,8 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
 #if MOTOR_MAX_PPS == 100
     // For half stepping, pulse frequency is double
     StepperIndexer::delayFor200PPS();
+#elif MOTOR_MAX_PPS == 6500
+    StepperIndexer::delayFor12000PPS();
 #else
     error
 #endif
@@ -252,6 +256,8 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
 #if MOTOR_MAX_PPS == 100
     // For quarter stepping, pulse frequency is quadruple
     StepperIndexer::delayFor400PPS();
+#elif MOTOR_MAX_PPS == 6500
+    StepperIndexer::delayFor24000PPS();
 #else
     error
 #endif

@@ -78,7 +78,12 @@ static unsigned int consecutiveCountFaultPicking = 0;
 
 #define JiggleDegrees             18
 
+#ifdef OLD
 #define MicrostepsLoweringIntoSeeds 4   // Quarter microsteps
+#endif
+
+// For 200 step motor, to get 18 degrees
+#define StepsLoweringIntoSeeds      10
 
 
 /*
@@ -130,6 +135,43 @@ void setAllOutputsLow3() {
 /*
  * Arm
  */
+
+// Wiggle the arm to help visually distinguish forward and back
+void
+testArmMotion()
+{
+    DegreeStepperMotor::turnAndHoldDegrees(18, MotorDirection::Backward, MotorSpeed::Quarter);
+    Delay::oneSecond();
+    DegreeStepperMotor::turnAndHoldDegrees(18, MotorDirection::Forward, MotorSpeed::Quarter);
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    // Max speed
+    DegreeStepperMotor::turnAndHoldDegrees(18, MotorDirection::Backward, MotorSpeed::Max);
+    Delay::oneSecond();
+    DegreeStepperMotor::turnAndHoldDegrees(18, MotorDirection::Forward, MotorSpeed::Max);
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    // 90 degrees
+    DegreeStepperMotor::turnAndHoldDegrees(90, MotorDirection::Backward, MotorSpeed::Quarter);
+    Delay::oneSecond();
+    DegreeStepperMotor::turnAndHoldDegrees(90, MotorDirection::Forward, MotorSpeed::Quarter);
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+    // Max speed
+    DegreeStepperMotor::turnAndHoldDegrees(90, MotorDirection::Backward, MotorSpeed::Max);
+    Delay::oneSecond();
+    DegreeStepperMotor::turnAndHoldDegrees(90, MotorDirection::Forward, MotorSpeed::Max);
+    Delay::oneSecond();
+    Delay::oneSecond();
+    Delay::oneSecond();
+
+
+
+    Delay::oneSecond();
+}
 
 void
 initArmToHome() {
@@ -555,7 +597,7 @@ bool
 lowerArmLastStepIntoBin() {
     bool result;
     result = performActionUntilPressureBelow(
-                        MicrostepsLoweringIntoSeeds,
+                        StepsLoweringIntoSeeds,
                         PressureThresholdHighVacuum,
                         stepInto);
     // Might be deep in the seeds if no seed attached yet
@@ -595,6 +637,8 @@ testPicker() {
     DegreeStepperMotor::delayUntilDriverChipAwake();
 
     calculatePressureThresholds();
+
+    testArmMotion();
 
     initArmToHome();
     // Expect arm to move to home position: upright

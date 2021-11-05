@@ -36,6 +36,8 @@ DegreeStepperMotor::turnAndHoldDegrees(
      */
     int steps = degrees / DEGREES_PER_STEP;
 
+    DriverChipInterface::enableCoilDrive();
+
     StepperMotor::turnStepsDirectionSpeedAndHold(steps, direction, speed);
 }
 

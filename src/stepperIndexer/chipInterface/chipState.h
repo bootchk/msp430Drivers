@@ -39,6 +39,7 @@ enum class MotorSpeed {
     Max,
     Half,
     Quarter,
+    Eighth,
     Sixteenth
 };
 

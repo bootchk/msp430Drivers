@@ -11,13 +11,16 @@
  */
 
 void Delay::oneMicrosecond()     { __delay_cycles(1);}
-void Delay::hundredMicroseconds(){ __delay_cycles(100);}
+void Delay::hundredMicroseconds(){
+    __delay_cycles(100);
+}
 void Delay::halfMillisecond()    { __delay_cycles(500);}
 
-void Delay::oneMillisecond()     { __delay_cycles(1000);}
-void Delay::fiveMilliseconds()   { __delay_cycles(50000);}
-void Delay::tenMilliseconds()    { __delay_cycles(10000);}
-void Delay::hundredMilliseconds(){ __delay_cycles(100000);}
+// __delay_ms() not defined on this platform
+void Delay::oneMillisecond()     { __delay_cycles(   1000);}
+void Delay::fiveMilliseconds()   { __delay_cycles(   5000);}
+void Delay::tenMilliseconds()    { __delay_cycles(  10000);}
+void Delay::hundredMilliseconds(){ __delay_cycles( 100000);}
 void Delay::oneSecond()          { __delay_cycles(1000000);}
 
 
