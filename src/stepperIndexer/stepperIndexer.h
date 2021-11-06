@@ -67,9 +67,13 @@ private:
     static void delayFor400PPS();
     static void delayFor500PPS();
 
-    static void delayFor6000PPS();
-    static void delayFor12000PPS();
-    static void delayFor24000PPS(); // 24kHz
+    static void delayFor600PPS();
+    static void delayFor1_2kPPS();
+    static void delayFor2_4kPPS();
+
+    static void delayFor6kPPS();
+    static void delayFor12kPPS();
+    static void delayFor24kPPS(); // 24kHz
 
     /*
      * Delay for a run-time settable speed.

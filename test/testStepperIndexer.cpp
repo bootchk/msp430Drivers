@@ -359,6 +359,14 @@ testSimpleHold() {
 }
 
 
+/*
+ * Test increasing speeds until motor fails to turn quarter turn.
+ *
+ * For SOYO NEMA, all speeds greater than Quarter failed when MAX_PPS was 6500
+ * and current limit was too low.
+ *
+ * I reduced MAX_PPS_FULL_STEP to 600
+ */
 void
 testMotions()
 {
@@ -367,11 +375,8 @@ testMotions()
     delayBetweenTests();
     quarterRevBackAndForth(MotorSpeed::Eighth);
     delayBetweenTests();
-    // SOYO NEMA fails some of these, skips, when current limit is low?
-    // This is about 1200 RPM ???
     quarterRevBackAndForth(MotorSpeed::Quarter);
     delayBetweenTests();
-    // SOYO NEMA fails these, skips, when current limit is low?
     quarterRevBackAndForth(MotorSpeed::Half);
     delayBetweenTests();
     quarterRevBackAndForth(MotorSpeed::Max);

@@ -87,6 +87,29 @@ StepperIndexer::delayFor500PPS() {
     Delay::oneMillisecond();
 }
 
+void
+StepperIndexer::delayFor600PPS() {
+    delayFor1_2kPPS();
+    delayFor1_2kPPS();
+}
+
+
+void
+StepperIndexer::delayFor1_2kPPS()
+{
+    delayFor2_4kPPS();
+    delayFor2_4kPPS();
+}
+
+void
+StepperIndexer::delayFor2_4kPPS()
+{
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+    Delay::hundredMicroseconds();
+}
+
 /*
  * 6k PPS is 166 uS/pulse
  * 4k PPS is 250 uS/pulse
@@ -94,8 +117,9 @@ StepperIndexer::delayFor500PPS() {
  */
 
 // TODO so these are actually 2.5k full steps per second or 12.5 rev per second, or 720RPM
+#ifdef TODO
 void
-StepperIndexer::delayFor6000PPS() {
+StepperIndexer::delayFor6kPPS() {
     Delay::hundredMicroseconds();
     Delay::hundredMicroseconds();
     Delay::hundredMicroseconds();
@@ -103,16 +127,16 @@ StepperIndexer::delayFor6000PPS() {
 }
 
 void
-StepperIndexer::delayFor12000PPS() {
+StepperIndexer::delayFor12kPPS() {
     Delay::hundredMicroseconds();
     Delay::hundredMicroseconds();
 }
 
 void
-StepperIndexer::delayFor24000PPS() {
+StepperIndexer::delayFor24kPPS() {
     Delay::hundredMicroseconds();
 }
-
+#endif
 
 
 

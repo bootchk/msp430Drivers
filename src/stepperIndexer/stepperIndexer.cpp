@@ -232,32 +232,32 @@ StepperIndexer::delayMicrostepForMaxSpeed() {
     //
     // StepperIndexer::delayFor250PPS();
     // 100 PPS is 5 RPS, 300 RPM
-#if MOTOR_MAX_PPS == 100
+#if MOTOR_MAX_PPS_FULL_STEP == 100
     StepperIndexer::delayFor100PPS();
-#elif MOTOR_MAX_PPS == 6500
-    StepperIndexer::delayFor6000PPS();
+#elif MOTOR_MAX_PPS_FULL_STEP == 600
+    StepperIndexer::delayFor600PPS();
 #else
     error
 #endif
 
 #elif STEPPER_MICROSTEP_SIZE_HALF
 
-#if MOTOR_MAX_PPS == 100
+#if MOTOR_MAX_PPS_FULL_STEP == 100
     // For half stepping, pulse frequency is double
     StepperIndexer::delayFor200PPS();
-#elif MOTOR_MAX_PPS == 6500
-    StepperIndexer::delayFor12000PPS();
+#elif MOTOR_MAX_PPS_FULL_STEP == 600
+    StepperIndexer::delayFor1_2kPPS();
 #else
     error
 #endif
 
 #elif STEPPER_MICROSTEP_SIZE_QUARTER
 
-#if MOTOR_MAX_PPS == 100
+#if MOTOR_MAX_PPS_FULL_STEP == 100
     // For quarter stepping, pulse frequency is quadruple
     StepperIndexer::delayFor400PPS();
-#elif MOTOR_MAX_PPS == 6500
-    StepperIndexer::delayFor24000PPS();
+#elif MOTOR_MAX_PPS_FULL_STEP == 600
+    StepperIndexer::delayFor2_4kPPS();
 #else
     error
 #endif

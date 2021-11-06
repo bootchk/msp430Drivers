@@ -8,23 +8,42 @@
 #include <gpio.h>
 
 
+/*
+ * MOTOR_MAX_PPS is defined for full step pulses.
+ * More PPS are generated if microstepping is used.
+ *
+ * The max PPS of the driver chip is 250k.
+ *
+ * The max PPS of the motor sometimes is defined to imply the highest RPM
+ * the motor will turn at some torque (torque usually lower at high RPM.)
+ * Typically the RPM of a stepper is no more than 1200 or 20 RPS.
+ * For a 200 step motor, that implies a max PPS of 4k is typical.
+ *
+ * Here MOTOR_MAX_PPS is defined differently:
+ * It is the PPS (implying an RPM) that will start the motor turning under some load torque
+ * (which must be less than the max starting torque from the motor datasheet.)
+ */
+
+
 // Declare the motor
 // Uncomment one
 #define MOTOR_SOYO_NIDEC 1
 //#define MOTOR_SYMBOL_TECH 1
 
 
-
-
-// PPS is defined for full step pulses
-
 #if MOTOR_SOYO_NIDEC
 
 #define MOTOR_STEPS_PER_REV 200
 #define DEGREES_PER_STEP    1.8
 
-// for 1.95k RPM @200 steps/rev
-#define MOTOR_MAX_PPS       6500
+/*
+ * The datasheet shows a torque to PPS curve with a highest PPS of 6500PPS for full step.
+ * But the datasheet is suspect.
+ *
+ * Experiments show that the max PPS (for full detent steps) that will reliably turn the motor
+ * is
+ */
+#define MOTOR_MAX_PPS_FULL_STEP       600
 
 
 #elif MOTOR_SYMBOL_TECH
@@ -99,6 +118,10 @@
 // The board hardwires step size to a quarter detent step, pin M0 is floating
 #define STEPPER_MICROSTEP_SIZE_QUARTER 1
 
+/*
+ * Quarter stepping is best for SOYO NEMA motor.
+ * At full stepping and MAX_PPS of 600, get erratic motion at slow commanded speed.
+ */
 
 // Whether the driver chip's fault detect pin is connected to a GPIO
 #define STEPPER_FAULT_DETECT_USED 0
