@@ -35,10 +35,11 @@ void testPressureSensor();
 void testStepperDriver();
 void testLoadSwitch();
 void testPressureSensor();
-*/
 
 void testPicker();
 void testStepperIndexer();
+*/
+void testSunDial();
 
 
 
@@ -47,8 +48,9 @@ int main(void)
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
 	//testStepper();
-	testStepperIndexer();
+	//testStepperIndexer();
 	//testPicker();
+	testSunDial();
 
 
 	//testCompass();

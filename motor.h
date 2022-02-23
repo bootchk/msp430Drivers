@@ -27,8 +27,8 @@
 
 // Declare the motor
 // Uncomment one
-#define MOTOR_SOYO_NIDEC 1
-//#define MOTOR_SYMBOL_TECH 1
+//#define MOTOR_SOYO_NIDEC 1
+#define MOTOR_SYMBOL_TECH 1
 
 
 #if MOTOR_SOYO_NIDEC
@@ -64,7 +64,7 @@
  *
  * By experiment, 500 PPS loses track and 250PPS does not, for full step microstepping
  */
-#define MOTOR_MAX_PPS       100
+#define MOTOR_MAX_PPS_FULL_STEP       100
 
 #else
     error
