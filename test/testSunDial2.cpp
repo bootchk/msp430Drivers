@@ -12,88 +12,61 @@
 #include "../src/stepperIndexer/stepperIndexer.h"
 #include "../src/delay/delay.h"
 #include "../src/assert/myAssert.h"
+#include "../src/stepperMotor/standbyStepper.h"
+#include "../src/timer/timer.h"
 
 
 
 
 
 
+bool
+isPowerForStepping()
+{
+    // TODO
+    return true;
+}
 
 
-
-
-
-
-static void
-delayBetweenTests() {
+void
+delayInLowPowerMode()
+{
+    // TODO this is not low power
     Delay::oneSecond();
-    Delay::oneSecond();
+
+    LowPowerTimer::delaySecond();
 }
 
 
 
 /*
- * Expect: motor move one step (say 1/20 rev i.e. 18 degrees)
+ * Test stepping a motor,
+ * where the motor driver is unpowered between steps,
+ * and enter low power mode.
  */
-static void
-wakeStepSleep() {
-   //StepperIndexer::sleep();
-
-    StepperIndexer::wake();
-    // assert wake restored driver to motor step
-
-    DriverChipInterface::enableCoilDrive();
-    myAssert(DriverChipInterface::isEnabledCoilDrive());
-
-    // Step one detent with a fixed delay
-    StepperIndexer::stepDetentWithDelay(100);
-
-    StepperIndexer::sleep();
-    DriverChipInterface::disableCoilDrive();
-    myAssert( ! DriverChipInterface::isEnabledCoilDrive());
-
-
-}
-
-
-
 void
-testSunDial() {
+testSunDial2() {
 
-    //launchpadLEDOff();
     GpioGroup::setAllOutputsLow();
     GpioGroup::configureGPIOLowPower();
 
     PMM_unlockLPM5();
 
-    StepperIndexer::wake();
-    // assert in home state
-
-    // Not runtime configurable for some boards
-    // DriverChipInterface::toHalfStepSizeMode();
-
-    DriverChipInterface::getStepSize();
-
-    // StepperIndexer::syncDriverWithMotor();
-    //StepperIndexer::findPhysicalStop(MotorDirection::Backward);
-
-    DriverChipInterface::enableCoilDrive();
-
-    // Test steps
-    // Ensure holds at step when coils deenergized.
-    // Repeat with a delay after every revolution (to insure we are not missing steps)
-
+    /*
+     * Assert the high side load switch for the stepper driver is configured and off.
+     */
 
     while (true) {
-        wakeStepSleep();
+        if (isPowerForStepping())
+        {
+            StandbyStepperMotor::powerOnAndStepThenOff();
+        }
 
-        //StepperIndexer::stepDetentWithDelay(100);
-        // TODO deenergize
-
-        delayBetweenTests();
+        /*
+         * For testing purposes, we don't need to be in low power mode sleep.
+         * But it will drain the storage supercap sooner.
+         */
+        delayInLowPowerMode();
     }
-
-
-
 
 }

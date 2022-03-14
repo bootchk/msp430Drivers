@@ -38,8 +38,11 @@ void testPressureSensor();
 
 void testPicker();
 void testStepperIndexer();
-*/
+
 void testSunDial();
+*/
+
+void testSunDial2();
 
 
 
@@ -50,7 +53,8 @@ int main(void)
 	//testStepper();
 	//testStepperIndexer();
 	//testPicker();
-	testSunDial();
+	//testSunDial();
+	testSunDial2();
 
 
 	//testCompass();

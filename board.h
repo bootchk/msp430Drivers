@@ -381,3 +381,10 @@
 #define LOW_SIDE_SWITCH_PIN   GPIO_PIN7
 
 
+/*
+ * High side switch
+ */
+
+#define HIGH_SIDE_SWITCH_PORT  GPIO_PORT_P1
+#define HIGH_SIDE_SWITCH_PIN   GPIO_PIN7
+
