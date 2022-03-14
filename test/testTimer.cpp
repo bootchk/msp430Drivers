@@ -1,6 +1,7 @@
 
 #include "../src/timer/timer.h"
 #include "../src/pinFunction/allPins.h"
+#include "../src/delay/delay.h"
 
 // DriverLib
 #include <pmm.h>
@@ -10,14 +11,15 @@ void testTimer()
 {
     // assert WDT stopped by main
 
-    AllPins::setHighOutput();
+    AllPins::setLowOutput();
+    // Launchpad LED's off
 
     PMM_unlockLPM5();
 
     while (true)
     {
 
-        __delay_cycles(500000);
+        Delay::oneSecond();
         /*
          * Expect half second duration power step while in active mode
          */
@@ -27,7 +29,7 @@ void testTimer()
          * Expect 1 second lower power
          */
 
-        __delay_cycles(500000);
+        Delay::oneSecond();
 
         LowPowerTimer::delayTenMilliSeconds();
         /*

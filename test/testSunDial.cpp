@@ -2,10 +2,8 @@
 // DriverLib
 #include <pmm.h>
 
-// Operations on all GPIO pins
-#include "../src/gpio/gpioGroup.h"
 
-
+#include "../src/pinFunction/allPins.h"
 #include "../src/stepperMotor/stepperMotor.h"
 #include "../src/stepperMotor/degreeStepperMotor.h"
 #include <src/stepperIndexer/chipInterface/chipInterface.h>
@@ -61,8 +59,8 @@ void
 testSunDial() {
 
     //launchpadLEDOff();
-    GpioGroup::setAllOutputsLow();
-    GpioGroup::configureGPIOLowPower();
+    AllPins::setAllOutputsLow();
+    AllPins::configureGPIOLowPower();
 
     PMM_unlockLPM5();
 

@@ -51,7 +51,7 @@ public:
     // Can be convenience functions that call the above.
     // Depends on implementation
     static void delayFiveSeconds();
-    static void delaySecond();
+    // Not implemented static void delaySecond();
     static void delayHalfSecond();
     static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();

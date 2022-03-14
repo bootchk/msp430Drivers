@@ -1,6 +1,8 @@
 
 
 #include "../src/timer/timer.h"
+#include "../src/delay/delay.h"
+#include "../src/pinFunction/allPins.h"
 
 // DriverLib
 #include <pmm.h>
@@ -27,58 +29,10 @@
 
 
 
-/*
-static void launchpadLEDOff() {
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN0);
-    GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_PIN1);
-}
-*/
-
-static void setAllOutputsLow() {
-    P1OUT = 0x00; P2OUT = 0x00; P3OUT = 0x00;
-}
-
- // configure all GPIO out to ensure low power
-static void configureGPIOLowPower() {
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN1);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN2);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN3);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN4);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN5);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN6);
-    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN7);
-
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN0);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN1);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN2);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN3);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN4);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN5);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
-    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN7);
-
-    // Only 5 pins on port 3.
-    // Datasheet says only 3 pins??
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN1);
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN2);
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN3);
-    GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN4);
-}
-
-/*
-static void delayOneSecond() {
-    __delay_cycles(1000000);    // 1 second at 1Mhz clock
-}
-*/
-
-
 void testTimer2() {
 
-    //launchpadLEDOff();
-    setAllOutputsLow();
-    configureGPIOLowPower();
+    AllPins::setLowOutput();
+    AllPins::configureGPIOLowPower();
 
     PMM_unlockLPM5();
 
@@ -86,7 +40,6 @@ void testTimer2() {
 
     while(true) {
         LowPowerTimer::delayFiveSeconds();
-        //delayOneSecond();
-        __delay_cycles(1000000);
+        Delay::oneSecond();
     }
 }

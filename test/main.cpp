@@ -19,7 +19,9 @@ void testAlarm2();
 void testAlarm3();
 void testAlarmLPM45();
 void testAlarmLPM45AndTimer();
+
 void testTimer();
+
 void testLEDSensor();
 void testLED();
 void testLEDSensor2();
@@ -40,6 +42,7 @@ void testPicker();
 void testStepperIndexer();
 
 void testSunDial();
+void testSunDial2();
 */
 
 void testSunDial2();
@@ -55,6 +58,7 @@ int main(void)
 	//testPicker();
 	//testSunDial();
 	testSunDial2();
+	//testTimer2();
 
 
 	//testCompass();
