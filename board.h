@@ -368,9 +368,9 @@
 #define MotorCoilB2Pin GPIO_PIN6
 
 
-#define StepperDrivePowerSwitchPort   GPIO_PORT_P1
-#define StepperDrivePowerSwitchPin   GPIO_PIN7
-
+/*
+ * Which GPIO is used to power a stepper driver is defined for LoadSwitch
+ */
 
 
 /*
@@ -385,6 +385,6 @@
  * High side switch
  */
 
-#define HIGH_SIDE_SWITCH_PORT  GPIO_PORT_P1
-#define HIGH_SIDE_SWITCH_PIN   GPIO_PIN7
+#define HIGH_SIDE_SWITCH_PORT  GPIO_PORT_P2
+#define HIGH_SIDE_SWITCH_PIN   GPIO_PIN1
 

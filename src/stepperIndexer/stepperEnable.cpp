@@ -5,6 +5,8 @@
  */
 
 #include "stepperIndexer.h"
+// Get configuration
+#include "motor.h"
 
 // Uses chip driver
 #include <src/stepperIndexer/chipInterface/chipInterface.h>

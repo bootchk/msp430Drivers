@@ -3,23 +3,26 @@
 
 #include "board.h"
 
-// DriverLib
-#include <gpio.h>
-
-
+#include <src/loadSwitch/loadSwitch.h>
 
 
 
 #ifdef USE_STEPPER
 
 void StepperDriver::turnPowerOn() {
-    GPIO_setOutputHighOnPin(StepperDrivePowerSwitchPort,    StepperDrivePowerSwitchPin);
-    //P1OUT |= DrivePowerSwitch;
+    HighSideSwitch::turnOn();
+
+    // CRUFT
+    // GPIO_setOutputHighOnPin(StepperDrivePowerSwitchPort,    StepperDrivePowerSwitchPin);
+    // P1OUT |= DrivePowerSwitch;
     }
 
 void StepperDriver::turnPowerOff() {
+    HighSideSwitch::turnOn();
+
+    // CRUFT
     //P1OUT &= ~DrivePowerSwitch;
-    GPIO_setOutputLowOnPin(StepperDrivePowerSwitchPort,    StepperDrivePowerSwitchPin);
+    // GPIO_setOutputLowOnPin(StepperDrivePowerSwitchPort,    StepperDrivePowerSwitchPin);
     }
 
 

@@ -11,18 +11,27 @@
 #include "../src/assert/myAssert.h"
 #include "../src/stepperMotor/standbyStepper.h"
 #include "../src/timer/timer.h"
+#include "../src/ADC/adc.h"
+#include "../src/LED/led.h"
 
 
 
+#define SURPLUS_VCC_VOLTAGE 350
 
-
-
+/*
+ * Vcc is from a supercapacitor via a regulator to 3.6V.
+ * The supercapacitor is charged above 3.6V, say to 5.5V.
+ * When the supercapacitor drops below 3.6V (say arbitrarily to 3.5V)
+ * we know there is not an excess charge on the capacitor.
+ * Not enough to continue a high load: stepping a motor.
+ */
 bool
-isPowerForStepping()
+isSurplusEnergy()
 {
-    // TODO
-    return true;
+    unsigned int vccCentiVolts = ADC::measureVccCentiVolts();
+    return (vccCentiVolts > SURPLUS_VCC_VOLTAGE);
 }
+
 
 
 void
@@ -33,6 +42,24 @@ delayInLowPowerMode()
 
     LowPowerTimer::delaySeconds(1);
 }
+
+// Not surplus is green LED, surplus is red LED.
+void indicateSurplus()
+{
+    // Also light an LED, in case the motor movement is not sufficient to indicate.
+    // In the future, we may turn the motor only ever so often.
+    // In the future, the LED may be eInk, taking no power.
+    LED::turnOnLED1();
+    LED::turnOffLED2();
+}
+
+void indicateNotSurplus()
+{
+    LED::turnOnLED2();
+    LED::turnOffLED1();
+}
+
+
 
 
 
@@ -54,9 +81,18 @@ testSunDial2() {
      */
 
     while (true) {
-        if (isPowerForStepping())
+        if (isSurplusEnergy())
         {
+            // Enough surplus to turn the motor.
             StandbyStepperMotor::powerOnAndStepThenOff();
+
+            // Indicate that we might be turning the motor
+            // Redundant, in case the motor does not actually turn.
+            indicateSurplus();
+        }
+        else {
+            // Else indicate that we are not trying to turn the motor.
+            indicateNotSurplus();
         }
 
         /*
@@ -65,5 +101,4 @@ testSunDial2() {
          */
         delayInLowPowerMode();
     }
-
 }

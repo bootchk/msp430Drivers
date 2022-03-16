@@ -7,6 +7,8 @@
  *
  * For single-ended LED.
  * Understands LED may be sunk or sourced.
+ *
+ * Configured in board.h
  */
 
 class LED {

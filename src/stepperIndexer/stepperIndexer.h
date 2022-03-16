@@ -120,10 +120,13 @@ public:
     /*
      * Wake chip from sleep.
      * Built-in SW delay of 1mS (per chip datasheet.)
+     * Does not enable coil drives.
      */
     static void wake();
     /*
-     * Sleep the chip.  Chip enters its low power mode.
+     * Sleep the chip.
+     * Disable coil drive and sleep.
+     * Chip enters its low power mode.
      */
     static void sleep();
 

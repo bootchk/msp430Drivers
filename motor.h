@@ -31,6 +31,24 @@
 #define MOTOR_SYMBOL_TECH 1
 
 
+// Declare the driver chip and board
+#define DRIVER_POLOLU_TI8834 1
+
+
+// Overall configuration
+
+// Whether the driver chip's fault detect pin is connected to a GPIO
+#define STEPPER_FAULT_DETECT_USED 0
+
+/*
+ * Whether the driver chip's sleep pin is connected to a GPIO.
+ * It can be hardwired to a logic signal.
+ * It cannot be hardwired to the Vint pin (a high logic) of the DRV8834 chip.
+ */
+#define STEPPER_SLEEP_USED 1
+
+
+
 #if MOTOR_SOYO_NIDEC
 
 #define MOTOR_STEPS_PER_REV 200
@@ -73,8 +91,7 @@
 
 
 
-// Declare the driver chip and board
-#define DRIVER_POLOLU_TI8834 1
+
 
 #ifdef DRIVER_POLOLU_TI8834
 
@@ -123,28 +140,27 @@
  * At full stepping and MAX_PPS of 600, get erratic motion at slow commanded speed.
  */
 
-// Whether the driver chip's fault detect pin is connected to a GPIO
-#define STEPPER_FAULT_DETECT_USED 0
-// Whether the driver chip's sleep pin is connected to a GPIO
-#define STEPPER_SLEEP_USED 0
 
 
-// Declare pinout for DIR pin
+
+// pinout for DIR pin
 #define STEPPER_DIR_PORT GPIO_PORT_P1
 #define STEPPER_DIR_PIN  GPIO_PIN5
 
-// Declare pinout for STEP pin
+// pinout for STEP pin
 #define STEPPER_STEP_PORT GPIO_PORT_P1
 #define STEPPER_STEP_PIN  GPIO_PIN4
+
+
 
 #if STEPPER_SLEEP_USED
 // Declare pinout for notSLEEP pin
 #define STEPPER_NSLEEP_PORT GPIO_PORT_P1
-#define STEPPER_NSLEEP_PIN  GPIO_PINX
+#define STEPPER_NSLEEP_PIN  GPIO_PIN7
 #endif
 
 
-// Declare pinout for pin that enables motor coil outputs
+// Dpinout for Enable pin, that enables motor coil outputs
 #define STEPPER_ENABLE_COILS_PORT GPIO_PORT_P1
 #define STEPPER_ENABLE_COILS_PIN  GPIO_PIN6
 
@@ -153,7 +169,6 @@
 #define STEPPER_FAULT_PIN  GPIO_PIN7
 #endif
 
-
-#endif
+#endif  // DRV8834
 
 
