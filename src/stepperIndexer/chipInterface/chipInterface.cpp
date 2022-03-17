@@ -168,7 +168,7 @@ DriverChipInterface::stepMicrostep() {
      */
 
     /*
-     * Chip spec requires > 1.7uSec pulse high and low.
+     * Chip spec requires > 1.9uSec pulse high and low.
      * We assume procedure call overhead is enough
      * i.e. cpu speed is about 1Mhz and procedure call requires greater than two uSec.
      */

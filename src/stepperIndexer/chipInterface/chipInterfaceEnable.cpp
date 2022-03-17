@@ -63,7 +63,6 @@ DriverChipInterface::wake() {
 }
 
 void DriverChipInterface::sleep() {
-
     GPIO_setOutputLowOnPin(
             STEPPER_NSLEEP_PORT,
             STEPPER_NSLEEP_PIN);
@@ -102,4 +101,24 @@ DriverChipInterface::isEnabledCoilDrive() {
     return IndexerChipState::isCoilsEnabled();
 }
 
+
+void
+DriverChipInterface::configureIndexerMode() {
+    GPIO_setOutputHighOnPin(
+            STEPPER_CONFIG_MODE_PORT,
+            STEPPER_CONFIG_MODE_PIN);
+    /*
+     * Short delay to settle.
+     * Might not be necessary.
+     * The chip will latch it on power up, or exit sleep.
+     */
+    delayForCommand();
+}
+
+void DriverChipInterface::unconfigureIndexerMode() {
+    GPIO_setOutputLowOnPin(
+            STEPPER_CONFIG_MODE_PORT,
+            STEPPER_CONFIG_MODE_PIN);
+
+}
 

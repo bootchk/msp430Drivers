@@ -14,4 +14,11 @@ public:
      */
     static void powerOnAndStepThenOff();
 
+    /*
+     * Power on, with built-in delay for chip ready.
+     * Datasheet does not specify a timing requirement.
+     */
+    static void powerOn();
+
+
 };

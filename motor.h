@@ -160,7 +160,7 @@
 #endif
 
 
-// Dpinout for Enable pin, that enables motor coil outputs
+// pinout for Enable pin, that enables motor coil outputs
 #define STEPPER_ENABLE_COILS_PORT GPIO_PORT_P1
 #define STEPPER_ENABLE_COILS_PIN  GPIO_PIN6
 
@@ -168,6 +168,12 @@
 #define STEPPER_FAULT_PORT GPIO_PORT_P1
 #define STEPPER_FAULT_PIN  GPIO_PIN7
 #endif
+
+// pinout for CONFIG pin, sets mode to Indexer or Phase/Enable
+#define STEPPER_CONFIG_MODE_PORT GPIO_PORT_P2
+#define STEPPER_CONFIG_MODE_PIN  GPIO_PIN2
+
+
 
 #endif  // DRV8834
 

@@ -108,4 +108,15 @@ public:
     // Defined, but optionally conditionally compiled out
     static bool isFault();
     static void enableInterruptOnFault();
+
+    /*
+     * Set GPIO that holds DRV8834 pin Config high (chip in indexer mode)
+     */
+    static void configureIndexerMode();
+    /*
+     * Set corresponding GPIO low, so won't draw current in LPM.
+     * Usually called before unpowering DRV8834 chip.
+     */
+    static void unconfigureIndexerMode();
+
 };

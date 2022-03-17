@@ -15,8 +15,15 @@
 #include "../src/LED/led.h"
 
 
-
-#define SURPLUS_VCC_VOLTAGE 350
+/*
+ * For testing using power from debugger, use 320 (since it provides 3.3V)
+ */
+#define SURPLUS_VCC_VOLTAGE 330
+/*
+ * For testing using power from a separate power board (when debugger of Launchpad is not connected to MSP430)
+ * use 350 (when that power board provides VCC ranging from 2 to 3.6V)
+ */
+//#define SURPLUS_VCC_VOLTAGE 350
 
 /*
  * Vcc is from a supercapacitor via a regulator to 3.6V.
