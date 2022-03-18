@@ -2,6 +2,11 @@
 /*
  * A high level API for a stepper behind a load switch,
  * that is unpowered between uses.
+ *
+ * When unpowered, a stepper cogs,
+ * i.e. assumes a natural detent.
+ *
+ * This tries to keep the motor on a natural detent.
  */
 
 class StandbyStepperMotor {

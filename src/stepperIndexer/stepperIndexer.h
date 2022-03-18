@@ -94,17 +94,15 @@ private:
      */
     static void stepMicrostepAtSpeed();
 
+public:
     /*
-     * Step driver one detent step (may be many microsteps) as fast as possible.
+     * Step driver one microstep as fast as possible.
      * Require coils disabled.
      * Motor does not move.
+     * Used when syncing chip with actual motor position.
      */
-    // TODO what is the purpose?
-    static void fastStepDetent();
+    static void fastStepMicrostep();
 
-
-
-public:
 
     /*
      * ??? Not sure this is valid design???
@@ -147,6 +145,11 @@ public:
     static void stepDetentMaxSpeed();
 
     static void stepMicrostepMaxSpeed();
+
+    /*
+     * Microstep motor (and shadow) with delay.
+     */
+    static void stepMicrostepWDelay(unsigned int delayMillseconds);
 
     /*
      * Step a full step (to detent)

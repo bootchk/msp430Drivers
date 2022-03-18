@@ -176,6 +176,9 @@ DriverChipInterface::stepMicrostep() {
     // assert 2 uSec have passed
     GPIO_setOutputLowOnPin (STEPPER_STEP_PORT, STEPPER_STEP_PIN);
     // assert 2 uSec have passed
+
+    // Maintain the shadow step
+    IndexerChipState::advanceDriverShadowState();
 }
 
 

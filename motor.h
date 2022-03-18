@@ -131,9 +131,36 @@
 // The board hardwires step size to a full detent step, pin M0 is grounded
 //#define STEPPER_MICROSTEP_SIZE_FULL 1
 // The board hardwires step size to a half detent step, pin M0 is high
-//#define STEPPER_MICROSTEP_SIZE_HALF 1
+#define STEPPER_MICROSTEP_SIZE_HALF 1
 // The board hardwires step size to a quarter detent step, pin M0 is floating
-#define STEPPER_MICROSTEP_SIZE_QUARTER 1
+//#define STEPPER_MICROSTEP_SIZE_QUARTER 1
+
+
+/*
+ * Define constants related to microstep size.
+ *
+ * DRV8834 where home electrical angle is 45 degrees.
+ */
+#if STEPPER_MICROSTEP_SIZE_FULL
+    /*  When full steps are 2-phase enable, there are no microsteps where one coil is 100% */
+    error
+#elif STEPPER_MICROSTEP_SIZE_HALF
+    /*  1,3,5,7 are microsteps where one coil is 100% */
+    #define STEPPER_COGGING_STEP 1
+    #define HOME_MICROSTEP       2
+    #define COUNT_MICROSTEP_STATES  8
+
+#elif STEPPER_MICROSTEP_SIZE_QUARTER
+    /* 1,5,9,13 are microsteps where one coil is 100% */
+    #define STEPPER_COGGING_STEP 5
+    #define HOME_MICROSTEP       3
+    #define COUNT_MICROSTEP_STATES  16
+#else
+error
+#endif
+
+
+
 
 /*
  * Quarter stepping is best for SOYO NEMA motor.

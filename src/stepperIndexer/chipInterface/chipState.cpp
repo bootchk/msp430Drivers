@@ -5,6 +5,13 @@
 
 #include "motor.h"
 
+#include <src/assert/myAssert.h>
+
+
+
+// Include back up the tree, but not circular?
+#include "../stepperIndexer.h"
+
 
 namespace {
 
@@ -43,12 +50,7 @@ MotorDirection _direction = MotorDirection::Forward;
 
 bool _isCoilsEnabled = false;
 
-unsigned int  _microstepState = 2;
 
-
-} // namespace
-
-namespace {
 /*
  * Step of the DriverChip.
  * The DriverChip will not tell us what step it is on.
@@ -60,6 +62,7 @@ namespace {
 unsigned int shadowMicrostepOfDriver;
 
 
+// TODO motor state is not part of chip state, but belongs to the high level API
 /*
  * Step the motor is on.
  *
@@ -72,11 +75,14 @@ unsigned int shadowMicrostepOfDriver;
 /*
  * Persistent.
  * Even if you unpower the mcu, we remember the step of the motor.
+ *
+ * Initialized to an arbitrary cogging (natural detent) step.
+ * TODO ???? is this right.
+ * 1 is zero electrical angle.
  */
+
 #pragma PERSISTENT
-unsigned int shadowMicrostepOfMotor;
-
-
+unsigned int shadowMicrostepOfMotor = STEPPER_COGGING_STEP;
 }
 
 
@@ -121,40 +127,75 @@ IndexerChipState::enableCoils(bool isEnabled) {
 void
 IndexerChipState::rememberMotorStep(){
     // TODO shadowMicrostepOfMotor = shadowMicrostepOfDriver;
+    myAssert(false);
 }
 
 
 void
 IndexerChipState::setMicrostepState(unsigned int aStep) {
-    _microstepState = aStep;
+    shadowMicrostepOfDriver = aStep;
+}
+
+
+void
+IndexerChipState::setDriverShadowStateToHomeStep()
+{
+    /* See motor.h */
+    shadowMicrostepOfDriver = HOME_MICROSTEP;
+}
+
+
+// TODO this is for quarter stepping only
+// TODO this is for forward only
+void
+IndexerChipState::advanceDriverShadowState()
+{
+    shadowMicrostepOfDriver += 1;
+    // Rollover, using 1-based counting, same as documentation
+    if (shadowMicrostepOfDriver > COUNT_MICROSTEP_STATES)
+        shadowMicrostepOfDriver = 1;
+    // assert step state is in [1,COUNT_MICROSTEP_STATES]
+}
+
+
+// TODO this is for quarter stepping only
+void
+IndexerChipState::advanceMotorShadowState()
+{
+    shadowMicrostepOfMotor += 1;
+    // Rollover, using 1-based counting, same as documentation
+    if (shadowMicrostepOfMotor > COUNT_MICROSTEP_STATES)
+        shadowMicrostepOfMotor = 1;
 }
 
 
 
-/*
- * TODO
 // quietly => non-energized
 void
 IndexerChipState::restoreDriverToMotorStep() {
-    // assert motor is on a detentStep
-    // assert chip is wake, in fact just waked from sleep and reset
+    /*
+     * assert motor is on a detentStep
+     * assert chip is just waked from sleep and step is home step.
+     */
 
-    // 2 is the state after reset when half step mode
-    // TODO get the step number by step mode
-    setMicrostepState(2);
 
-    // Prevent motor movement
-    // TODO remember the actual state and restore it
+    /*
+     * Prevent motor movement while stepping the chip itself.
+     */
     DriverChipInterface::disableCoilDrive();
 
     while ( not (shadowMicrostepOfDriver == shadowMicrostepOfMotor) ) {
-        // Here we don't need a delay for speed, since motor is not turning, but we do need update shadow.
-        // TODO fastStepDetent();
+        /*
+         * Here we don't need a delay for speed, since motor is not turning, but we do need update shadow.
+         */
+        StepperIndexer::fastStepMicrostep();
+        // assert the chip's state, and the SW shadow step state, were advanced.
     }
 
-    DriverChipInterface::enableCoilDrive();
+    // We don't ensure the coils are re enabled.
+    // DriverChipInterface::enableCoilDrive();
 }
-*/
+
 
 
 /*

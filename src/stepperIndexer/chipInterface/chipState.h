@@ -62,6 +62,26 @@ public:
     static void           enableCoils(bool);
 
 
+    /*
+     * The driver has been powered on or unsleeped,
+     * and so the chip step state is at home.
+     * Make the SW state correspond.
+     */
+    static void setDriverShadowStateToHomeStep();
+
+    /*
+     * Advance the chip driver shadow state one step.
+     * Called when stepping the motor with coils disabled
+     * (when syncing.)
+     */
+    static void advanceDriverShadowState();
+
+    /*
+     * Advance the motor shadow state one step.
+     * Called when stepping the motor with coils enabled
+     */
+    static void advanceMotorShadowState();
+
 
     static void rememberMotorStep();
 
@@ -74,7 +94,8 @@ public:
 
     /*
      * Advance shadow state from home step to current step without energizing coils.
-     * This disables the driver outputs while stepping, to advance DriverChip internal state w/o moving motor.
+     * This disables the driver outputs while stepping,
+     * to advance DriverChip internal state w/o moving motor.
      */
     static void restoreDriverToMotorStep();
 };

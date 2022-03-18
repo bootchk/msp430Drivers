@@ -51,6 +51,8 @@ public:
      * Datasheet is not clear that sleep also disables outputs.
      *
      * Built-in delay for wake.
+     *
+     * Only sets/clears a GPIO.  Does NOT maintain shadow state.
      */
     // Defined, but optionally conditionally compiled out
     static void wake();

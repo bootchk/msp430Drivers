@@ -141,22 +141,31 @@ StepperIndexer::delayFor24kPPS() {
 
 
 void StepperIndexer::stepMicrostepAtSpeed() {
+    myAssert(IndexerChipState::isCoilsEnabled() == true);
 
-    // tell driver.  Driver has no explicit delays.
+    // Tell driver chip to step.
     DriverChipInterface::stepMicrostep();
+    // assert the shadow driver step was advanced.
 
+    // Also advance the shadow motor step
+    IndexerChipState::advanceMotorShadowState();
+
+    // Chip has no explicit delays.
     delayAccordingToSpeed();
 }
 
 
 
-void StepperIndexer::fastStepDetent() {
+void StepperIndexer::fastStepMicrostep() {
     myAssert(IndexerChipState::isCoilsEnabled() == false);
 
-    // TODO why only two microsteps??
-    // tell driver, not self (no delay)
+    /*
+     * Tell the chip to step.
+     * Since coils disabled, motor will not move.
+     * No delay.
+     */
     DriverChipInterface::stepMicrostep();
-    DriverChipInterface::stepMicrostep();
+    // assert the shadow microstep advanced.
 }
 
 

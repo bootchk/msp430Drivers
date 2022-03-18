@@ -55,6 +55,15 @@ void StepperIndexer::syncDriverWithMotor() {
  * Stepping
  */
 
+
+void
+StepperIndexer::stepMicrostepWDelay(unsigned int milliseconds) {
+    DriverChipInterface::stepMicrostep();
+    Delay::inMilliseconds(milliseconds);
+    IndexerChipState::advanceMotorShadowState();
+}
+
+
 void
 StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
     /*
@@ -71,14 +80,10 @@ StepperIndexer::stepDetentWithDelay(unsigned int milliseconds) {
     DriverChipInterface::stepMicrostep();
     Delay::inMilliseconds(milliseconds);
 #elif STEPPER_MICROSTEP_SIZE_QUARTER
-    DriverChipInterface::stepMicrostep();
-    Delay::inMilliseconds(milliseconds);
-    DriverChipInterface::stepMicrostep();
-    Delay::inMilliseconds(milliseconds);
-    DriverChipInterface::stepMicrostep();
-    Delay::inMilliseconds(milliseconds);
-    DriverChipInterface::stepMicrostep();
-    Delay::inMilliseconds(milliseconds);
+    StepperIndexer::stepMicrostepWDelay(milliseconds);
+    StepperIndexer::stepMicrostepWDelay(milliseconds);
+    StepperIndexer::stepMicrostepWDelay(milliseconds);
+    StepperIndexer::stepMicrostepWDelay(milliseconds);
 #else
     error
 #endif
@@ -120,6 +125,7 @@ StepperIndexer::stepDetentMaxSpeed() {
     DriverChipInterface::stepMicrostep();
     delayMicrostepForMaxSpeed();
 #elif STEPPER_MICROSTEP_SIZE_QUARTER
+
     DriverChipInterface::stepMicrostep();
     delayMicrostepForMaxSpeed();
     DriverChipInterface::stepMicrostep();

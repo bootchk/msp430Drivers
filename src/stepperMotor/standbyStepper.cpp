@@ -16,7 +16,7 @@ StandbyStepperMotor::powerOn()
 {
     /*
     * Configure mode,
-    * Mode is latched at power up and when cobing out of sleep.
+    * Mode is latched at power up and when coming out of sleep.
     * Failed to work when hardwired pin Config to pin Vint.
     */
    DriverChipInterface::configureIndexerMode();
@@ -32,6 +32,14 @@ StandbyStepperMotor::powerOn()
     * Experimentally determined.
     */
    Delay::oneMillisecond();
+
+   /*
+    * Set direction.
+    * Since we have set all GPIO low,
+    * the DIR pin is low and the chip direction is  TODO.
+    * TODO The rest of the code is temporatily assumes forward.
+    */
+   DriverChipInterface::setDirectionAndRelease(MotorDirection::Forward);
 }
 
 
@@ -54,12 +62,17 @@ StandbyStepperMotor::powerOnAndStepThenOff()
      */
 
     StepperIndexer::wake();
+    // assert chip step state is home state, but motor could be at another step
+
+    IndexerChipState::restoreDriverToMotorStep();
     // assert wake restored driver to motor step
 
     DriverChipInterface::enableCoilDrive();
     myAssert(DriverChipInterface::isEnabledCoilDrive());
 
-    // Step one detent with a fixed delay
+    /*
+     * Step one detent with a fixed delay.
+     */
     StepperIndexer::stepDetentWithDelay(100);
 
     /*
