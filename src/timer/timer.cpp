@@ -96,10 +96,20 @@ void LowPowerTimer::delaySeconds(unsigned int count) {
 
 #ifdef LOW_POWER_TIMER_USE_WDT
 
+void LowPowerTimer::delay48Seconds() {
+    VeryLowOscillator::ensureOn();
+    IntervalTimer::initForIntervalOf48Seconds();
+    IntervalTimer::start();
+    _low_power_mode_3();
+    __no_operation();
+    VeryLowOscillator::allowOff();
+    IntervalTimer::stop();
+}
+
 void LowPowerTimer::delaySecond() {
-    // Init the clock each time
-    VeryLowOscillator::start();
-    // Init RTC each time
+    // IntervalTimer uses VLO, which starts automatically when WDT requests is
+    VeryLowOscillator::ensureOn();
+    
     IntervalTimer::initForIntervalOfOneSecond();
 
     IntervalTimer::start();
@@ -111,9 +121,11 @@ void LowPowerTimer::delaySecond() {
     _low_power_mode_3();
     __no_operation();
 
-    // shutdown resources(
+    // shutdown resources
     // Let VLO stop when RTC stops using it
+    // TODO move this to interval timer
     VeryLowOscillator::allowOff();
+    
     IntervalTimer::stop();
 
 }
@@ -121,7 +133,7 @@ void LowPowerTimer::delaySecond() {
 
 void LowPowerTimer::delayTenMilliSeconds() {
    // See comments above
-    VeryLowOscillator::start();
+    
     IntervalTimer::initForIntervalOfTenMillisecond();
     IntervalTimer::start();
     _low_power_mode_3();

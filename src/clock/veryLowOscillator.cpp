@@ -24,6 +24,12 @@ void VeryLowOscillator::start() {
 }
 #endif
 
+// Ensure the VLO is on regardless of peripheral requests.
+// The opposite is allowOff.
+void VeryLowOscillator::ensureOn() {
+    CS_disableVLOAutoOff();
+}
+
 void VeryLowOscillator::allowOff() {
 #ifdef __MSP430FR2433__
     // Let VLO stop when RTC stops using it

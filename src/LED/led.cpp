@@ -18,7 +18,6 @@ void LED::configureLED1() {
     turnOffLED1();
 
 	GPIO_setAsOutputPin(APP_LED1_PORT,    APP_LED1_PIN);
-
 }
 
 void LED::configureLED2() {

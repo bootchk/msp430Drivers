@@ -50,9 +50,12 @@ public:
 
     // Can be convenience functions that call the above.
     // Depends on implementation
+
+    static void delay48Seconds();
     static void delayFiveSeconds();
-    // Not implemented static void delaySecond();
+    static void delaySecond();
     static void delayHalfSecond();
+
     static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();
     static void delayTwoMilliSeconds();

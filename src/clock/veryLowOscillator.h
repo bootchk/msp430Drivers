@@ -6,12 +6,13 @@
 class VeryLowOscillator {
 public:
 
-    // NOT USED static void start();
+    static void ensureOn();
 
     /*
-     * Allow stop after last module requests it.
-     *
-     * Reset default is allowOff, so this is unneccessary.
+    Let VLO stop itself after last module requests it.
+    
+    Reset default is allowOff, so this is unneccessary
+    when ensureOn was never called.
      */
     static void allowOff();
 };

@@ -22,6 +22,7 @@ public:
      * 8k        0.8 Sec (~1) implemented
      * 32k       3.2 Sec
      */
+    static void initForIntervalOf48Seconds();
     static void initForIntervalOfOneSecond();
     static void initForIntervalOfTenMillisecond();
 
