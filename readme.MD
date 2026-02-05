@@ -31,12 +31,39 @@ But you also need to add an include path (in the project properties) to the down
 Configuration
 =============
 
+The code has many compile time options, using C macros i.e. ifdefs.
+You configure those options by changing commented lines in various files.
+
 board.h defines the configuration of your PCB (the functions of GPIO pins of the mcu.)
+You must copy and modify board.h from the repo into your project.
 
-config.h defines other configuration of the library (for testing versus production.)
+Other configuration files are found in the /config dir.
 
-driverParameters defines constants for certain drivers
+config/driverParameters.h defines constants for certain drivers
+config/driverConfig.h chooses options of implementation in the library
+config/busConfig.h describes addresses on the I2C or SPI buses
 
+The CCS development system
+generates the file msp430.h
+as a configuration file.
+It describes your choice of specific model from the MSP430 family.
+It defines macro variables
+that are used (referenced) by DriverLib or this library or your code.
+
+Interrupt Service Routines
+==========================
+
+The ISR dir contains some.
+Usually you need to modify them.
+
+You should think of an ISR as an independent task.
+The provided ISR's do not just set flags
+for the main loop to handle.
+
+For example, the provided ISR for the watchdog time (WDT)
+is for the WDT used as an interval timer.
+All it does is restore the MCU to active mode
+(exiting LPM)
 
 Layers
 ======
