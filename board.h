@@ -373,18 +373,23 @@
  */
 
 
-/*
- * Low side switch
- */
+// Low side switch
 
 #define LOW_SIDE_SWITCH_PORT  GPIO_PORT_P1
 #define LOW_SIDE_SWITCH_PIN   GPIO_PIN7
 
 
-/*
- * High side switch
- */
+// High side switch
 
 #define HIGH_SIDE_SWITCH_PORT  GPIO_PORT_P2
 #define HIGH_SIDE_SWITCH_PIN   GPIO_PIN1
 
+
+
+
+// PWM out
+
+// msp430fr2433
+// P1.1
+#define PWM_PORT  GPIO_PORT_P1
+#define PWM_PIN   GPIO_PIN1
