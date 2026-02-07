@@ -13,7 +13,7 @@
 #include "../pinFunction/pwmPins.h"
 
 
-// This tells which timer peripheral used
+// Declare timer peripheral to use
 #define TIMER_BASE_ADDRESS TIMER_A0_BASE
 
 /*
@@ -26,6 +26,10 @@ For a higher freq, use a faster clock.
 
 void PWM::turnOff() {
 	Timer_A_stop(TIMER_BASE_ADDRESS);
+
+	// Stopping timer leaves the output indeterminate value, high or low.
+	// Ensure it is low.
+	PWMPins::configureToDigitalLow();
 }
 
 

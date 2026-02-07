@@ -4,10 +4,10 @@
 #include <board.h>
 
 
-
-void PWMPins::configure() {
+void PWMPins::configure()
+{
     // msp4302433 
-    // Choose P1.1 second module
+    // Route pin P1.1 to output of second module
     GPIO_setAsPeripheralModuleFunctionOutputPin(
         PWM_PORT,   PWM_PIN,  
         GPIO_SECONDARY_MODULE_FUNCTION);
@@ -15,3 +15,11 @@ void PWMPins::configure() {
     // Assert direction is out
     // Since the above is "OutputPin"
 };
+
+void
+PWMPins::configureToDigitalLow()
+{ 
+    GPIO_setOutputLowOnPin(PWM_PORT, PWM_PIN);
+    GPIO_setAsOutputPin(PWM_PORT, PWM_PIN);
+}
+
