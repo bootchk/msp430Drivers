@@ -1,5 +1,7 @@
 
 #include <msp430.h>
+#include <board.h>
+
 
 // TI driverlib
 #include <sysctl.h>
@@ -97,12 +99,14 @@ bool SoC::isResetWakeFromSleep() { return ResetReason::isResetAWakeFromSleep(); 
 
 
 void SoC::disableXT1() {
-#ifdef __MSP430FR2433__
-    CS_turnOffXT1();
-#else
-    CS_turnOffLFXT();
-#endif
+    /*
+    Macro resolves to either:
+    CS_turnOffXT1(); FR2xx
+    CS_turnOffLFXT(); FRxx
+    depending on target
+    */
 
+    disableLowXT();
 }
 
 void SoC::turnOffSMCLK()  { CS_turnOffSMCLK(); }

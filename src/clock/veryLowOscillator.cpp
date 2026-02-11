@@ -1,4 +1,6 @@
 
+#include <board.h>
+
 #include "veryLowOscillator.h"
 
 // Implementation uses Driverlib
@@ -31,12 +33,10 @@ void VeryLowOscillator::ensureOn() {
 }
 
 void VeryLowOscillator::allowOff() {
-#ifdef __MSP430FR2433__
+#ifdef __MSP430_HAS_CS__
     // Let VLO stop when RTC stops using it
         CS_enableVLOAutoOff();
 #else
-    //  ??? not necessary
-    // FUTURE FR6989
     assert(false);
 #endif
 }

@@ -11,10 +11,12 @@ void AllPins::setOutput() {
 
     P1DIR = 0xFF;
     P2DIR = 0xFF;
+#if USE_PORT3
     P3DIR = 0xFF;
+#endif
 
-#ifdef __MSP430FR6989__
 
+#if USE_PORT4
     P4DIR = 0xFF;
     P5DIR = 0xFF;
     P6DIR = 0xFF;
@@ -23,7 +25,6 @@ void AllPins::setOutput() {
     P9DIR = 0xFF;
     P10DIR = 0xFF;
     PJDIR = 0xFF;
-
 #endif
 }
 
@@ -53,6 +54,7 @@ AllPins::configureGPIOLowPower() {
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN6);
     GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_PIN7);
 
+#if USE_PORT3
     // Only 5 pins on port 3.
     // Datasheet says only 3 pins??
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN0);
@@ -60,6 +62,7 @@ AllPins::configureGPIOLowPower() {
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN2);
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN3);
     GPIO_setAsOutputPin(GPIO_PORT_P3, GPIO_PIN4);
+#endif
 }
 
 
@@ -68,7 +71,9 @@ void AllPins::setValue(unsigned char value) {
 
     P1OUT = value;
     P2OUT = value;
+#if USE_PORT3
     P3OUT = value;
+#endif
 
 #ifdef __MSP430FR6989__
     P4OUT = value;
@@ -84,9 +89,14 @@ void AllPins::setValue(unsigned char value) {
 
 void
 AllPins::setAllOutputsLow() {
-    P1OUT = 0x00; P2OUT = 0x00; P3OUT = 0x00;
+    P1OUT = 0x00; 
+    P2OUT = 0x00;
+#if USE_PORT3
+    P3OUT = 0x00;
+#endif
 }
 
+#
 
 void AllPins::setHighOutput() {
     setOutput();
@@ -101,7 +111,10 @@ void AllPins::setLowOutput() {
 bool AllPins::areGeneralPurpose() {
     return      (P1SEL0 == 0) and (P1SEL1 == 0)
             and (P2SEL0 == 0) and (P2SEL1 == 0)
-            and (P3SEL0 == 0) and (P3SEL1 == 0);
+#if USE_PORT3
+            and (P3SEL0 == 0) and (P3SEL1 == 0)
+#endif
+            ;
 }
 
 
@@ -125,7 +138,9 @@ void AllPins::assertAreConfiguredForSleep() {
      * Experimentation shows that OUT does vary after a reset.
      */
     myAssert(
-        (P2DIR == 0xFF) and
-        (P3DIR == 0x7)  // port 3 only 3 pins
+        (P2DIR == 0xFF) 
+#if USE_PORT3
+        and (P3DIR == 0x7)  // port 3 only 3 pins
+#endif
     );
 }

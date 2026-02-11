@@ -3,11 +3,25 @@
 
 
 /*
+board.h
 
- * This board.h is only for the test harness of msp430Drivers.
- * This is NOT in /src and hence not part of the library.
- * A real app would define board.h higher in the dependency tree.
- */
+Configures mspDrivers library.
+Is an abstraction layer.
+Defines virtual devices in terms of actual devices on MCU
+and in terms of a PCB board.
+
+This example is for the test harness of msp430Drivers.
+NOT in /src and hence not part of the library.
+A real app would define board.h higher in the dependency tree.
+
+The CCS IDE defines macros for the target mcu
+e.g. __MSP430FR2433__
+mspDrivers lib modules should not reference those definitions.
+Only this file should.
+
+When msp430Drivers throws errors,
+ensure that board.h was included.
+*/
 
 
 #pragma once
@@ -21,8 +35,31 @@
 #include "src/config/busConfig.h"
 
 
-
-
+/*
+DriverLib defines like __MSP430_HAS_CS__
+But here we augment.
+*/
+#ifdef __MSP430FR2433__
+    #define USE_PORT3 1
+    #define disableLowXT CS_turnOffXT1
+    // Declare timer peripheral to use
+    #define TIMER_BASE_ADDRESS TIMER_A0_BASE
+#endif
+#ifdef __MSP430FR2311__
+    #define USE_PORT3 0
+    #define disableLowXT CS_turnOffXT1
+    #define TIMER_BASE_ADDRESS TIMER_B0_BASE
+    // Redirect Timer_A calls and constants
+    // Assumes that TimerB really is similar to TimerA
+    // i.e. DriverLib code is same for A and B
+    #define Timer_A_stop      Timer_B_stop
+    #define Timer_A_outputPWM Timer_B_outputPWM
+    #define Timer_A_outputPWMParam Timer_B_outputPWMParam
+    #define TIMER_A_CLOCKSOURCE_ACLK TIMER_B_CLOCKSOURCE_ACLK
+    #define TIMER_A_CLOCKSOURCE_DIVIDER_1 TIMER_B_CLOCKSOURCE_DIVIDER_1
+    #define TIMER_A_CAPTURECOMPARE_REGISTER_1 TIMER_B_CAPTURECOMPARE_REGISTER_1
+    #define TIMER_A_OUTPUTMODE_RESET_SET TIMER_B_OUTPUTMODE_RESET_SET
+#endif
 
 /*
  * Describes hardware design i.e. connections between pins of mcu and rtc chips
@@ -35,19 +72,24 @@
  */
 
 
+/*
+Define the board instance.
 
-// Choose exactly one configuration of board.
-// Board may be a breadboard of Launchpad's target and sub-boards
+Choose exactly one board.
+Board may be a breadboard of Launchpad's target and sub-boards
+*/
 //#define MYPCB_BOARD_R5
 #define FULL_PROTO_LAUNCHPAD
 //#define BLINKERBQ_BOARD
 
 
-// Choose exactly one debugger probe (Launchpad)
+// Choose exactly one Launchpad as board
 // Only required when the board uses target board of launchpad
 #define USE_EXP430FR2433
 //#define USE_EXP430FRFR698
 
+
+// Depends on board instance defined already
 #include "src/config/ledAndLightSensorConfig.h"
 
 
@@ -393,3 +435,6 @@
 // P1.1
 #define PWM_PORT  GPIO_PORT_P1
 #define PWM_PIN   GPIO_PIN1
+
+
+// Test that required definitions exist

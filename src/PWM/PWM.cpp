@@ -4,17 +4,19 @@
 // depends on register symbols
 #include <msp430.h>
 
+#include <board.h>
+
 // device abstraction: MSPWare DriverLib
 // Implementation uses DriverLib
 // depends on msp430.h
 #include <timer_a.h>
+#include <timer_b.h>
 
 // logical device abstraction: msp430drivers
 #include "../pinFunction/pwmPins.h"
 
 
-// Declare timer peripheral to use
-#define TIMER_BASE_ADDRESS TIMER_A0_BASE
+
 
 /*
 The PWM generates pulses at the clock freq (32khz)

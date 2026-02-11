@@ -2,13 +2,12 @@
 #include "UVCommands.h"
 
 #include "UVSensorRegisters.h"
-
 #include "../bridge/bridge.h"
-
 #include "UVSensor.h"
 
 // DriverLib
 #include <msp430.h>     // __delay_cycles
+#include <board.h>
 
 
 enum Response {
@@ -165,7 +164,7 @@ UVCommands::sendCommand(UVCommand command)
  */
 
 unsigned int
-UVCommands::getID(unsigned char * ID) {
+UVCommands::getID(unsigned char *ID) {
     unsigned int fail = not Bridge::readByte(static_cast<unsigned char>(UVSensorAddress::Identifier), ID);
     return fail;
 }
