@@ -48,16 +48,21 @@ public:
     static void delayTicksOf100uSec(unsigned int);
 
 
-    // Can be convenience functions that call the above.
-    // Depends on implementation
+    // Some are convenience functions that iterate and call others.
+    // Depends on implementation.
+    // Do not assume the delay is one continuous period in LPM.
 
+    // When LowPowerTimer uses WDT, these are continuous periods
     static void delay48Seconds();
-    static void delayFiveSeconds();
+    static void delayThreeSeconds();
     static void delaySecond();
-    static void delayHalfSecond();
-
-    static void delayTwentyMilliSeconds();
     static void delayTenMilliSeconds();
+
+    // Can be iterated periods in LPM
+    // Convenience
+    static void delayFiveSeconds();
+    static void delayHalfSecond();
+    static void delayTwentyMilliSeconds();
     static void delayTwoMilliSeconds();
 
     static void delaySeconds(unsigned int count);

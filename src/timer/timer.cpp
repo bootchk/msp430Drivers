@@ -106,6 +106,16 @@ void LowPowerTimer::delay48Seconds() {
     IntervalTimer::stop();
 }
 
+void LowPowerTimer::delayThreeSeconds() {
+    VeryLowOscillator::ensureOn();
+    IntervalTimer::initForIntervalOfThreeSeconds();
+    IntervalTimer::start();
+    _low_power_mode_3();
+    __no_operation();
+    VeryLowOscillator::allowOff();
+    IntervalTimer::stop();
+}
+
 void LowPowerTimer::delaySecond() {
     // IntervalTimer uses VLO, which starts automatically when WDT requests is
     VeryLowOscillator::ensureOn();
