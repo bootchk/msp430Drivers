@@ -36,15 +36,19 @@ void PWM::turnOff() {
 
 
 
-// turn on a train of PWM  pulses on a pin.
-// Remains on until you turn it off.
-// Requires ACLK is on.
-// Configures the GPIO pin speced in board.h.
-// Must be the same pin as the MSP430 model routes to
-// instance of TimerA specified above (TIMER_BASE_ADDRESS)
-// Must be the same pin as the MSP430 model routes to
-// instance of TimerA specified above (TIMER_A0_BASE, or 1,2,3
-// See data sheet for model of family.
+/*
+turn on a train of PWM  pulses on a pin.
+Remains on until you turn it off.
+
+Requires clock (ACLK or SMCLK) is on.
+
+Configures the GPIO pin speced in board.h.
+Must be the same pin as the MSP430 model routes to
+instance of TimerA specified above (TIMER_A0_BASE, or 1,2,3
+See data sheet for model of family.
+
+dutyCycle is a percent in range [0,100]
+*/
 
 void PWM::turnOn(uint16_t dutyCycle) {
 	// Init param struct to zero
@@ -54,7 +58,11 @@ void PWM::turnOn(uint16_t dutyCycle) {
 	
 	// Arbitrarily choose clock source is aux clock ACLCK
 	// ACLCK defaults to on with source REFO at 32khz
-	config.clockSource        = TIMER_A_CLOCKSOURCE_ACLK;
+	// config.clockSource        = TIMER_A_CLOCKSOURCE_ACLK;
+	// config.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
+
+	// SMCLK @ 1mHz / 100 period yields 10k
+	config.clockSource        = TIMER_A_CLOCKSOURCE_SMCLK;
 	config.clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_1;
 
 	// CCR0 is not externally connected on some models of family
@@ -66,7 +74,10 @@ void PWM::turnOn(uint16_t dutyCycle) {
 	// Arbitrary timer period of 100
 	// dutyCycle in [1,100] ? e.g. 50 yields 50% duty cycle
 	config.timerPeriod        = 100;
-	config.dutyCycle          = dutyCycle;
+	config.timerPeriod        = 64;
+
+	// Integer math
+	config.dutyCycle          = dutyCycle * 64 / 100;
 
 	// Configure GPIO pin.
 	// You can move this to main.
