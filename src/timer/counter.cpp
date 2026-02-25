@@ -16,7 +16,6 @@ volatile bool overflowFlag = false;
  * Remember the parameter stored to modulo register.
  *
  * DriverLib hides modulo register but I modified DriverLib to make it accessible.
- * But
  */
 unsigned int overflowCount;
 
@@ -112,6 +111,11 @@ void Counter::stop() {
     // RTC IFG is clear
 }
 
+#ifdef OLD
+/*
+This works only with a modified DriverLib
+that has RTC_getModulo() and RTC_getCounter()
+*/
 
 unsigned int Counter::getCount() {
     unsigned int result;
@@ -138,6 +142,7 @@ unsigned int Counter::getCount() {
 
     return result;
 }
+#endif
 
 // Called from ISR
 void Counter::setOverflowFlag() { overflowFlag = true; }
