@@ -16,27 +16,21 @@
 #include "../assert/myAssert.h"
 
 /*
- * Use internal RTC instead of TIMER_A.
- * Rationale: lower power?
- *
- * !!! Note internal RTC vs external RTC
- */
+Compile time option to use either:
+    Counter (what TI calls its internal RTC)
+    WDT
+ 
+ !!! Note internal RTC vs external RTC
 
+This is NOT ultra low power.
+LPM3: ram retention, CPU stopped, most clocks off (except VLO and REFO), core regulator on, 
+WDT or RTC interrupt
+This is typically 15uA (the REFO is guilty)
 
-
-
-/*
- * LPM3 ram retention, CPU stopped, all clocks off (except VLO), core regulator on, RTC interrupt
- *
- * LPM3.5 no ram retention, core regulator off, external OR RTC interrupt
- *
- * LPM4 is ram retention, CPU stopped, all clocks off, core regulator on, external interrupt only
- *
- * LPM4.5 no ram retention, core regulator off, external interrupt only
- */
-/*
- * Here, we don't mess with 3.5 since we want continuation here (instead of a BOR.)
- */
+Here, we don't mess with 3.5 since we want continuation here (instead of a reset.)
+LPM3.5 draws 1uA.
+See elsewhere for waiting in LPM3.5
+*/
 
 
 #ifdef LOW_POWER_TIMER_USE_RTC
@@ -61,7 +55,7 @@ void LowPowerTimer::delayTicksOf100uSec(unsigned int ticks) {
 
     // Can tolerate extra wakeup time from LPM3
     _low_power_mode_3();
-
+    // Continuation is here i.e. execution resumes here after sleep.
     __no_operation();
 
     // shutdown resources(
