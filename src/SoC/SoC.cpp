@@ -33,21 +33,39 @@ void SoC::stopWatchDog() {
 }
 
 
-void SoC::enterLPM4orLPM4_5(){
+/*
+Enters LPM4 or LPM4.5 with general interrupts enabled.
 
+DOES NOT RETURN
+
+Whether is 4 or 4.5 depends on prior step
+of call to PMM::configureOff to turn power off.
+Such a call must be immediately before,
+since only capacitors hold up Vcc long enough
+for the CPU to execute this call.
+
+Discussion:
+	- LPM4 macro
+    __bis_SR_register(LPM4_bits)
+These do not atomic set GIE
+*/
+void SoC::enterLPM4orLPM4_5(){
 	/*
-	 * Set certain bits in the mcu status register (SR)
-	 *
-	 * Alternatives:
-	 * - LPM4 macro (doesn't atomic set GIE)
-	 * - __bis_SR_register(LPM4_bits);
-	 */
-	/*
-	 * Atomically enable global interrupts and sleep.
-	 */
+	Set certain bits in the mcu status register (SR)
+	Atomically enable global interrupts and sleep.
+	*/
 	__bis_SR_register(LPM4_bits & GIE);
+    __no_operation();
 }
 
+void SoC::enterLPM3orLPM3_5(){
+	/*
+	Set certain bits in the mcu status register (SR)
+	Atomically enable global interrupts and sleep.
+	*/
+	__bis_SR_register(LPM3_bits & GIE);
+    __no_operation();
+}
 
 
 void SoC::enableGlobalInterrupts() {

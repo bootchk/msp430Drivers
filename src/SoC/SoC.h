@@ -18,6 +18,7 @@ public:
     static void stopWatchDog();
 
 	static void enterLPM4orLPM4_5();
+    static void enterLPM3orLPM3_5();
 
 	static void enableGlobalInterrupts();
 
