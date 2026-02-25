@@ -16,10 +16,27 @@ void PWMPins::configure()
     // Since the above is "OutputPin"
 };
 
+/*
+Equivalent to OFF for most PWM uses.
+No pulses.
+*/
 void
 PWMPins::configureToDigitalLow()
 { 
     GPIO_setOutputLowOnPin(PWM_PORT, PWM_PIN);
     GPIO_setAsOutputPin(PWM_PORT, PWM_PIN);
 }
+
+/*
+Equivalent to 100% duty cycle.
+No pulses, unless you consider high state a pulse.
+For speed control, means full speead.
+*/
+void
+PWMPins::configureToDigitalHigh()
+{ 
+    GPIO_setOutputHighOnPin(PWM_PORT, PWM_PIN);
+    GPIO_setAsOutputPin(PWM_PORT, PWM_PIN);
+}
+
 
