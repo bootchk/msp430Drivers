@@ -55,10 +55,14 @@ But here we augment.
     #define Timer_A_stop      Timer_B_stop
     #define Timer_A_outputPWM Timer_B_outputPWM
     #define Timer_A_outputPWMParam Timer_B_outputPWMParam
+    #define TIMER_A_CLOCKSOURCE_SMCLK TIMER_B_CLOCKSOURCE_SMCLK
     #define TIMER_A_CLOCKSOURCE_ACLK TIMER_B_CLOCKSOURCE_ACLK
     #define TIMER_A_CLOCKSOURCE_DIVIDER_1 TIMER_B_CLOCKSOURCE_DIVIDER_1
     #define TIMER_A_CAPTURECOMPARE_REGISTER_1 TIMER_B_CAPTURECOMPARE_REGISTER_1
     #define TIMER_A_OUTPUTMODE_RESET_SET TIMER_B_OUTPUTMODE_RESET_SET
+
+    #define OFS_TAxCTL OFS_TBxCTL
+    #define TIMER_A_UPDOWN_MODE TIMER_B_UPDOWN_MODE
 #endif
 
 /*
@@ -429,12 +433,17 @@ Board may be a breadboard of Launchpad's target and sub-boards
 
 
 
-// PWM out
+// PWM out from a timer compare register 1
 
-// msp430fr2433
+#ifdef __MSP430FR2433__
 // P1.1
 #define PWM_PORT  GPIO_PORT_P1
 #define PWM_PIN   GPIO_PIN1
-
+#endif
+#ifdef __MSP430FR2311__
+// P2.0
+#define PWM_PORT  GPIO_PORT_P2
+#define PWM_PIN   GPIO_PIN0
+#endif
 
 // Test that required definitions exist
