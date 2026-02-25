@@ -11,11 +11,11 @@
 // depends on msp430.h
 #include <timer_a.h>
 #include <timer_b.h>
-
+ 
 // logical device abstraction: msp430drivers
 #include "../pinFunction/pwmPins.h"
 
-
+#include "../assert/myAssert.h"
 
 
 /*
@@ -35,22 +35,10 @@ void PWM::turnOff() {
 }
 
 
-
-/*
-turn on a train of PWM  pulses on a pin.
-Remains on until you turn it off.
-
-Requires clock (ACLK or SMCLK) is on.
-
-Configures the GPIO pin speced in board.h.
-Must be the same pin as the MSP430 model routes to
-instance of TimerA specified above (TIMER_A0_BASE, or 1,2,3
-See data sheet for model of family.
-
-dutyCycle is a percent in range [0,100]
-*/
-
-void PWM::turnOn(uint16_t dutyCycle) {
+// Uses DriverLib
+static void
+setTimerForPWM(uint16_t dutyCycle)
+{
 	// Init param struct to zero
 	Timer_A_outputPWMParam config = {0};
 
@@ -73,7 +61,8 @@ void PWM::turnOn(uint16_t dutyCycle) {
 
 	// Arbitrary timer period of 100
 	// dutyCycle in [1,100] ? e.g. 50 yields 50% duty cycle
-	config.timerPeriod        = 100;
+	// config.timerPeriod        = 100;
+	
 	config.timerPeriod        = 64;
 
 	// Integer math
@@ -87,8 +76,43 @@ void PWM::turnOn(uint16_t dutyCycle) {
 	// Using DriverLib
 	Timer_A_outputPWM(TIMER_BASE_ADDRESS, &config);
 
-	// The above started PWM pulses, no separate start is required.
+	//Timer_A_startCounter(TIMER_BASE_ADDRESS, TIMER_A_UPDOWN_MODE);
+	
+	// Timer count mode is not STOP
+	myAssert(* (int*) (TIMER_BASE_ADDRESS + OFS_TAxCTL) & TIMER_A_UPDOWN_MODE);
+};
+
+
+
+
+/*
+turn on a train of PWM  pulses on a pin.
+Remains on until you turn it off.
+
+Requires clock (ACLK or SMCLK) is on.
+
+Configures the GPIO pin speced in board.h.
+Must be the same pin as the MSP430 model routes to
+instance of TimerA specified above (TIMER_A0_BASE, or 1,2,3
+See data sheet for model of family.
+
+dutyCycle is a percent in range [0,100]
+*/
+
+void 
+PWM::turnOn(uint16_t dutyCycle)
+{
+	if (dutyCycle == 100)
+	{
+		PWMPins::configureToDigitalHigh();
+	}
+	else 
+	{
+		setTimerForPWM(dutyCycle);
+		// The above started PWM pulses, no separate start is required.
+	}
 	
 	// assert timer is started and generating PWM on the configured pin
+	// !!! Or the pin is high, for 100% duty cycle
 }
 
