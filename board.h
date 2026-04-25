@@ -440,10 +440,15 @@ Board may be a breadboard of Launchpad's target and sub-boards
 #define PWM_PORT  GPIO_PORT_P1
 #define PWM_PIN   GPIO_PIN1
 #endif
+
 #ifdef __MSP430FR2311__
-// P2.0
-#define PWM_PORT  GPIO_PORT_P2
-#define PWM_PIN   GPIO_PIN0
+// P2.0 isTB1.1 i.e. Timer_B #1 CCR #1
+//#define PWM_PORT  GPIO_PORT_P2
+//#define PWM_PIN   GPIO_PIN0
+
+// P1.6 is TB0.1
+#define PWM_PORT  GPIO_PORT_P1
+#define PWM_PIN   GPIO_PIN6
 #endif
 
 // Test that required definitions exist
