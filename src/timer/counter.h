@@ -1,4 +1,6 @@
 
+#include <stdint.h>
+
 /*
  * Counts up to a given count and then interrupts.
  * May interrupt again since overflow resets counter but keeps ticking.
@@ -24,6 +26,8 @@ public:
 
     static void init12kHz(unsigned int durationInTicks);
     static void init1_2kHz(unsigned int durationInTicks);
+
+    static void initCountInSeconds(uint16_t countSeconds);
 
     /*
      * Returns immediately.
