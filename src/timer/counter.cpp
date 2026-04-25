@@ -63,6 +63,7 @@ void Counter::init12kHz(unsigned int durationInTicks)
     initWithDivisor(durationInTicks, RTC_CLOCKPREDIVIDER_1);
 }
 
+// Each count is 0.8mSec
 void Counter::init1_2kHz(unsigned int durationInTicks)
 {
     initWithDivisor(durationInTicks, RTC_CLOCKPREDIVIDER_10);
@@ -147,3 +148,17 @@ unsigned int Counter::getCount() {
 // Called from ISR
 void Counter::setOverflowFlag() { overflowFlag = true; }
 
+
+void Counter::initCountInSeconds(uint16_t countSeconds)
+{
+    // Require countSeconds * 1200 < max int 16 bit
+    myAssert(countSeconds < 53);
+
+    // 1.2kHz is 0.83mSec per tick.
+    // 1.2k counts is 1 second
+    Counter::init1_2kHz(1200 * countSeconds);
+}
+
+    // 12kHz is 80uSec per tick.
+    // 50k ticks is 4 seconds
+    
