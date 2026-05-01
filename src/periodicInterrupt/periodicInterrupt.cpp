@@ -35,7 +35,7 @@ PeriodicInterrupt::initInSeconds(uint16_t seconds)
 {
     // assert seconds < 64 else overflow in 16-bit integer multiplication
     // TODO cast to long 32-bit to avoid overflow
-    PeriodicInterrupt::initInSeconds ((seconds * 1024)/1200);
+    PeriodicInterrupt::initInSeconds ((seconds * 1024)/12000);
 }
 
 
