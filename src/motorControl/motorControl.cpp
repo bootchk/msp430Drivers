@@ -3,28 +3,35 @@
 // Pins
 #include "board.h"
 
+
 // DriverLib
 #include <timer_b.h>
 #include <gpio.h>
 
 static bool countReachedFlag = false;
+static int  countPolePairs = 4;
 
-// Use B0 for motor control IN, use B1 for PWM to motor OUT
-#define MOTOR_CONTROL_TIMER_BASE TIMER_B0_BASE
+// See board.h for configuration of Timer peripherals
 
 // Configure pin as input from motor driver to TimerB clock
-// The signal name is abstact, referred to elsewhere.
+// The signal name is abstract, referred to elsewhere.
 // The driver IC DRV10866.FG is open drain, needs pull up.
 void 
 MotorControl::initPins()
 {
+    // Must configure pullup and module function separately.
+
+    // Configure pull up
     GPIO_setAsInputPinWithPullUpResistor(MOTOR_CONTROL_PORT, MOTOR_CONTROL_PIN);
-    
+    // Choose the use as a clock for timer
+    GPIO_setAsPeripheralModuleFunctionInputPin(
+        MOTOR_CONTROL_PORT, MOTOR_CONTROL_PIN,
+        GPIO_SECONDARY_MODULE_FUNCTION);
 }
 
 
 void 
-MotorControl::startTurnCounter( int turnsToReach)
+MotorControl::startTurnCounter( int turnsToReach, int polePairs)
 {
     /*
     Require GPIO pin configured to function as input to internal signal TXCLK,
@@ -34,6 +41,8 @@ MotorControl::startTurnCounter( int turnsToReach)
     */
 
     countReachedFlag = false;
+    countPolePairs = polePairs;
+
     
     Timer_B_initUpModeParam config = {0};
     
@@ -54,8 +63,7 @@ MotorControl::startTurnCounter( int turnsToReach)
    
     // trigger value
     // Multiply by polePairCount: 4 for Maxon EC9.2
-    config.timerPeriod                 = turnsToReach * 4;
-
+    config.timerPeriod                 = turnsToReach * countPolePairs;
     Timer_B_initUpMode(
         MOTOR_CONTROL_TIMER_BASE, //TIMER_BASE_ADDRESS, 
         &config);

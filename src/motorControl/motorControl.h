@@ -7,7 +7,7 @@ class MotorControl {
 public:
     static void initPins();
 
-    static void startTurnCounter( int turnsToReach);
+    static void startTurnCounter( int turnsToReach, int polePairs);
     static void stopTurnCounter();
 
     // Used by ISR

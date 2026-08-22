@@ -48,7 +48,12 @@ But here we augment.
 #ifdef __MSP430FR2311__
     #define USE_PORT3 0
     #define disableLowXT CS_turnOffXT1
-    #define TIMER_BASE_ADDRESS TIMER_B0_BASE
+
+    // Configure timers to different program uses
+    // Use B0 for motor control IN, use B1 for PWM to motor OUT
+    #define MOTOR_CONTROL_TIMER_BASE TIMER_B0_BASE
+    #define PWM_BASE_ADDRESS         TIMER_B1_BASE
+
     // Redirect Timer_A calls and constants
     // Assumes that TimerB really is similar to TimerA
     // i.e. DriverLib code is same for A and B

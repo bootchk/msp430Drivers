@@ -27,7 +27,7 @@ For a higher freq, use a faster clock.
 
 
 void PWM::turnOff() {
-	Timer_A_stop(TIMER_BASE_ADDRESS);
+	Timer_A_stop(PWM_BASE_ADDRESS);
 
 	// Stopping timer leaves the output indeterminate value, high or low.
 	// Ensure it is low.
@@ -74,12 +74,12 @@ setTimerForPWM(uint16_t dutyCycle)
 	
 	// Configure and start a TimerA peripheral.
 	// Using DriverLib
-	Timer_A_outputPWM(TIMER_BASE_ADDRESS, &config);
+	Timer_A_outputPWM(PWM_BASE_ADDRESS, &config);
 
 	//Timer_A_startCounter(TIMER_BASE_ADDRESS, TIMER_A_UPDOWN_MODE);
 	
 	// Timer count mode is not STOP
-	myAssert(* (int*) (TIMER_BASE_ADDRESS + OFS_TAxCTL) & TIMER_A_UPDOWN_MODE);
+	myAssert(* (int*) (PWM_BASE_ADDRESS + OFS_TAxCTL) & TIMER_A_UPDOWN_MODE);
 };
 
 
