@@ -6,14 +6,14 @@
 
 void PWMPins::configure()
 {
-    // msp4302433 
-    // Route pin P1.1 to output of second module
+    // Port, pin, and function defined in board.h
+    // Varies with MSP430 model
     GPIO_setAsPeripheralModuleFunctionOutputPin(
-        PWM_PORT,   PWM_PIN,  
-        GPIO_SECONDARY_MODULE_FUNCTION);
+        PWM_PORT,   
+        PWM_PIN,  
+        PWM_MODULE_FUNCTION);
 
-    // Assert direction is out
-    // Since the above is "OutputPin"
+    // Direction is out since called func is "OutputPin"
 };
 
 /*

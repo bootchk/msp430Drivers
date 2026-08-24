@@ -448,19 +448,23 @@ Board may be a breadboard of Launchpad's target and sub-boards
 
 #ifdef __MSP430FR2311__
 //#ifdef PACKAGE_20PIN
-// P2.0 isTB1.1 i.e. Timer_B #1 CCR #1
+// P2.0 primary out is TB1.1 i.e. Timer_B #1 CCR #1
 #define PWM_PORT  GPIO_PORT_P2
 #define PWM_PIN   GPIO_PIN0
+#define PWM_MODULE_FUNCTION GPIO_PRIMARY_MODULE_FUNCTION
+
 // OLD
-// P1.6 is TB0.1
+// P1.6 *secondary* out function is TB0.1
 //#define PWM_PORT  GPIO_PORT_P1
 //#define PWM_PIN   GPIO_PIN6
+//#define PWM_MODULE_FUNCTION GPIO_SECONDARY_MODULE_FUNCTION
 #endif
 
 
 // Motor Control
-// Timer B #0
+// p2.7 primary in is Timer B #0 external clock
 #define MOTOR_CONTROL_PORT  GPIO_PORT_P2
 #define MOTOR_CONTROL_PIN   GPIO_PIN7
+#define MOTOR_CONTROL_MODULE_FUNCTION   GPIO_PRIMARY_MODULE_FUNCTION
 
 // Test that required definitions exist
