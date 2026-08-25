@@ -94,10 +94,9 @@ void SoC::enableBSLOffAndVacantMemoryNMI() {
 
 
 void SoC::disableFRAMWriteProtect() {
-#ifdef __MSP430FR2433__
     // By default, writes cause NMI.  To disable, enable writing.
-    SysCtl_enableFRAMWrite(SYSCTL_FRAMWRITEPROTECTION_DATA | SYSCTL_FRAMWRITEPROTECTION_PROGRAM);
-#endif
+    SysCtl_enableFRAMWrite(
+        SYSCTL_FRAMWRITEPROTECTION_DATA | SYSCTL_FRAMWRITEPROTECTION_PROGRAM);
 }
 
 

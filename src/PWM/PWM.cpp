@@ -32,6 +32,10 @@ void PWM::turnOff() {
 	// Stopping timer leaves the output indeterminate value, high or low.
 	// Ensure it is low.
 	PWMPins::configureToDigitalLow();
+
+	// PWM network has a pulldown.
+	// When enter LPMx.5 and pins are high impedance, PWM net remains low.
+	// When we wake from LPMx.5, MCU also drives PWM net low.
 }
 
 
