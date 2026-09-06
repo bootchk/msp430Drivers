@@ -11,12 +11,17 @@ void fail(unsigned int line);
  * Here "myAssert()" etc. are macros
  */
 
-/*
- * TODO
- * ifndef NDEBUG
- * define myAssert(_ignore) ((void)0)
- */
 
+#ifdef NDEBUG
+
+// assert functions generate no code
+#define myAssert(_ignore)  ((void)0)
+#define myRequire(_ignore) ((void)0)
+#define myEnsure(_ignore)  ((void)0)
+
+#else
+
+// assertions generate code and are checked at runtime
 
 // general assertion
 #define myAssert(expr) \
@@ -35,6 +40,6 @@ void fail(unsigned int line);
     if (!(expr)) \
         fail(__LINE__)
 
-
+#endif
 
 // traditionally would be fail(__FILE__, __LINE__)
