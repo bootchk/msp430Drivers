@@ -438,33 +438,59 @@ Board may be a breadboard of Launchpad's target and sub-boards
 
 
 
-// PWM out from a timer compare register 1
+// PWM out 
+// from a timer compare register 1
+
+// This is my production board, 16 pin QFN
+#define PACKAGE_RGY 1
+// This is the FR2311EVM LaunchPad
+// #define PACKAGE_20PIN 1
 
 #ifdef __MSP430FR2433__
-// P1.1
+
 #define PWM_PORT  GPIO_PORT_P1
 #define PWM_PIN   GPIO_PIN1
-#endif
 
-#ifdef __MSP430FR2311__
-//#ifdef PACKAGE_20PIN
+#elif defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
+
+
 // P2.0 primary out is TB1.1 i.e. Timer_B #1 CCR #1
 #define PWM_PORT  GPIO_PORT_P2
 #define PWM_PIN   GPIO_PIN0
 #define PWM_MODULE_FUNCTION GPIO_PRIMARY_MODULE_FUNCTION
 
-// OLD
+#elif defined(__MSP430FR2311__) && defined(PACKAGE_RGY)
+
 // P1.6 *secondary* out function is TB0.1
-//#define PWM_PORT  GPIO_PORT_P1
-//#define PWM_PIN   GPIO_PIN6
-//#define PWM_MODULE_FUNCTION GPIO_SECONDARY_MODULE_FUNCTION
+#define PWM_PORT  GPIO_PORT_P1
+#define PWM_PIN   GPIO_PIN6
+#define PWM_MODULE_FUNCTION GPIO_SECONDARY_MODULE_FUNCTION
+
+#else
+#error "board.h does not define PWM config"
 #endif
 
 
 // Motor Control
+// PWM is control to the motor, this is control from the motor
+
+
+#if defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
+
 // p2.7 primary in is Timer B #0 external clock
 #define MOTOR_CONTROL_PORT  GPIO_PORT_P2
 #define MOTOR_CONTROL_PIN   GPIO_PIN7
 #define MOTOR_CONTROL_MODULE_FUNCTION   GPIO_PRIMARY_MODULE_FUNCTION
+#define BOARD_HAS_MOTOR_CONTROL 1
 
-// Test that required definitions exist
+#else
+
+#warning "board.h has no motor control"
+#define BOARD_HAS_MOTOR_CONTROL 0
+
+#endif
+
+
+
+
+// TODO Test that required definitions exist without conflicts
