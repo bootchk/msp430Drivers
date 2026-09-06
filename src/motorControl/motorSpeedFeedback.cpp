@@ -1,5 +1,5 @@
 
-#include "motorControl.h"
+#include "motorSpeedFeedback.h"
 // Pins
 #include "board.h"
 
@@ -9,6 +9,7 @@
 #include <gpio.h>
 
 
+// TODO make this a counter instead of a flag
 bool countReachedFlag = false;
 
 
@@ -26,14 +27,14 @@ to MCU pin.
 */
 
 
-#if BOARD_HAS_MOTOR_CONTROL
+#if BOARD_HAS_MOTOR_SPEED_FEEDBACK
 
 /*
 Init a GPIO to catch the first turn
 using interrupt from a low pulse from FG pin of motor driver
 */ 
 void 
-MotorControl::initPinsForSingleTurn()
+MotorSpeedFeedback::initPinsForSingleTurn()
 {
     countReachedFlag = false;
     
@@ -48,7 +49,7 @@ MotorControl::initPinsForSingleTurn()
 
 
 void 
-MotorControl::disableSingleTurnInterrupt()
+MotorSpeedFeedback::disableSingleTurnInterrupt()
 {
     GPIO_disableInterrupt(
         MOTOR_CONTROL_PORT, 
@@ -56,7 +57,7 @@ MotorControl::disableSingleTurnInterrupt()
 }
 
 void 
-MotorControl::enableSingleTurnInterrupt()
+MotorSpeedFeedback::enableSingleTurnInterrupt()
 {
     // clear global flag set by ISR
     countReachedFlag = false;
@@ -72,7 +73,7 @@ MotorControl::enableSingleTurnInterrupt()
 
 
 void 
-MotorControl::handlePinInterrupt()
+MotorSpeedFeedback::handlePinInterrupt()
 {
     // Set global flag
     countReachedFlag = true;
@@ -87,7 +88,7 @@ MotorControl::handlePinInterrupt()
 #else
 
 /*
-Board not support motor control
+Board not support motor speed feedback
 
 The program must expect wasCountReachedFlag always false,
 and do something else (time expires usually.)
@@ -96,21 +97,21 @@ The program should at least call initPinsForSingleTurn
 because it initializes countReachedFlag which is not persistent in FRAM.
 */
 void 
-MotorControl::initPinsForSingleTurn()
+MotorSpeedFeedback::initPinsForSingleTurn()
 {
     countReachedFlag = false;
 }
 
 void 
-MotorControl::disableSingleTurnInterrupt()
+MotorSpeedFeedback::disableSingleTurnInterrupt()
 {  __no_operation(); }
 
 void 
-MotorControl::enableSingleTurnInterrupt()
+MotorSpeedFeedback::enableSingleTurnInterrupt()
 {  __no_operation(); }
 
 void
-MotorControl::handlePinInterrupt()
+MotorSpeedFeedback::handlePinInterrupt()
 { __never_executed(); }
 
 #endif
@@ -119,7 +120,7 @@ MotorControl::handlePinInterrupt()
 
 
 bool 
-MotorControl::wasCountReachedFlag()
+MotorSpeedFeedback::wasCountReachedFlag()
 {
     return countReachedFlag;
 }

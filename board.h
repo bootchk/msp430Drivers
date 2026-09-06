@@ -471,8 +471,11 @@ Board may be a breadboard of Launchpad's target and sub-boards
 #endif
 
 
-// Motor Control
-// PWM is control to the motor, this is control from the motor
+
+
+
+
+// Speed feedback from the motor
 
 
 #if defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
@@ -481,12 +484,12 @@ Board may be a breadboard of Launchpad's target and sub-boards
 #define MOTOR_CONTROL_PORT  GPIO_PORT_P2
 #define MOTOR_CONTROL_PIN   GPIO_PIN7
 #define MOTOR_CONTROL_MODULE_FUNCTION   GPIO_PRIMARY_MODULE_FUNCTION
-#define BOARD_HAS_MOTOR_CONTROL 1
+#define BOARD_HAS_MOTOR_SPEED_FEEDBACK 1
 
 #else
 
-#warning "board.h has no motor control"
-#define BOARD_HAS_MOTOR_CONTROL 0
+#warning "board.h has no motor speed feedback"
+#define BOARD_HAS_MOTOR_SPEED_FEEDBACK 0
 
 #endif
 

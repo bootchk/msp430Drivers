@@ -1,5 +1,7 @@
 /*
-Understands control motor having a speed output
+Understands motor having a speed feedback from motor.
+The desired speed is controlled.
+This is the actual speed as fed back.
 
 Two separate modes:
     Catch first turn
@@ -18,7 +20,7 @@ Use a 4.7k ohm external resistor.
 */
 
 
-class MotorControl {
+class MotorSpeedFeedback{
 public:
     static void initPinsForTurnCount();
     static void initPinsForSingleTurn();
