@@ -24,15 +24,31 @@ ensure that board.h was included.
 */
 
 
-#pragma once
-
-
 // Some right hand sides from gpio.h in DriverLib
 #include <gpio.h>
 
 // Depends on configuration of app
 #include "src/config/driverConfig.h"
 #include "src/config/busConfig.h"
+
+
+
+/* Miscellaneous constants, independent(?) of board and MSP430 model. */
+/*
+ * A voltage which ensures a slow-rising power supply (solar)
+ * has enough reserve to continue the boot code.
+ * At coldstart time, we do a minimal boot and wait in LPM,
+ * hoping that Vcc rises beyond this.
+ * Then the app checks voltage levels before doing work.
+ *
+ * This depends on the board: the trigger voltage of the voltage monitor
+ * and the size of the power supply storage.
+ *
+ * Units centivolts
+ */
+ // TODO should say ForStartingApp
+#define MinVccForStarting 190
+
 
 
 /*
@@ -51,8 +67,11 @@ But here we augment.
 
     // Configure timers to different program uses
     // Use B0 for motor control IN, use B1 for PWM to motor OUT
-    #define MOTOR_CONTROL_TIMER_BASE TIMER_B0_BASE
-    #define PWM_BASE_ADDRESS         TIMER_B1_BASE
+    // CRUFT from testing motor feedback
+    // TODO rework so don't have conflicting uses of timers.
+    // PWM also uses TimerB0
+    //#define MOTOR_FEEDBACK_TIMER_BASE TIMER_B0_BASE
+    
 
     // Redirect Timer_A calls and constants
     // Assumes that TimerB really is similar to TimerA
@@ -363,23 +382,6 @@ Board may be a breadboard of Launchpad's target and sub-boards
 
 
 
-
-
-
-/*
- * A voltage which ensures a slow-rising power supply (solar)
- * has enough reserve to continue the boot code.
- * Used at coldstart time, to sleep until Vcc reaches this level.
- *
- * This depends on the board: the trigger voltage of the voltage monitor
- * and the size of the power supply storage.
- *
- * Units centivolts
- */
-#define MinVccForStarting 190
-
-
-
 // GPIO config for pin used for ADC reads
 // GPIO_PORT_ADC7, GPIO_PIN_ADC7, GPIO_FUNCTION_ADC7 are used in examples, but undefined
 // The module function is moot??? GPIO_PRIMARY_MODULE_FUNCTION
@@ -462,9 +464,16 @@ Board may be a breadboard of Launchpad's target and sub-boards
 #elif defined(__MSP430FR2311__) && defined(PACKAGE_RGY)
 
 // P1.6 *secondary* out function is TB0.1
-#define PWM_PORT  GPIO_PORT_P1
-#define PWM_PIN   GPIO_PIN6
-#define PWM_MODULE_FUNCTION GPIO_SECONDARY_MODULE_FUNCTION
+#define PWM_PORT             GPIO_PORT_P1
+#define PWM_PIN              GPIO_PIN6
+#define PWM_MODULE_FUNCTION  GPIO_SECONDARY_MODULE_FUNCTION
+
+#ifdef TIMER_B0_CONFIGURED
+#error "board.h timer B0 already configured"
+#else
+#define PWM_BASE_ADDRESS     TIMER_B0_BASE
+#define TIMER_B0_CONFIGURED  1
+#endif
 
 #else
 #error "board.h does not define PWM config"
