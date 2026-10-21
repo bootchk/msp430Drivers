@@ -101,14 +101,59 @@ But here we augment.
 
 
 /*
-Define the board instance.
-
 Choose exactly one board.
 Board may be a breadboard of Launchpad's target and sub-boards
+
+This is old method of config.
+Some code still uses it.
+TODO clean this up.
+The board should define features,
+and the code depend on features, not board.
 */
 //#define MYPCB_BOARD_R5
 #define FULL_PROTO_LAUNCHPAD
 //#define BLINKERBQ_BOARD
+
+/*
+New method, defining features.
+Corresponds to HW routing of a board or breadboard
+*/
+#define BOARD_VEER_NFP 1
+//#define BOARD_SMART_UNIV 1
+
+
+#if defined(BOARD_VEER_NFP)
+// Features
+
+    // Choice of timer for PWM.
+    #define PWM_USE_TB1 1
+
+    // Package  16 pin QFN
+    #define PACKAGE_RGY 1
+    // This is the FR2311EVM LaunchPad
+    // #define PACKAGE_20PIN 1
+
+    // Feature: motor feedback
+    #define BOARD_HAS_MOTOR_SPEED_FEEDBACK 1
+
+
+#elif defined(BOARD_SMART_UNIV)
+
+    // Choice of timer for PWM.
+    #define PWM_USE_TB0 1
+
+    // Package  16 pin QFN
+    #define PACKAGE_RGY 1
+    // This is the FR2311EVM LaunchPad
+    // #define PACKAGE_20PIN 1
+
+    // No motor feedback
+    #define BOARD_HAS_MOTOR_SPEED_FEEDBACK 0
+
+    
+#else
+#error "board.h does not define board features"
+#endif
 
 
 // Choose exactly one Launchpad as board
@@ -443,40 +488,51 @@ Board may be a breadboard of Launchpad's target and sub-boards
 // PWM out 
 // from a timer compare register 1
 
-// This is my production board, 16 pin QFN
-#define PACKAGE_RGY 1
-// This is the FR2311EVM LaunchPad
-// #define PACKAGE_20PIN 1
+// TODO choice of board dictates choice of PWM timer and package
 
+
+
+/*
+Obsolete
 #ifdef __MSP430FR2433__
-
 #define PWM_PORT  GPIO_PORT_P1
 #define PWM_PIN   GPIO_PIN1
+*/
 
-#elif defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
+#if defined(PWM_USE_TB1)
 
+    #if (defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)) \
+        || (defined(__MSP430FR2311__) && defined(PACKAGE_RGY))
 
-// P2.0 primary out is TB1.1 i.e. Timer_B #1 CCR #1
-#define PWM_PORT  GPIO_PORT_P2
-#define PWM_PIN   GPIO_PIN0
-#define PWM_MODULE_FUNCTION GPIO_PRIMARY_MODULE_FUNCTION
+    // P2.0 primary out is TB1.1 i.e. Timer_B #1 CCR #1
+    #define PWM_PORT            GPIO_PORT_P2
+    #define PWM_PIN             GPIO_PIN0
+    #define PWM_MODULE_FUNCTION GPIO_PRIMARY_MODULE_FUNCTION
+    #define PWM_BASE_ADDRESS    TIMER_B1_BASE
+    #define TIMER_B0_CONFIGURED 1
+    
+    #else
+    #error "board.h does not define PWM TB1 config"
+    #endif
 
-#elif defined(__MSP430FR2311__) && defined(PACKAGE_RGY)
+#elif defined(PWM_USE_TB0)
 
-// P1.6 *secondary* out function is TB0.1
-#define PWM_PORT             GPIO_PORT_P1
-#define PWM_PIN              GPIO_PIN6
-#define PWM_MODULE_FUNCTION  GPIO_SECONDARY_MODULE_FUNCTION
+    #if (defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)) \
+         || (defined(__MSP430FR2311__) && defined(PACKAGE_RGY))
 
-#ifdef TIMER_B0_CONFIGURED
-#error "board.h timer B0 already configured"
+    // P1.6 *secondary* out function is TB0.1
+    #define PWM_PORT             GPIO_PORT_P1
+    #define PWM_PIN              GPIO_PIN6
+    #define PWM_MODULE_FUNCTION  GPIO_SECONDARY_MODULE_FUNCTION
+    #define PWM_BASE_ADDRESS     TIMER_B0_BASE
+    #define TIMER_B0_CONFIGURED  1
+
+    #else
+    #error "board.h does not define PWM TB0 config"
+    #endif
+
 #else
-#define PWM_BASE_ADDRESS     TIMER_B0_BASE
-#define TIMER_B0_CONFIGURED  1
-#endif
-
-#else
-#error "board.h does not define PWM config"
+#error "board.h does not define PWM_USE_TBx"
 #endif
 
 
@@ -486,19 +542,24 @@ Board may be a breadboard of Launchpad's target and sub-boards
 
 // Speed feedback from the motor
 
+#if BOARD_HAS_MOTOR_SPEED_FEEDBACK
 
-#if defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
+    #if defined(__MSP430FR2311__) && defined(PACKAGE_20PIN)
 
-// p2.7 primary in is Timer B #0 external clock
-#define MOTOR_CONTROL_PORT  GPIO_PORT_P2
-#define MOTOR_CONTROL_PIN   GPIO_PIN7
-#define MOTOR_CONTROL_MODULE_FUNCTION   GPIO_PRIMARY_MODULE_FUNCTION
-#define BOARD_HAS_MOTOR_SPEED_FEEDBACK 1
+    // p2.7 primary in is Timer B #0 external clock
+    // This is cruft from a design that used FG as clock to a timer
+    #define MOTOR_CONTROL_PORT  GPIO_PORT_P2
+    #define MOTOR_CONTROL_PIN   GPIO_PIN7
+    #define MOTOR_CONTROL_MODULE_FUNCTION   GPIO_PRIMARY_MODULE_FUNCTION
 
-#else
-
-#warning "board.h has no motor speed feedback"
-#define BOARD_HAS_MOTOR_SPEED_FEEDBACK 0
+    #elif defined(BOARD_VEER_NFP)
+    
+    #define MOTOR_CONTROL_PORT  GPIO_PORT_P2
+    #define MOTOR_CONTROL_PIN   GPIO_PIN7
+    // Pin used as GPIO with interrupt
+    #else
+    #error "board.h fails to configure motor speed feedback"
+    #endif
 
 #endif
 

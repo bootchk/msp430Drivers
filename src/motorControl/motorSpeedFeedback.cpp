@@ -9,8 +9,8 @@
 #include <gpio.h>
 
 
-// TODO make this a counter instead of a flag
-bool countReachedFlag = false;
+bool         didTurnFlag = false;
+unsigned int turnCount = 0;
 
 
 /*
@@ -19,24 +19,23 @@ See board.h for configuration of Timer peripherals
 !!! Optional: some boards may not support.
 In that case, many functions are no-ops
 and no interrupt comes
-and wasCountReachedFlag always returns false.
+and didTurn always returns false.
 
 Some packages don't have enough TimerB instances.
-Some boards may not route the FG signal from motor driver
-to MCU pin.
+Some boards may not route the FG signal from motor driver to MCU pin.
 */
 
 
 #if BOARD_HAS_MOTOR_SPEED_FEEDBACK
 
 /*
-Init a GPIO to catch the first turn
+Init a GPIO to catch first and subsequent turns
 using interrupt from a low pulse from FG pin of motor driver
 */ 
 void 
-MotorSpeedFeedback::initPinsForSingleTurn()
+MotorSpeedFeedback::initPinsForTurnInterrupt()
 {
-    countReachedFlag = false;
+    didTurnFlag = false;  // TODO don't need this
     
     GPIO_setAsInputPinWithPullUpResistor(
         MOTOR_CONTROL_PORT, 
@@ -49,7 +48,7 @@ MotorSpeedFeedback::initPinsForSingleTurn()
 
 
 void 
-MotorSpeedFeedback::disableSingleTurnInterrupt()
+MotorSpeedFeedback::disableTurnInterrupt()
 {
     GPIO_disableInterrupt(
         MOTOR_CONTROL_PORT, 
@@ -57,10 +56,11 @@ MotorSpeedFeedback::disableSingleTurnInterrupt()
 }
 
 void 
-MotorSpeedFeedback::enableSingleTurnInterrupt()
+MotorSpeedFeedback::enableTurnInterrupt()
 {
-    // clear global flag set by ISR
-    countReachedFlag = false;
+    // clear vars set by ISR
+    didTurnFlag = false;
+    turnCount   = 0;
 
     // Clear before enabling
     GPIO_clearInterrupt(
@@ -75,13 +75,15 @@ MotorSpeedFeedback::enableSingleTurnInterrupt()
 void 
 MotorSpeedFeedback::handlePinInterrupt()
 {
-    // Set global flag
-    countReachedFlag = true;
+    // Set global vars
+    didTurnFlag = true;
+    turnCount++;
+
     // Clear interrupt
     GPIO_clearInterrupt(
        MOTOR_CONTROL_PORT, 
-        MOTOR_CONTROL_PIN);
-    // The interrupt may come again, until we unconfigure the pin
+       MOTOR_CONTROL_PIN);
+    // The interrupt may come again, until we disable interrupt
     // or stop motor and motor stops turning.
 }
 
@@ -90,24 +92,24 @@ MotorSpeedFeedback::handlePinInterrupt()
 /*
 Board not support motor speed feedback
 
-The program must expect wasCountReachedFlag always false,
+The program must expect didTurn always false,
 and do something else (time expires usually.)
 
 The program should at least call initPinsForSingleTurn
-because it initializes countReachedFlag which is not persistent in FRAM.
+because it initializes didTurnFlag which is not persistent in FRAM.
 */
 void 
-MotorSpeedFeedback::initPinsForSingleTurn()
+MotorSpeedFeedback::initPinsForTurnInterrupt()
 {
-    countReachedFlag = false;
+    didTurnFlag = false;
 }
 
 void 
-MotorSpeedFeedback::disableSingleTurnInterrupt()
+MotorSpeedFeedback::disableTurnInterrupt()
 {  __no_operation(); }
 
 void 
-MotorSpeedFeedback::enableSingleTurnInterrupt()
+MotorSpeedFeedback::enableTurnInterrupt()
 {  __no_operation(); }
 
 void
@@ -117,11 +119,30 @@ MotorSpeedFeedback::handlePinInterrupt()
 #endif
 
 
-
+/*
+!!!
+If board has no motor speed feedback:
+    didTurn() returns false
+    getTurnCount returns zero
+(And usually a program would turn motor on for a certain period.)
+*/
 
 bool 
-MotorSpeedFeedback::wasCountReachedFlag()
+MotorSpeedFeedback::didTurn()
 {
-    return countReachedFlag;
+    return didTurnFlag;
+}
+
+
+/*
+!!! This is not revolutions, but electrical commutation ticks,
+which depends on pole count.
+E.G. 16 commutations for an 8 pole motor is two revolutions.
+Note the driver IC can also divide by two.
+*/
+unsigned int 
+MotorSpeedFeedback::getTurnCount()
+{
+    return turnCount;
 }
 
