@@ -1,3 +1,6 @@
+#pragma once
+#include <cstdint>
+
 /*
 Understands motor control.
 
@@ -31,6 +34,10 @@ public:
     static void toggleDirection();
 
     // TODO if the driver IC is load switched.
+    // Typically, if driver IC PWM signal is low for a certain period,
+    // the driver IC enters shutdown and draws little current.
     // void powerDown();
+
+    static void setDutyCycleDynamically(uint16_t dutyCycle);
 };
 

@@ -30,3 +30,11 @@ MotorControl::toggleDirection()
 
 }
 
+/*
+While PWM is on, change the duty cycle.
+*/
+void 
+MotorControl::setDutyCycleDynamically(uint16_t dutyCycle)
+{
+    PWM::setDutyCycleDynamically(dutyCycle);
+}

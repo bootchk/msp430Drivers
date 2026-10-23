@@ -7,7 +7,7 @@ PWM pulse width modulation.
 Generates a train of pulses wth given duty cycle.
 Pulses are squarish.
 
-Uses a TIMER_A device.
+Uses a TIMER_A or TIMER_B device 
 The device operates concurrently with the MCU.
 
 Here the API is just to turn the train on and off.
@@ -25,4 +25,6 @@ class PWM {
     public:
     static void turnOn(uint16_t dutyCycle);
 	static void turnOff();
+    
+    static void setDutyCycleDynamically(uint16_t dutyCycle);
 };

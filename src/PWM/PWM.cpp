@@ -17,11 +17,17 @@
 
 #include "../assert/myAssert.h"
 
+/* 
+This is confusing re TimerA vs TimerB.
+I suppose because originally coded for TimerA,
+and not all MSP430 instances have TimerB,
+and DriverLib does not abstract the difference away?
+See board.h which aliases TimerA as TimerB.
+*/
 
 /*
-The PWM generates pulses at the clock freq (32khz)
-divided by the timer period (100).
-That is 320Hz.
+The PWM generates pulses at the clock freq divided by the timer period (100).
+For aux clock at 32kHz, pulse frequency is 320Hz.
 For a higher freq, use a faster clock.
 */
 
@@ -36,6 +42,35 @@ void PWM::turnOff() {
 	// PWM network has a pulldown.
 	// When enter LPMx.5 and pins are high impedance, PWM net remains low.
 	// When we wake from LPMx.5, MCU also drives PWM net low.
+}
+
+/* 
+The somewhat arbitrary period of the PWM.
+Does not need to be a power of two.
+The greater the value, the less the frequency of the PWM.
+
+The consumer of the PWM accepts a certain range of frequencies.
+E.G. a motor driver IC on its PWM pin.
+With 1Mhz SMCLOCK and divider 1 and period 64
+yields 15.6kHz freq on PWM.
+DRV10866 accepts 15-50kHz
+!!! A period greater than that would yield
+a PWM frequency lower than the driver IC requires.
+*/
+#define PWM_PERIOD 64
+
+/* 
+Return a value in units TimerTicks
+that represents dutyCycle in %.
+To set as the value of a compare register.
+*/
+static uint16_t
+timerTicksInDutyCycle (uint16_t dutyCycle)
+{
+	// Integer math, so fast but rounded.
+	// 100 is the denominator that converts
+	// an integer percent duty cycle to a fraction.
+	return dutyCycle * PWM_PERIOD / 100;
 }
 
 
@@ -67,19 +102,18 @@ setTimerForPWM(uint16_t dutyCycle)
 	// dutyCycle in [1,100] ? e.g. 50 yields 50% duty cycle
 	// config.timerPeriod        = 100;
 	
-	config.timerPeriod        = 64;
-
-	// Integer math
-	config.dutyCycle          = dutyCycle * 64 / 100;
+	config.timerPeriod        = PWM_PERIOD;
+	config.dutyCycle          = timerTicksInDutyCycle(dutyCycle);
 
 	// Configure GPIO pin.
 	// You can move this to main.
 	PWMPins::configure();
 	
-	// Configure and start a TimerA peripheral.
+	// Configure and start a Timer peripheral to generate PWM.
 	// Using DriverLib
 	Timer_A_outputPWM(PWM_BASE_ADDRESS, &config);
 
+	// Docs say PWM starts without need this:
 	//Timer_A_startCounter(TIMER_BASE_ADDRESS, TIMER_A_UPDOWN_MODE);
 	
 	// Timer count mode is not STOP
@@ -120,3 +154,25 @@ PWM::turnOn(uint16_t dutyCycle)
 	// !!! Or the pin is high, for 100% duty cycle
 }
 
+
+/*
+Set duty cycle while PWM in progress.
+On some Timer devices, may yield abberant pulse.
+On TimerB device, register is synced, so no abberant pulse.
+
+DriverLib has no support for this.
+
+Change the CCR1 register which is the duty cycle.
+*/
+void 
+PWM::setDutyCycleDynamically(uint16_t dutyCycle)
+{
+	/*
+	Require dutyCycle < 100.
+	Expect timer is generating PWM, but has no effect if not.
+	*/
+
+	// Convert to TimerTicks relative to the period (in CCR0)
+	// Store in CCR1
+	HWREG16(PWM_BASE_ADDRESS + OFS_TBxCCR1) = timerTicksInDutyCycle(dutyCycle);
+}
