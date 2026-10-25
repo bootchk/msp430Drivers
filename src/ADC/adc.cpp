@@ -11,10 +11,20 @@
 
 
 /*
- * See mspware/examples/device/.../msp430fr243x_adc10_05.c
- * for example code to measure vcc
- * from which I derived this code.
- */
+See mspware/examples/device/.../msp430fr243x_adc10_05.c
+for example code to measure vcc from which I derived this code.
+
+This arbitrarily uses the 1.5V reference,
+in what is called "reversed measure"
+measuring the 1.5V reference versus Vcc
+(contrast with measuring some external voltage versus 1.5V reference.)
+The 1.5V reference is accurate since it is below Vcc
+even when Vcc is near 1.8V brownout.
+
+Alternatively, we could use the 1.2V "bandgap" reference.
+The 1.5V reference derives from the 1.2V reference anyway
+through a resistor net in the MSP430?
+*/
 
 
 
@@ -29,17 +39,14 @@
 unsigned int ADC::measureVccCentiVolts() {
 
     // Require VBG internal voltage reference is ready
-    
-    ADCConfigure::configureForVccMeasure();
+    // Require ADC configured
 
     unsigned int adcResult = read();
-
-    ADCConfigure::unconfigureForVccMeasure();
 
     return convert8BitADCReadToCentiVolts(adcResult);
     
     /* 
-    Ensure ADC is off.
+    Ensure ADC is not converting but still on.
     Voltage reference is still on. 
     */
 }
@@ -130,13 +137,16 @@ unsigned int ADC::read()
  * The result is in hundreths of volts; needs to be divided by 100 to obtain units volts.
  * DVCC = (1023 * 150) / adcResult
  *
- * For 10-bit resolution need a long (32 bits, max 4G) to hold 1023*150)
- * For 8-bit resolution, need int (16 bits, max 65k) to hold 255*150=38,250
+ * To hold intermediate results:
+ 10-bit resolution need a long (32 bits, max 4G) to hold 1023*150)
+ 8-bit resolution, need int (16 bits, max 65k) to hold 255*150=38,250
+ The result in centiVolt is [0, 360] wehich requires 16-bit int.
  */
-unsigned long ADC::convert10BitADCReadToCentiVolts(unsigned int adcResult) {
+unsigned int
+ADC::convert10BitADCReadToCentiVolts(unsigned int adcResult) {
     unsigned long result = ((unsigned long) MaxADCRead * (unsigned long) 150)
             / (unsigned long) (adcResult);
-    return result;
+    return (unsigned int) result;
 }
 
 unsigned int ADC::convert8BitADCReadToCentiVolts(unsigned int adcResult) {

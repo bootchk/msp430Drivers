@@ -71,7 +71,7 @@ class ADC {
      */
     static unsigned int read();
 
-    static unsigned long convert10BitADCReadToCentiVolts(unsigned int);
+    static unsigned int convert10BitADCReadToCentiVolts(unsigned int);
     static unsigned int convert8BitADCReadToCentiVolts(unsigned int);
 
 

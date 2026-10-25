@@ -38,7 +38,9 @@ void ADCConfigure::configureCommon() {
      * Do not enable Multiple Sampling
      */
     ADC_setupSamplingTimer(ADC_BASE,
-       ADC_CYCLEHOLD_4_CYCLES, //ADC_CYCLEHOLD_16_CYCLES, 4, 64
+       ADC_CYCLEHOLD_4_CYCLES, 
+       // This does not seem to affect accuracy
+       //ADC_CYCLEHOLD_16_CYCLES,
        ADC_MULTIPLESAMPLESDISABLE);
 
     // Default read-back format is unsigned
@@ -70,9 +72,12 @@ void ADCConfigure::configureForVccMeasure() {
      */
     ADC_configureMemory(ADC_BASE,
                 ADC_INPUT_REFVOLTAGE,              // <<<<<<<<
+                //ADC_INPUT_A7,
                 ADC_VREFPOS_AVCC,
                 ADC_VREFNEG_AVSS);
 }
+
+
 
 void ADCConfigure::unconfigureForVccMeasure() {
     /* The ADC itself will enter low power automatically. */
