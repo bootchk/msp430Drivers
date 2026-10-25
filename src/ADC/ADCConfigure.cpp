@@ -1,7 +1,6 @@
 
 #include "ADCConfigure.h"
 
-#include "voltBandgapRef.h"
 
 // DriverLib
 #include <gpio.h>
@@ -53,20 +52,13 @@ void ADCConfigure::configureCommon() {
 
 
 
-/*
- * Public
- */
+/* Public */
+
 
 // See adc.h for these constants for input sources
 //ADC_INPUT_DVSS
 
 void ADCConfigure::configureForVccMeasure() {
-    VBG::enableInternalVoltageReference();
-    // We wait for ready later
-
-    // Some docs suggest
-    // Allow reference buffer settling time (~30µs is required; 400 clock cycles is safe at 1MHz)
-    //__delay_cycles(400);
 
     configureCommon();
 
@@ -80,18 +72,10 @@ void ADCConfigure::configureForVccMeasure() {
                 ADC_INPUT_REFVOLTAGE,              // <<<<<<<<
                 ADC_VREFPOS_AVCC,
                 ADC_VREFNEG_AVSS);
-
-    VBG::waitForInternalVoltageReferenceReady();
-    // Assert ready to read
 }
 
 void ADCConfigure::unconfigureForVccMeasure() {
-    /*
-     * The ADC itself will enter low power automatically,
-     * but we must disable the VBG???
-     */
-    VBG::disableInternalVoltageReference();
-
+    /* The ADC itself will enter low power automatically. */
     disableADC();
 }
 

@@ -2,6 +2,7 @@
 #include "adc.h"
 #include "ADCConfigure.h"
 #include "../assert/myAssert.h"
+#include "voltBandgapRef.h"
 
 
 // DriverLib
@@ -26,15 +27,27 @@
 
 
 unsigned int ADC::measureVccCentiVolts() {
+
+    VBG::enableInternalVoltageReference();
+    // We wait for ready just before a read
+
+    // Some docs suggest
+    // Allow reference buffer settling time (~30µs is required; 400 clock cycles is safe at 1MHz)
+    //__delay_cycles(400);
+
     ADCConfigure::configureForVccMeasure();
 
-    // Assert VBG internal bandgap reference is ready
+    // Require VBG internal voltage reference is ready
 
     unsigned int adcResult = read();
 
     ADCConfigure::unconfigureForVccMeasure();
 
+    VBG::disableInternalVoltageReference();
+
     return convert8BitADCReadToCentiVolts(adcResult);
+    
+    /* Ensure ADC is off and voltage reference is off. */
 }
 
 
@@ -91,7 +104,10 @@ unsigned int ADC::read()
 {
     unsigned int result;
 
-    // Require configuration
+    // Require configuration done
+
+    // Require sampled voltage ready
+    VBG::waitForInternalVoltageReferenceReady();
 
     //Enable and Start conversion  in Single-Channel, Single Conversion Mode
     ADC_startConversion(ADC_BASE, ADC_SINGLECHANNEL);
