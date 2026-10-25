@@ -28,26 +28,20 @@
 
 unsigned int ADC::measureVccCentiVolts() {
 
-    VBG::enableInternalVoltageReference();
-    // We wait for ready just before a read
-
-    // Some docs suggest
-    // Allow reference buffer settling time (~30µs is required; 400 clock cycles is safe at 1MHz)
-    //__delay_cycles(400);
-
-    ADCConfigure::configureForVccMeasure();
-
     // Require VBG internal voltage reference is ready
+    
+    ADCConfigure::configureForVccMeasure();
 
     unsigned int adcResult = read();
 
     ADCConfigure::unconfigureForVccMeasure();
 
-    VBG::disableInternalVoltageReference();
-
     return convert8BitADCReadToCentiVolts(adcResult);
     
-    /* Ensure ADC is off and voltage reference is off. */
+    /* 
+    Ensure ADC is off.
+    Voltage reference is still on. 
+    */
 }
 
 
