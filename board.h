@@ -118,8 +118,8 @@ and the code depend on features, not board.
 New method, defining features.
 Corresponds to HW routing of a board or breadboard
 */
-#define BOARD_VEER_NFP 1
-//#define BOARD_SMART_UNIV 1
+//#define BOARD_VEER_NFP 1
+#define BOARD_SMART_UNIV 1
 
 
 #if defined(BOARD_VEER_NFP)

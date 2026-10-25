@@ -13,11 +13,7 @@
 
 
 
-/*
- * Private
- */
-
-
+/* Private */
 
 
 void ADCConfigure::configureCommon() {
@@ -65,8 +61,12 @@ void ADCConfigure::configureCommon() {
 //ADC_INPUT_DVSS
 
 void ADCConfigure::configureForVccMeasure() {
-    VBG::enable();
+    VBG::enableInternalVoltageReference();
     // We wait for ready later
+
+    // Some docs suggest
+    // Allow reference buffer settling time (~30µs is required; 400 clock cycles is safe at 1MHz)
+    //__delay_cycles(400);
 
     configureCommon();
 
@@ -81,7 +81,7 @@ void ADCConfigure::configureForVccMeasure() {
                 ADC_VREFPOS_AVCC,
                 ADC_VREFNEG_AVSS);
 
-    VBG::waitForReady();
+    VBG::waitForInternalVoltageReferenceReady();
     // Assert ready to read
 }
 
@@ -90,7 +90,7 @@ void ADCConfigure::unconfigureForVccMeasure() {
      * The ADC itself will enter low power automatically,
      * but we must disable the VBG???
      */
-    VBG::disable();
+    VBG::disableInternalVoltageReference();
 
     disableADC();
 }

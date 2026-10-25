@@ -1,6 +1,7 @@
 
 #include "adc.h"
 #include "ADCConfigure.h"
+#include "../assert/myAssert.h"
 
 
 // DriverLib
@@ -129,6 +130,9 @@ unsigned long ADC::convert10BitADCReadToCentiVolts(unsigned int adcResult) {
 }
 
 unsigned int ADC::convert8BitADCReadToCentiVolts(unsigned int adcResult) {
+    // Result will be wrong if adcResult > 255
+    myRequire(adcResult <= MaxADCRead);
+
     unsigned int result = ((unsigned int) MaxADCRead * (unsigned int) 150)
             / adcResult;
     return result;
